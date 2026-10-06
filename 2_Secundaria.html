@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador Tech Kids · 2° de secundaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F9; --surface:#FFFFFF; --sunk:#F6F9FC; --ink:#172338; --muted:#56637A; --line:#D3DDEA; --grid:#E4EBF4;
+  --datos:#12804F; --codigo:#5D3FD3; --ciudadania:#0A7584; --creacion:#B42A66; --comunicacion:#8C5E00; --integra:#3D4A63;
+  --ok:#12804F; --ok-bg:#E3F4EA; --bad:#B82633; --bad-bg:#FBE7E9; --mid:#8C5E00; --mid-bg:#FFF3D6; --focus:#2563EB;
+  --s1:#2D6FD6; --s2:#E08A00; --s3:#12804F; --s4:#B42A66; --s5:#5D3FD3; --s6:#0A7584;
+  --cf-verde:#CDEFD9; --cf-amarillo:#FFF0B3; --cf-rojo:#F9CDD2;
+  --r-sm:6px; --r:10px;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-head:"Bricolage Grotesque", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
+    --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+    --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
+    --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
+    --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
+  --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+  --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
+  --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
+  --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
+}
+*{box-sizing:border-box}
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px); -webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink); font:17px/1.55 var(--f-body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:28px 28px;}
+h1,h2,h3,h4{font-family:var(--f-head); line-height:1.15; margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+.row{display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin:.6rem 0}
+.row.wrap{align-items:flex-end}
+.grow{flex:1}
+
+/* encabezado */
+.top{display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; padding:.9rem clamp(1rem,3vw,2rem); background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5}
+.brand{display:flex; gap:.8rem; align-items:center}
+.logo{display:grid; place-items:center; width:46px; height:46px; border-radius:var(--r); background:var(--ink); color:var(--surface); font:800 1.25rem var(--f-head)}
+.brand h1{font-size:1.25rem; font-weight:800}
+.brand p{margin:0; color:var(--muted); font-size:.9rem}
+.top-r{display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
+.who{display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--muted)}
+.who input{border:1px solid var(--line); background:var(--sunk); border-radius:var(--r-sm); padding:.35rem .6rem; width:13rem; max-width:50vw}
+.prog-pill{display:flex; flex-direction:column; gap:.25rem; font-size:.85rem; min-width:9rem}
+.pbar{display:block; height:8px; border-radius:99px; background:var(--grid); overflow:hidden}
+.pbar i{display:block; height:100%; background:var(--datos); transition:width .4s}
+
+/* estructura */
+.body{display:grid; grid-template-columns:290px minmax(0,1fr); gap:0; max-width:1440px; margin:0 auto}
+.side{position:sticky; top:78px; align-self:start; max-height:calc(100vh - 78px); overflow:auto; padding:1rem .8rem 2rem 1rem; border-right:1px solid var(--line); background:color-mix(in srgb,var(--bg) 85%,transparent)}
+.side-home{display:block; padding:.45rem .6rem; border-radius:var(--r-sm); text-decoration:none; font-weight:700; margin-bottom:.4rem}
+.side-home.on,.side a.on{background:var(--surface); box-shadow:inset 3px 0 0 var(--hc,var(--ink))}
+.side-m{margin:.8rem 0}
+.side-m h2{font-size:.95rem; display:flex; gap:.45rem; align-items:center; margin:0 0 .25rem .2rem}
+.side ul{list-style:none; margin:0; padding:0}
+.side li a{display:flex; gap:.5rem; padding:.32rem .6rem; border-radius:var(--r-sm); text-decoration:none; font-size:.92rem; color:var(--muted)}
+.side li a:hover{background:var(--surface); color:var(--ink)}
+.side li a.st-hecho,.side li a.st-dominado{color:var(--ink)}
+.side .ic{width:1rem; flex:none; color:var(--hc)}
+.mcol{display:inline-grid; place-items:center; min-width:1.6rem; height:1.6rem; padding:0 .3rem; border-radius:5px; background:var(--hc,var(--ink)); color:#fff; font:700 .8rem var(--f-mono)}
+main{padding:1.4rem clamp(1rem,3vw,2.4rem) 4rem; min-width:0; outline:none}
+
+/* inicio: mapa de prácticas como hoja */
+.hero{max-width:62ch; margin-bottom:1.4rem}
+.hero h2{font-size:clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-.01em}
+.hero p{color:var(--muted); margin:.5rem 0 0}
+.pmap-wrap{overflow-x:auto; padding-bottom:.4rem}
+.pmap{display:grid; grid-template-columns:repeat(var(--n),minmax(150px,1fr)); border:1px solid var(--line); border-radius:var(--r); background:var(--surface); min-width:calc(var(--n) * 150px)}
+.mcolumn{border-right:1px solid var(--line); display:flex; flex-direction:column}
+.mcolumn:last-child{border-right:0}
+.mhead{padding:.7rem .7rem .6rem; border-bottom:3px solid var(--hc); min-height:6.2rem; display:flex; flex-direction:column; gap:.3rem}
+.mname{font:700 .98rem/1.2 var(--f-head)}
+.mhilo{font-size:.78rem; color:var(--muted)}
+.pcell{display:flex; flex-direction:column; gap:.2rem; padding:.6rem .7rem; min-height:6.4rem; border-bottom:1px solid var(--line); text-decoration:none; position:relative; transition:background .15s}
+.pcell:last-child{border-bottom:0}
+.pcell.empty{background:repeating-linear-gradient(135deg,transparent 0 8px,var(--grid) 8px 9px)}
+a.pcell:hover{background:var(--sunk)}
+.pref{font:600 .78rem var(--f-mono); color:var(--muted)}
+.pname{font-weight:700; line-height:1.25}
+.pst{margin-top:auto; font-size:.8rem; color:var(--muted)}
+.pcell.st-hecho,.pcell.st-dominado{background:color-mix(in srgb,var(--hc) 14%,var(--surface))}
+.pcell.st-hecho .pst,.pcell.st-dominado .pst{color:var(--hc); font-weight:700}
+.pcell.st-intentado{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--hc) 45%,transparent)}
+.legend{display:flex; gap:1.2rem; flex-wrap:wrap; color:var(--muted); font-size:.88rem}
+
+/* práctica */
+.prac{max-width:980px}
+.back{display:none; text-decoration:none; color:var(--muted); margin-bottom:.6rem}
+.crumb{display:flex; gap:.5rem; align-items:center; color:var(--muted); margin:0 0 .4rem; font-size:.95rem}
+.prac h2{font-size:clamp(1.6rem,3.4vw,2.2rem); font-weight:800}
+.intro{max-width:70ch; margin:.6rem 0 1rem}
+.tip{background:var(--surface); border:1px dashed var(--line); border-radius:var(--r); padding:.5rem .9rem; margin-bottom:1rem; max-width:75ch}
+.tip summary{cursor:pointer; font-weight:700}
+.engine{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:clamp(.9rem,2.4vw,1.5rem); border-top:4px solid var(--hc)}
+.lead-card{background:var(--sunk); border-left:4px solid var(--hc); padding:.7rem 1rem; border-radius:0 var(--r-sm) var(--r-sm) 0; margin-bottom:1rem; max-width:80ch}
+.lead-card p{margin:.3rem 0}
+.sub{font-size:1.1rem; margin:1.4rem 0 .6rem}
+.result{margin:1rem 0 .4rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
+.res{display:flex; gap:.8rem; align-items:center; padding:.6rem 1rem; border-radius:var(--r); flex:1; min-width:260px}
+.res b{font:800 1.5rem var(--f-head)}
+.res-ok{background:var(--ok-bg); color:var(--ok)} .res-mid{background:var(--mid-bg); color:var(--mid)} .res-bad{background:var(--bad-bg); color:var(--bad)}
+.res span{color:var(--ink)}
+.foot{display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin-top:.8rem}
+.btn{display:inline-flex; align-items:center; gap:.4rem; border:1px solid var(--line); background:var(--surface); padding:.55rem 1rem; border-radius:var(--r-sm); cursor:pointer; text-decoration:none; font-weight:700; min-height:44px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px; padding:.35rem .7rem; font-size:.9rem}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.mini{border:1px solid var(--line); background:var(--surface); border-radius:5px; min-width:28px; height:28px; cursor:pointer; padding:0 .4rem; font-weight:700}
+.mini.txt{font-weight:400; font-size:.82rem}
+.mini.x{color:var(--bad)}
+
+/* clasificar / quiz */
+.cls{display:flex; flex-direction:column; gap:.7rem}
+.cls-item{border:1px solid var(--line); border-radius:var(--r); padding:.7rem .9rem; background:var(--surface)}
+.cls-text{margin-bottom:.5rem}
+.cls-text code{font:600 1.05rem var(--f-mono)}
+.seg{display:flex; flex-wrap:wrap; gap:.4rem}
+.seg button{border:1px solid var(--line); background:var(--sunk); border-radius:99px; padding:.4rem .85rem; cursor:pointer; min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--hc,var(--ink)); color:#fff; border-color:transparent}
+.cls-fb,.q-fb{font-size:.9rem; margin-top:.35rem}
+.ok>.cls-fb,.ok .q-fb{color:var(--ok)} .bad>.cls-fb,.bad .q-fb{color:var(--bad)}
+.cls-item.ok,.q.ok,.tr.ok,.ord-set.ok{border-color:var(--ok); box-shadow:inset 4px 0 0 var(--ok)}
+.cls-item.bad,.q.bad,.tr.bad,.ord-set.bad{border-color:var(--bad); box-shadow:inset 4px 0 0 var(--bad)}
+.q{border:1px solid var(--line); border-radius:var(--r); padding:.7rem 1rem; margin:0 0 .8rem}
+.q legend{font-weight:700; padding:0 .3rem}
+.q-art{margin:.4rem 0 .6rem}
+.opt{display:flex; gap:.6rem; align-items:flex-start; padding:.35rem .2rem; cursor:pointer}
+.opt input{margin-top:.35rem; width:18px; height:18px; flex:none}
+.toc{margin-top:1rem; border:1px solid var(--line); border-radius:var(--r); padding:.8rem 1rem; background:var(--sunk)}
+.toc-body{margin-top:.4rem}
+.toc-l1{font-weight:700} .toc-l2{padding-left:1.4rem}
+
+/* señales */
+.spot-frame{border:1px solid var(--line); border-radius:var(--r); margin-bottom:1rem; overflow:hidden}
+.spot-head{background:var(--sunk); padding:.6rem 1rem; border-bottom:1px solid var(--line); font-size:.92rem}
+.spot-body{padding:.9rem 1rem; line-height:2}
+.frame-chat .spot-body{background:var(--sunk)}
+.frame-news .spot-head{font:800 1.15rem var(--f-head)}
+.spot{border:0; background:transparent; padding:.05rem .15rem; border-radius:4px; cursor:pointer; text-decoration:underline dotted color-mix(in srgb,var(--muted) 60%,transparent); text-underline-offset:4px; line-height:1.5}
+.spot:hover{background:var(--grid)}
+.spot[aria-pressed="true"]{background:var(--mid-bg); outline:2px solid var(--mid); text-decoration:none}
+.spot.ok{background:var(--ok-bg); outline-color:var(--ok)} .spot.bad{background:var(--bad-bg); outline-color:var(--bad)}
+.spot-why{display:inline-block; font-size:.8rem; background:var(--ok); color:#fff; border-radius:4px; padding:0 .4rem; margin:0 .3rem; line-height:1.6}
+
+/* ordenar */
+.ord-set{border:1px solid var(--line); border-radius:var(--r); padding:.7rem 1rem; margin-bottom:1rem}
+.ord-prompt{margin:0 0 .5rem; font-weight:700}
+.ord{margin:0; padding-left:1.6rem}
+.ord li{display:flex; align-items:center; gap:.6rem; justify-content:space-between; padding:.4rem .5rem; border:1px solid var(--line); border-radius:var(--r-sm); margin:.35rem 0; background:var(--surface)}
+.ord li::marker{font-weight:700}
+.ord-btns{display:flex; gap:.25rem; flex:none}
+.ord-btns button{width:36px; height:36px; border:1px solid var(--line); border-radius:var(--r-sm); background:var(--sunk); cursor:pointer}
+.ord-wrap.with-prev{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,300px); gap:1rem; align-items:start}
+.layer-prev svg{width:100%; border:1px solid var(--line); border-radius:var(--r-sm); background:repeating-conic-gradient(var(--grid) 0 25%,var(--surface) 0 50%) 0 0/16px 16px}
+
+/* reglas / medidor */
+.rules{list-style:none; padding:0; margin:.5rem 0}
+.rules li{padding:.2rem 0 .2rem 1.6rem; position:relative}
+.rules li::before{content:"○"; position:absolute; left:.2rem; color:var(--muted)}
+.rules li.on::before{content:"✓"; color:var(--ok); font-weight:700}
+.rules li.on{color:var(--ink)}
+.fld{display:flex; flex-direction:column; gap:.3rem; margin:.6rem 0}
+.fld>span{font-weight:700; font-size:.95rem}
+.fld input[type=text],.fld textarea,.pw,.tr-in,.sm-in,select{border:1px solid var(--line); background:var(--sunk); border-radius:var(--r-sm); padding:.5rem .7rem; max-width:100%}
+.fld textarea{resize:vertical; min-height:4.5rem}
+.fld.ok textarea,.fld.ok input{border-color:var(--ok)}
+.pw{font:600 1.1rem var(--f-mono)}
+.meter{height:12px; background:var(--grid); border-radius:99px; overflow:hidden; margin-top:.5rem}
+.meter-bar{height:100%; width:0; transition:width .25s; background:var(--bad)}
+.meter-bar[data-lv="mid"]{background:var(--mid)} .meter-bar[data-lv="high"]{background:var(--ok)}
+.meter-t{font-weight:700; margin:.3rem 0}
+.rw{border:1px solid var(--line); border-radius:var(--r); padding:.8rem 1rem; margin-bottom:1rem}
+.bubble{display:inline-block; padding:.5rem .9rem; border-radius:14px 14px 14px 4px; background:var(--bad-bg); max-width:60ch}
+.chk{display:flex; gap:.5rem; align-items:center}
+
+/* composición / foto / audio */
+.thirds{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(220px,1fr); gap:1.2rem; align-items:start}
+.th-svg{width:100%; border-radius:var(--r-sm); touch-action:none; user-select:none; display:block}
+.th-g{stroke:#fff; stroke-width:1.5; stroke-dasharray:6 5; opacity:.9}
+.th-dot{fill:#fff; stroke:#172338; stroke-width:1.5}
+input[type=range]{width:100%; accent-color:var(--hc,var(--ink)); min-height:32px}
+.ph-row{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+.ph-row figure{margin:0} .ph{width:100%; border-radius:var(--r-sm); display:block}
+.ph-row figcaption{text-align:center; color:var(--muted); font-size:.9rem; margin-top:.3rem}
+.ctl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0 1.2rem; margin-top:.6rem}
+.mixer{display:flex; flex-direction:column; gap:.6rem}
+.trk{display:grid; grid-template-columns:8rem 1fr; align-items:center; gap:.8rem}
+.trk-n{font-weight:700}
+.wave{display:flex; align-items:center; gap:2px; height:56px; background:var(--sunk); border-radius:var(--r-sm); padding:0 6px}
+.wave i{flex:1; background:var(--hc); border-radius:2px; height:calc(var(--h) * var(--lv,.5) * 100%); min-height:2px}
+.mix-t{font-weight:700}
+
+/* robot */
+.lv-tabs{display:flex; gap:.4rem; margin-bottom:.6rem; flex-wrap:wrap}
+.lv-tabs button{border:1px solid var(--line); background:var(--sunk); border-radius:var(--r-sm); padding:.35rem .8rem; cursor:pointer}
+.lv-tabs button[aria-selected="true"]{background:var(--hc); color:#fff; border-color:transparent}
+.lv-goal{margin:.2rem 0 .8rem}
+.rb-wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,1fr); gap:1.2rem; align-items:start}
+.rb-svg{width:100%; display:block}
+.rb-cell{fill:var(--sunk); stroke:var(--line)} .rb-wall{fill:var(--integra); stroke:var(--line)}
+.rb-pal{display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.6rem}
+.pal{border:0; color:#fff; border-radius:var(--r-sm); padding:.45rem .8rem; cursor:pointer; font-weight:700; min-height:40px}
+.k-avanzar.pal{background:var(--s1)} .k-izq.pal,.k-der.pal{background:var(--codigo)} .k-rep.pal{background:var(--s2); color:#1a1205}
+.rb-head{font-weight:700; background:var(--s3); color:#fff; padding:.35rem .7rem; border-radius:var(--r-sm) var(--r-sm) 0 0; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+.rb-head .muted{color:#e6fff0}
+.rb-prog{list-style:none; margin:0; padding:.3rem 0 .3rem .5rem; border-left:4px solid var(--s3)}
+.rb-prog.nested{border-left-color:var(--s2); margin-left:.6rem}
+.rb-b{margin:.25rem 0; padding:.3rem .5rem; border-radius:var(--r-sm); background:var(--sunk); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.3rem}
+.rb-b>ul{flex-basis:100%}
+.rb-b.k-avanzar{box-shadow:inset 4px 0 0 var(--s1)} .rb-b.k-izq,.rb-b.k-der{box-shadow:inset 4px 0 0 var(--codigo)} .rb-b.k-rep{box-shadow:inset 4px 0 0 var(--s2)}
+.rb-b.dest{outline:2px dashed var(--s2)}
+.rb-msg.ok{color:var(--ok); font-weight:700} .rb-msg.bad{color:var(--bad); font-weight:700}
+.rb-empty{padding:.5rem}
+
+/* código */
+.code{font:14px/1.6 var(--f-mono); background:#16202F; color:#E6ECF5; padding:.8rem 1rem; border-radius:var(--r-sm); overflow:auto; margin:0 0 .6rem}
+.code .ln{display:inline-block; width:1.8rem; color:#6B7A93; user-select:none}
+.tr{border:1px solid var(--line); border-radius:var(--r); padding:.8rem; margin-bottom:1rem}
+.tr-q p{margin:.2rem 0 .4rem}
+.ed{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+.ed textarea{font:14px/1.55 var(--f-mono); min-height:340px; white-space:pre; tab-size:2}
+.ed-prev{display:flex; flex-direction:column; gap:.3rem; margin:.6rem 0}
+.ed-prev iframe{flex:1; min-height:340px; border:1px solid var(--line); border-radius:var(--r-sm); background:#fff}
+
+/* dados / contraste */
+.tbl-wrap{overflow-x:auto}
+.freq{border-collapse:collapse; margin:.6rem 0; font-variant-numeric:tabular-nums}
+.freq th,.freq td{border:1px solid var(--line); padding:.3rem .6rem; text-align:center}
+.freq th{background:var(--sunk)}
+.chart{width:100%; max-width:560px; display:block; margin:.6rem 0}
+.ch-title{font:700 15px var(--f-head); fill:var(--ink)} .ch-ax{font:12px var(--f-body); fill:var(--muted)} .ch-lab{font:13px var(--f-body); fill:var(--ink)}
+.ch-grid{stroke:var(--grid)} .ch-axis{stroke:var(--muted)}
+.ct-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,320px); gap:1.4rem; align-items:start}
+.ct-role{margin-bottom:.8rem} .ct-role>span{font-weight:700; display:block; margin-bottom:.3rem}
+.sw-row{display:flex; flex-wrap:wrap; gap:.4rem}
+.sw{width:40px; height:40px; border-radius:8px; border:2px solid var(--line); cursor:pointer}
+.sw[aria-pressed="true"]{outline:3px solid var(--ink); outline-offset:2px}
+.post{aspect-ratio:4/5; border-radius:var(--r); padding:1.2rem; display:flex; flex-direction:column; gap:.6rem; border:1px solid var(--line); position:relative; overflow:hidden}
+.post-band{position:absolute; left:0; right:0; top:0; height:12px}
+.post h4{font-size:1.5rem; margin-top:.8rem} .post p{margin:0}
+.post-btn{margin-top:auto; align-self:flex-start; padding:.5rem 1rem; border-radius:99px; font-weight:700}
+
+/* hoja de cálculo */
+.xl{border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--surface)}
+.fbar{display:flex; gap:.5rem; align-items:center; padding:.45rem .6rem; border-bottom:1px solid var(--line); background:var(--sunk)}
+.addr{font:600 .9rem var(--f-mono); min-width:3.2rem; text-align:center; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:.25rem .3rem}
+.fx{font:italic 700 .95rem var(--f-body); color:var(--muted)}
+.finput{flex:1; min-width:0; font:15px var(--f-mono); border:1px solid var(--line); border-radius:4px; padding:.4rem .6rem; background:var(--surface)}
+.valpick{padding:.4rem .7rem; border-bottom:1px solid var(--line); background:var(--mid-bg)}
+.gridwrap{overflow:auto; max-height:460px}
+.grid{border-collapse:separate; border-spacing:0; font-variant-numeric:tabular-nums; outline:none; font-size:.93rem}
+.grid th{position:sticky; top:0; background:var(--sunk); color:var(--muted); font:600 .8rem var(--f-mono); padding:.25rem .5rem; border-right:1px solid var(--line); border-bottom:1px solid var(--line); z-index:1}
+.grid tbody th{position:sticky; left:0; z-index:1; min-width:2.4rem}
+.grid th.corner{left:0; z-index:2}
+.grid td{min-width:92px; max-width:220px; height:32px; padding:.2rem .5rem; border-right:1px solid var(--grid); border-bottom:1px solid var(--grid); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:cell; background:var(--surface)}
+.grid td.num{text-align:right} .grid td.b{font-weight:700; background:var(--sunk)} .grid td.err{color:var(--bad); font-weight:700}
+.grid td.f{color:color-mix(in srgb,var(--ink) 88%,var(--datos))}
+.grid td.hasval{background-image:linear-gradient(135deg,transparent 85%,var(--mid) 85%)}
+.grid td[data-cf="verde"]{background-color:var(--cf-verde)} .grid td[data-cf="amarillo"]{background-color:var(--cf-amarillo)} .grid td[data-cf="rojo"]{background-color:var(--cf-rojo)}
+.grid td.sel{outline:2px solid var(--datos); outline-offset:-2px; position:relative}
+.toolbar{display:flex; gap:.4rem; flex-wrap:wrap; padding:.5rem .6rem; border-top:1px solid var(--line); background:var(--sunk)}
+.toolpanel{padding:.6rem .8rem; border-top:1px solid var(--line)}
+.toolpanel p{margin:.2rem 0 .4rem}
+.toolpanel label{display:flex; flex-direction:column; gap:.2rem; font-size:.88rem}
+.sm-in{width:5rem; padding:.3rem .5rem} .w6{width:6rem} .w8{width:8rem} .w12{width:12rem} .w16{width:16rem}
+.rulelist{margin:.4rem 0 0; padding-left:1.2rem; font-size:.9rem}
+.outputs{display:flex; flex-wrap:wrap; gap:1rem; padding:0 .8rem}
+.out-card{border:1px solid var(--line); border-radius:var(--r); padding:.6rem .8rem; margin:.8rem 0; background:var(--surface); flex:1 1 320px; max-width:600px}
+.out-h{display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:.92rem}
+.pivot{border-collapse:collapse; margin-top:.4rem; font-variant-numeric:tabular-nums}
+.pivot th,.pivot td{border:1px solid var(--line); padding:.3rem .7rem} .pivot th{background:var(--sunk)} .pivot td.num{text-align:right} .pivot tr.tot td{font-weight:700}
+.xl-flash{background:var(--bad-bg); color:var(--bad); padding:.4rem .7rem; margin:0; font-weight:700}
+.tasks{padding-left:1.4rem}
+.tasks li{margin:.35rem 0; padding:.2rem .4rem}
+.tasks li.ok{color:var(--ok)} .tasks li.ok::marker{content:"✓ "; color:var(--ok)}
+.tasks li.bad .tk-t{color:var(--bad)}
+.tasks code,.intro code,.lead-card code,.tip code{font:600 .9em var(--f-mono); background:var(--sunk); padding:0 .25rem; border-radius:4px}
+
+/* constancia */
+#print{display:none}
+body.show-cert #print{display:block; position:fixed; inset:0; background:var(--bg); z-index:20; overflow:auto; padding:2rem}
+.cert{max-width:900px; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:1.6rem}
+.cert table{border-collapse:collapse; width:100%; font-size:.9rem; margin-top:1rem}
+.cert th,.cert td{border:1px solid var(--line); padding:.35rem .5rem; text-align:left}
+@media print{ body{background:#fff} .top,.body{display:none !important} #print{display:block !important; position:static !important; padding:0} .no-print{display:none !important} .cert{border:0} }
+
+/* adaptable */
+@media (max-width: 900px){
+  .body{grid-template-columns:1fr}
+  .side{display:none}
+  .back{display:inline-block}
+  .top{position:static}
+  .thirds,.rb-wrap,.ct-grid,.ed,.ord-wrap.with-prev{grid-template-columns:1fr}
+  .ph-row{grid-template-columns:1fr 1fr}
+  .who input{width:10rem}
+}
+@media (max-width: 520px){ body{font-size:16px} .ph-row{grid-template-columns:1fr} .trk{grid-template-columns:1fr} }
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== Motor de fórmulas (Excel en español, con alias en inglés) ===== */
+const FX = (() => {
+  const ERR = (code) => ({ err: code });
+  const isErr = (v) => v && typeof v === 'object' && 'err' in v;
+
+  function colToNum(c) { let n = 0; for (const ch of c) n = n * 26 + (ch.charCodeAt(0) - 64); return n; }
+  function numToCol(n) { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
+  function parseAddr(a) {
+    const m = /^\$?([A-Z]{1,2})\$?(\d+)$/.exec(String(a).toUpperCase().trim());
+    if (!m) return null; return { c: colToNum(m[1]), r: parseInt(m[2], 10) };
+  }
+  function addr(c, r) { return numToCol(c) + r; }
+  function parseRange(s) {
+    s = String(s).toUpperCase().replace(/\$/g, '').trim();
+    const p = s.split(':');
+    const a = parseAddr(p[0]); const b = p[1] ? parseAddr(p[1]) : a;
+    if (!a || !b) return null;
+    return { c1: Math.min(a.c, b.c), r1: Math.min(a.r, b.r), c2: Math.max(a.c, b.c), r2: Math.max(a.r, b.r) };
+  }
+  function rangeCells(s) {
+    const g = parseRange(s); if (!g) return [];
+    const out = []; for (let r = g.r1; r <= g.r2; r++) for (let c = g.c1; c <= g.c2; c++) out.push(addr(c, r));
+    return out;
+  }
+
+  /* ---------- tokenizador ---------- */
+  function tokenize(src) {
+    const t = []; let i = 0;
+    const isL = (ch) => /[A-Za-zÁÉÍÓÚÑáéíóúñ_]/.test(ch);
+    while (i < src.length) {
+      const ch = src[i];
+      if (/\s/.test(ch)) { i++; continue; }
+      if (ch === '"') { let j = i + 1, s = ''; while (j < src.length) { if (src[j] === '"') { if (src[j + 1] === '"') { s += '"'; j += 2; continue; } break; } s += src[j++]; } if (j >= src.length) throw new Error('comillas'); t.push({ k: 'str', v: s }); i = j + 1; continue; }
+      if (/[0-9.]/.test(ch)) { const m = /^[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/.exec(src.slice(i)) || /^[0-9]+\.?/.exec(src.slice(i)); t.push({ k: 'num', v: parseFloat(m[0]) }); i += m[0].length; continue; }
+      if (ch === '$' || isL(ch)) {
+        const rest = src.slice(i);
+        const rr = /^(\$?[A-Za-z]{1,2}\$?\d+)(:\$?[A-Za-z]{1,2}\$?\d+)?/.exec(rest);
+        const fm = /^[A-Za-zÁÉÍÓÚÑáéíóúñ_][A-Za-zÁÉÍÓÚÑáéíóúñ_0-9.]*\s*\(/.exec(rest);
+        if (fm && (!rr || fm[0].length > rr[0].length)) { t.push({ k: 'fn', v: fm[0].replace(/[\s(]/g, '').toUpperCase() }); i += fm[0].length; continue; }
+        if (rr && !/[A-Za-z(]/.test(rest[rr[0].length] || '')) { t.push({ k: rr[2] ? 'range' : 'ref', v: rr[0].toUpperCase() }); i += rr[0].length; continue; }
+        const wm = /^[A-Za-zÁÉÍÓÚÑáéíóúñ_][A-Za-zÁÉÍÓÚÑáéíóúñ_0-9.]*/.exec(rest);
+        const w = wm[0].toUpperCase();
+        if (['VERDADERO', 'TRUE'].includes(w)) t.push({ k: 'bool', v: true });
+        else if (['FALSO', 'FALSE'].includes(w)) t.push({ k: 'bool', v: false });
+        else t.push({ k: 'name', v: w });
+        i += wm[0].length; continue;
+      }
+      const two = src.slice(i, i + 2);
+      if (['<>', '<=', '>='].includes(two)) { t.push({ k: 'op', v: two }); i += 2; continue; }
+      if ('+-*/^&=<>(),;:%'.includes(ch)) { t.push({ k: 'op', v: ch }); i++; continue; }
+      throw new Error('símbolo ' + ch);
+    }
+    return t;
+  }
+
+  /* ---------- analizador ---------- */
+  function parse(src) {
+    const t = tokenize(src); let p = 0;
+    const peek = () => t[p]; const next = () => t[p++];
+    const isOp = (v) => peek() && peek().k === 'op' && peek().v === v;
+    function cmp() { let l = cat(); while (peek() && peek().k === 'op' && ['=', '<>', '<', '>', '<=', '>='].includes(peek().v)) { const o = next().v; l = { k: 'bin', o, l, r: cat() }; } return l; }
+    function cat() { let l = add(); while (isOp('&')) { next(); l = { k: 'bin', o: '&', l, r: add() }; } return l; }
+    function add() { let l = mul(); while (isOp('+') || isOp('-')) { const o = next().v; l = { k: 'bin', o, l, r: mul() }; } return l; }
+    function mul() { let l = pow(); while (isOp('*') || isOp('/')) { const o = next().v; l = { k: 'bin', o, l, r: pow() }; } return l; }
+    function pow() { let l = un(); while (isOp('^')) { next(); l = { k: 'bin', o: '^', l, r: un() }; } return l; }
+    function un() { if (isOp('-')) { next(); return { k: 'neg', e: un() }; } if (isOp('+')) { next(); return un(); } let e = prim(); while (isOp('%')) { next(); e = { k: 'bin', o: '/', l: e, r: { k: 'num', v: 100 } }; } return e; }
+    function prim() {
+      const tk = next(); if (!tk) throw new Error('fin');
+      if (tk.k === 'num') return { k: 'num', v: tk.v };
+      if (tk.k === 'str') return { k: 'str', v: tk.v };
+      if (tk.k === 'bool') return { k: 'bool', v: tk.v };
+      if (tk.k === 'ref') return { k: 'ref', a: tk.v.replace(/\$/g, '') };
+      if (tk.k === 'range') return { k: 'range', a: tk.v.replace(/\$/g, '') };
+      if (tk.k === 'name') return { k: 'name', v: tk.v };
+      if (tk.k === 'fn') {
+        const args = [];
+        if (isOp(')')) { next(); return { k: 'call', n: tk.v, args }; }
+        while (true) { args.push(cmp()); if (isOp(',') || isOp(';')) { next(); continue; } if (isOp(')')) { next(); break; } throw new Error('falta )'); }
+        return { k: 'call', n: tk.v, args };
+      }
+      if (tk.k === 'op' && tk.v === '(') { const e = cmp(); if (!isOp(')')) throw new Error('falta )'); next(); return e; }
+      throw new Error('inesperado');
+    }
+    const e = cmp(); if (p < t.length) throw new Error('sobra'); return e;
+  }
+
+  /* ---------- utilidades de valores ---------- */
+  const flat = (v) => (v && v.rows) ? v.rows.flat() : [v];
+  const toNum = (v) => { if (isErr(v)) return v; if (v === null || v === undefined || v === '') return 0; if (typeof v === 'boolean') return v ? 1 : 0; if (typeof v === 'number') return v; const n = Number(String(v).replace(',', '.')); return isNaN(n) ? ERR('#¡VALOR!') : n; };
+  const nums = (args) => { const out = []; for (const a of args) { if (a && a.rows) { for (const x of a.rows.flat()) { if (isErr(x)) return x; if (typeof x === 'number') out.push(x); } } else { if (isErr(a)) return a; const n = toNum(a); if (isErr(n)) return n; out.push(n); } } return out; };
+  const norm = (s) => String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  function crit(c) {
+    if (typeof c === 'number') return (x) => typeof x === 'number' ? x === c : norm(x) === norm(c);
+    const m = /^(<>|<=|>=|<|>|=)?(.*)$/.exec(String(c)); const op = m[1] || '='; const rhs = m[2];
+    const rn = Number(rhs.replace(',', '.')); const isN = rhs.trim() !== '' && !isNaN(rn);
+    return (x) => {
+      if (x === null || x === undefined) x = '';
+      if (isN && typeof x === 'number') { switch (op) { case '=': return x === rn; case '<>': return x !== rn; case '<': return x < rn; case '>': return x > rn; case '<=': return x <= rn; case '>=': return x >= rn; } }
+      if (isN && op !== '=' && op !== '<>') return false;
+      const re = new RegExp('^' + norm(rhs).replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
+      const hit = re.test(norm(x));
+      return op === '<>' ? !hit : hit;
+    };
+  }
+  const truthy = (v) => { if (typeof v === 'boolean') return v; if (typeof v === 'number') return v !== 0; if (typeof v === 'string') { const n = norm(v); if (n === 'verdadero' || n === 'true') return true; if (n === 'falso' || n === 'false') return false; return ERR('#¡VALOR!'); } return false; };
+
+  const F = {
+    SUMA: (a) => { const n = nums(a); return isErr(n) ? n : n.reduce((s, x) => s + x, 0); },
+    PROMEDIO: (a) => { const n = nums(a); if (isErr(n)) return n; return n.length ? n.reduce((s, x) => s + x, 0) / n.length : ERR('#¡DIV/0!'); },
+    MAX: (a) => { const n = nums(a); return isErr(n) ? n : (n.length ? Math.max(...n) : 0); },
+    MIN: (a) => { const n = nums(a); return isErr(n) ? n : (n.length ? Math.min(...n) : 0); },
+    CONTAR: (a) => a.reduce((s, x) => s + flat(x).filter((v) => typeof v === 'number').length, 0),
+    CONTARA: (a) => a.reduce((s, x) => s + flat(x).filter((v) => v !== null && v !== undefined && v !== '').length, 0),
+    'CONTAR.BLANCO': (a) => a.reduce((s, x) => s + flat(x).filter((v) => v === null || v === undefined || v === '').length, 0),
+    'CONTAR.SI': (a) => { if (a.length < 2) return ERR('#¡VALOR!'); const f = crit(a[1]); return flat(a[0]).filter(f).length; },
+    'SUMAR.SI': (a) => { if (a.length < 2) return ERR('#¡VALOR!'); const f = crit(a[1]); const r = flat(a[0]); const s = a[2] ? flat(a[2]) : r; let t = 0; r.forEach((x, i) => { if (f(x) && typeof s[i] === 'number') t += s[i]; }); return t; },
+    'PROMEDIO.SI': (a) => { if (a.length < 2) return ERR('#¡VALOR!'); const f = crit(a[1]); const r = flat(a[0]); const s = a[2] ? flat(a[2]) : r; let t = 0, n = 0; r.forEach((x, i) => { if (f(x) && typeof s[i] === 'number') { t += s[i]; n++; } }); return n ? t / n : ERR('#¡DIV/0!'); },
+    SI: (a) => { const c = truthy(a[0]); if (isErr(c)) return c; return c ? (a.length > 1 ? a[1] : true) : (a.length > 2 ? a[2] : false); },
+    Y: (a) => { let r = true; for (const x of a) for (const v of flat(x)) { const b = truthy(v); if (isErr(b)) return b; r = r && b; } return r; },
+    O: (a) => { let r = false; for (const x of a) for (const v of flat(x)) { const b = truthy(v); if (isErr(b)) return b; r = r || b; } return r; },
+    NO: (a) => { const b = truthy(a[0]); return isErr(b) ? b : !b; },
+    BUSCARV: (a) => {
+      const v = a[0], tab = a[1], col = toNum(a[2]); if (!tab || !tab.rows) return ERR('#¡VALOR!');
+      if (isErr(col) || col < 1 || col > tab.rows[0].length) return ERR('#¡REF!');
+      const exact = a.length > 3 ? !truthy(a[3]) : false;
+      if (exact) { for (const row of tab.rows) { if (typeof v === 'number' ? row[0] === v : norm(row[0] ?? '') === norm(v)) return row[col - 1] ?? 0; } return ERR('#N/A'); }
+      let best = null; for (const row of tab.rows) { const k = row[0]; if (typeof v === 'number' ? (typeof k === 'number' && k <= v) : norm(k ?? '') <= norm(v)) best = row; else break; }
+      return best ? (best[col - 1] ?? 0) : ERR('#N/A');
+    },
+    MEDIANA: (a) => { const n = nums(a); if (isErr(n)) return n; if (!n.length) return ERR('#¡NUM!'); const s = [...n].sort((x, y) => x - y); const m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; },
+    MODA: (a) => { const n = nums(a); if (isErr(n)) return n; const c = new Map(); let best = null, bc = 1; for (const x of n) { const k = (c.get(x) || 0) + 1; c.set(x, k); if (k > bc) { bc = k; best = x; } } return best === null ? ERR('#N/A') : best; },
+    REDONDEAR: (a) => { const x = toNum(a[0]), d = toNum(a[1] ?? 0); if (isErr(x)) return x; const f = Math.pow(10, d); return Math.round((x + Math.sign(x) * 1e-12) * f) / f; },
+    ENTERO: (a) => { const x = toNum(a[0]); return isErr(x) ? x : Math.floor(x); },
+    ABS: (a) => { const x = toNum(a[0]); return isErr(x) ? x : Math.abs(x); },
+    POTENCIA: (a) => { const x = toNum(a[0]), y = toNum(a[1]); return isErr(x) ? x : isErr(y) ? y : Math.pow(x, y); },
+    RAIZ: (a) => { const x = toNum(a[0]); if (isErr(x)) return x; return x < 0 ? ERR('#¡NUM!') : Math.sqrt(x); },
+    'ALEATORIO.ENTRE': (a) => { const x = toNum(a[0]), y = toNum(a[1]); if (isErr(x)) return x; if (isErr(y)) return y; return Math.floor(Math.random() * (y - x + 1)) + x; },
+    CONCATENAR: (a) => a.map((x) => flat(x).map(txt).join('')).join(''),
+    MAYUSC: (a) => txt(a[0]).toUpperCase(),
+    MINUSC: (a) => txt(a[0]).toLowerCase(),
+    LARGO: (a) => txt(a[0]).length,
+  };
+  const alias = { SUM: 'SUMA', AVERAGE: 'PROMEDIO', COUNT: 'CONTAR', COUNTA: 'CONTARA', COUNTIF: 'CONTAR.SI', SUMIF: 'SUMAR.SI', AVERAGEIF: 'PROMEDIO.SI', IF: 'SI', AND: 'Y', OR: 'O', NOT: 'NO', VLOOKUP: 'BUSCARV', MEDIAN: 'MEDIANA', MODE: 'MODA', 'MODA.UNO': 'MODA', 'MODE.SNGL': 'MODA', ROUND: 'REDONDEAR', INT: 'ENTERO', POWER: 'POTENCIA', SQRT: 'RAIZ', RANDBETWEEN: 'ALEATORIO.ENTRE', CONCAT: 'CONCATENAR', CONCATENATE: 'CONCATENAR', UPPER: 'MAYUSC', LOWER: 'MINUSC', LEN: 'LARGO', COUNTBLANK: 'CONTAR.BLANCO', 'PROMEDIO.SI.CONJUNTO': null };
+  function txt(v) { if (v === null || v === undefined) return ''; if (typeof v === 'boolean') return v ? 'VERDADERO' : 'FALSO'; if (typeof v === 'number') return String(Math.round(v * 1e10) / 1e10); if (isErr(v)) return v.err; if (v.rows) return txt(v.rows[0][0]); return String(v); }
+
+  /* ---------- evaluación ---------- */
+  function evalNode(n, ctx) {
+    switch (n.k) {
+      case 'num': case 'str': case 'bool': return n.v;
+      case 'name': return ERR('#¿NOMBRE?');
+      case 'ref': return ctx.get(n.a);
+      case 'range': { const g = parseRange(n.a); const rows = []; for (let r = g.r1; r <= g.r2; r++) { const row = []; for (let c = g.c1; c <= g.c2; c++) row.push(ctx.get(addr(c, r))); rows.push(row); } return { rows }; }
+      case 'neg': { const v = toNum(scalar(evalNode(n.e, ctx))); return isErr(v) ? v : -v; }
+      case 'call': {
+        const name = alias[n.n] !== undefined ? alias[n.n] : n.n; const fn = name && F[name]; if (!fn) return ERR('#¿NOMBRE?');
+        const lazy = name === 'SI';
+        if (lazy) { const c = scalar(evalNode(n.args[0], ctx)); if (isErr(c)) return c; const b = truthy(c); if (isErr(b)) return b; if (b) return n.args.length > 1 ? scalar(evalNode(n.args[1], ctx)) : true; return n.args.length > 2 ? scalar(evalNode(n.args[2], ctx)) : false; }
+        const args = n.args.map((a) => evalNode(a, ctx));
+        const keepsRange = ['SUMA', 'PROMEDIO', 'MAX', 'MIN', 'CONTAR', 'CONTARA', 'CONTAR.BLANCO', 'CONTAR.SI', 'SUMAR.SI', 'PROMEDIO.SI', 'BUSCARV', 'MEDIANA', 'MODA', 'Y', 'O', 'CONCATENAR'];
+        const fa = keepsRange.includes(name) ? args : args.map(scalar);
+        if (!['CONTAR', 'CONTARA', 'CONTAR.BLANCO', 'CONTAR.SI', 'SUMAR.SI', 'PROMEDIO.SI', 'BUSCARV'].includes(name)) { for (const a of fa) if (isErr(a)) return a; }
+        return fn(fa);
+      }
+      case 'bin': {
+        const l = scalar(evalNode(n.l, ctx)), r = scalar(evalNode(n.r, ctx));
+        if (isErr(l)) return l; if (isErr(r)) return r;
+        if (n.o === '&') return txt(l) + txt(r);
+        if (['=', '<>', '<', '>', '<=', '>='].includes(n.o)) {
+          let a = l ?? '', b = r ?? '';
+          if (typeof a === 'string' && typeof b === 'string') { a = norm(a); b = norm(b); }
+          else if (typeof a !== typeof b) { if (a === '' ) a = typeof b === 'number' ? 0 : a; if (b === '') b = typeof a === 'number' ? 0 : b; }
+          if (typeof a !== typeof b) { const eq = false; if (n.o === '=') return eq; if (n.o === '<>') return true; const ra = typeof a === 'number' ? 0 : 1, rb = typeof b === 'number' ? 0 : 1; a = ra; b = rb; }
+          switch (n.o) { case '=': return a === b; case '<>': return a !== b; case '<': return a < b; case '>': return a > b; case '<=': return a <= b; case '>=': return a >= b; }
+        }
+        const x = toNum(l), y = toNum(r); if (isErr(x)) return x; if (isErr(y)) return y;
+        switch (n.o) { case '+': return x + y; case '-': return x - y; case '*': return x * y; case '/': return y === 0 ? ERR('#¡DIV/0!') : x / y; case '^': return Math.pow(x, y); }
+      }
+    }
+    return ERR('#¡VALOR!');
+  }
+  function scalar(v) { if (v && v.rows) { return v.rows.length === 1 && v.rows[0].length === 1 ? v.rows[0][0] : ERR('#¡VALOR!'); } return v; }
+
+  /* ---------- hoja ---------- */
+  function literal(raw) {
+    if (raw === null || raw === undefined) return null; const s = String(raw);
+    if (s.trim() === '') return null;
+    const t = s.trim();
+    if (/^-?\d+([.,]\d+)?$/.test(t)) return parseFloat(t.replace(',', '.'));
+    if (/^-?\d+([.,]\d+)?%$/.test(t)) return parseFloat(t.replace(',', '.')) / 100;
+    const u = t.toUpperCase(); if (u === 'VERDADERO') return true; if (u === 'FALSO') return false;
+    return s;
+  }
+  function makeSheet(raw) {
+    const cache = new Map(); const stack = new Set(); const astCache = new Map();
+    const ctx = { get: (a) => value(a) };
+    function value(a) {
+      a = a.toUpperCase();
+      if (cache.has(a)) return cache.get(a);
+      const r = raw[a];
+      if (typeof r !== 'string' || !r.startsWith('=')) { const v = literal(r); cache.set(a, v); return v; }
+      if (stack.has(a)) return ERR('#¡CIRC!');
+      stack.add(a);
+      let v;
+      try { let ast = astCache.get(r); if (!ast) { ast = parse(r.slice(1)); astCache.set(r, ast); } v = scalar(evalNode(ast, ctx)); }
+      catch (e) { v = ERR('#¿ERROR?'); }
+      stack.delete(a);
+      if (v === null || v === undefined) v = 0;
+      cache.set(a, v); return v;
+    }
+    return { value, reset: () => cache.clear() };
+  }
+
+  /* ---------- copiar fórmulas (referencias relativas / absolutas) ---------- */
+  function shift(formula, dr, dc) {
+    if (typeof formula !== 'string' || !formula.startsWith('=')) return formula;
+    const parts = formula.split('"');
+    for (let i = 0; i < parts.length; i += 2) {
+      parts[i] = parts[i].replace(/(?<![A-Za-z0-9_.ÁÉÍÓÚÑáéíóúñ])(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z0-9(])/g, (m, d1, col, d2, row) => {
+        let c = colToNum(col.toUpperCase()), r = parseInt(row, 10);
+        if (!d1) c += dc; if (!d2) r += dr;
+        if (c < 1 || r < 1) return '#¡REF!';
+        return d1 + numToCol(c) + d2 + r;
+      });
+    }
+    return parts.join('"');
+  }
+
+  function fmt(v) {
+    if (v === null || v === undefined) return '';
+    if (isErr(v)) return v.err;
+    if (typeof v === 'boolean') return v ? 'VERDADERO' : 'FALSO';
+    if (typeof v === 'number') { if (!isFinite(v)) return '#¡NUM!'; if (Number.isInteger(v)) return String(v); const r = Math.round(v * 100) / 100; return String(r); }
+    return String(v);
+  }
+  return { parse, makeSheet, shift, fmt, isErr, parseAddr, parseRange, rangeCells, addr, colToNum, numToCol, norm, crit, literal };
+})();
+
+
+</script>
+<script>
+(() => {
+const row = (a) => +String(a).replace(/\D/g, '');
+const col = (a) => String(a).replace(/\d/g, '');
+const num = (v) => (typeof v === 'number' ? v : 0);
+const post = (inner, extra = '') => `<div style="width:220px;aspect-ratio:4/5;border-radius:10px;border:1px solid #c9d3e0;padding:14px;font-family:Arial,sans-serif;display:flex;flex-direction:column;gap:6px;overflow:hidden;${extra}">${inner}</div>`;
+const sleep = [8, 7, 9, 6, 8, 7, 7, 10, 6, 8, 7, 5];
+const mean = sleep.reduce((a, b) => a + b, 0) / sleep.length;
+const desv = sleep.reduce((a, b) => a + Math.abs(b - mean), 0) / sleep.length;
+
+window.GRADE = {
+  id: 'sec2', short: '2°',
+  title: 'Simulador de Tecnología · 2° de secundaria',
+  subtitle: 'Tech Kids · Creación y datos',
+  heroTitle: 'Tu hoja de prácticas de 2°',
+  heroText: 'Cada columna es un módulo y cada celda es un tema. Haz clic en una celda, resuelve la práctica y presiona Revisar. Con 80% el tema queda completado; con 100%, dominado. Tu avance se guarda en este navegador.',
+  modules: [
+  /* ---------------- M1 ---------------- */
+  { name: 'Edición de imagen', hilo: 'creacion', temas: [
+    { t: 'Composición y encuadre', p: { type: 'thirds',
+      intro: 'Aplica la regla de los tercios: coloca el horizonte sobre una línea horizontal de la cuadrícula y el faro en una de las cuatro intersecciones.',
+      tip: 'Con el horizonte en la línea de arriba le das protagonismo al mar; con el de abajo, al cielo. Evita ponerlo justo a la mitad.',
+      lead: '<p>Una buena composición dirige la mirada. El centro exacto suele verse estático; las intersecciones de los tercios, más dinámicas.</p>' } },
+    { t: 'Capas y máscaras', p: { type: 'order',
+      intro: 'En GIMP, cada elemento vive en su propia capa. Ordena las capas del cartel de la Feria de Ciencias para que todo se vea y luego ordena los pasos para integrar una foto con máscara.',
+      tip: 'La capa de arriba de la lista se dibuja encima de las demás. El fondo siempre va hasta abajo.',
+      sets: [
+        { prompt: 'Capas del cartel (de la de arriba a la de abajo)', items: ['Texto «Feria de Ciencias»', 'Estrella decorativa', 'Foto del alumno recortada', 'Fondo de color'],
+          layers: [
+            '<text x="150" y="40" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="24" fill="#fff" stroke="#172338" stroke-width="1">Feria de Ciencias</text>',
+            '<path d="M240,70 l9,20 22,3 -16,15 4,22 -19,-11 -19,11 4,-22 -16,-15 22,-3z" fill="#FFD25E" stroke="#8C5E00"/>',
+            '<g><circle cx="110" cy="110" r="28" fill="#F2C7A5"/><rect x="72" y="140" width="76" height="60" rx="30" fill="#2D6FD6"/></g>',
+            '<rect width="300" height="200" fill="#5D3FD3"/>',
+          ] },
+        { prompt: 'Pasos para integrar una foto con máscara', items: ['Abrir la imagen de fondo', 'Agregar la foto como una capa nueva', 'Agregar una máscara de capa a la foto', 'Pintar con negro en la máscara lo que quieres ocultar', 'Guardar el .xcf y exportar como PNG'] },
+      ] } },
+    { t: 'Corrección de color', p: { type: 'sliders', kind: 'photo',
+      intro: 'La foto salió oscura, apagada y sin color. Ajusta brillo, contraste y saturación hasta que se parezca a la referencia.',
+      lead: '<p>Compara las dos imágenes mientras mueves cada control. Ajusta uno a la vez.</p>',
+      defect: { b: 0.65, c: 0.75, s: 0.45 },
+      sliders: [
+        { id: 'b', label: 'Brillo', min: 0.5, max: 2.5, step: 0.05, start: 1, target: [1.42, 1.68], fmt: (v) => Math.round(v * 100) + '%', hint: 'compara qué tan clara es la referencia' },
+        { id: 'c', label: 'Contraste', min: 0.5, max: 2.5, step: 0.05, start: 1, target: [1.2, 1.47], fmt: (v) => Math.round(v * 100) + '%', hint: 'mira la diferencia entre zonas claras y oscuras' },
+        { id: 's', label: 'Saturación', min: 0.5, max: 3, step: 0.05, start: 1, target: [2.0, 2.45], fmt: (v) => Math.round(v * 100) + '%', hint: 'observa qué tan intensos son los colores' },
+      ] } },
+  ] },
+  /* ---------------- M2 ---------------- */
+  { name: 'Video y audio', hilo: 'creacion', temas: [
+    { t: 'Cortes y transiciones', p: { type: 'classify', cats: ['Conservar', 'Cortar'],
+      intro: 'Este es el material grabado para un video de 30 segundos. Decide qué clips conservas y cuáles cortas.',
+      tip: 'Elimina silencios, errores, tomas repetidas y todo lo que no aporta al mensaje.',
+      items: [
+        { t: '0:00–0:04 · Saludo y presentación del tema', c: 0, hint: '¿Aporta al mensaje?' },
+        { t: '0:04–0:09 · Silencio mientras buscas tu hoja', c: 1, why: 'Los silencios largos se cortan.', hint: '¿Pasa algo en esos 5 segundos?' },
+        { t: '0:09–0:20 · Explicación de la idea principal (te trabas a la mitad)', c: 1, why: 'Usarás la segunda toma, que salió sin errores.', hint: 'Hay una mejor versión de este clip.' },
+        { t: '0:20–0:31 · Segunda toma de la explicación, sin errores', c: 0, hint: '¿Es la mejor versión?' },
+        { t: '0:31–0:35 · Repites el saludo por accidente', c: 1, why: 'Es una toma repetida.', hint: '¿Ya tienes ese contenido?' },
+        { t: '0:35–0:43 · Ejemplo con el experimento', c: 0, hint: '¿Ayuda a entender la idea?' },
+        { t: '0:43–0:48 · Cierre con invitación a la feria', c: 0, hint: '¿Es el cierre del video?' },
+        { t: '0:48–0:55 · La cámara grabando el piso', c: 1, why: 'No aporta nada.', hint: '¿Qué se ve ahí?' },
+      ] } },
+    { t: 'Subtitulado', p: { type: 'classify', cats: ['Correcto', 'Demasiado largo', 'Fuera de tiempo'],
+      intro: 'Revisa cada subtítulo comparándolo con el audio. Un subtítulo debe aparecer al mismo tiempo que la voz y ocupar máximo dos líneas (unos 80 caracteres).',
+      items: [
+        { html: '<b>Audio 0:00–0:03:</b> «Bienvenidos a la Feria de Ciencias.»<br><b>Subtítulo 0:00–0:03:</b> Bienvenidos a la Feria de Ciencias.', c: 0, hint: 'Compara tiempos y largo.' },
+        { html: '<b>Audio 0:03–0:07:</b> «Hoy les mostramos cómo funciona un volcán.»<br><b>Subtítulo 0:09–0:13:</b> Hoy les mostramos cómo funciona un volcán.', c: 2, why: 'Aparece 6 segundos tarde.', hint: 'Compara los tiempos de inicio.' },
+        { html: '<b>Audio 0:07–0:12:</b> «El magma sube por la chimenea.»<br><b>Subtítulo 0:07–0:12:</b> El magma, que es roca fundida mezclada con gases que vienen del interior de la Tierra, sube poco a poco por la chimenea del volcán hasta llegar a la superficie.', c: 1, why: 'Ocupa más de dos líneas y agrega texto que no se dice.', hint: 'Cuenta los caracteres.' },
+        { html: '<b>Audio 0:12–0:15:</b> «Mezclamos bicarbonato y vinagre.»<br><b>Subtítulo 0:12–0:15:</b> Mezclamos bicarbonato y vinagre.', c: 0, hint: 'Compara tiempos y largo.' },
+        { html: '<b>Audio 0:15–0:19:</b> «¡Y aquí está la erupción!»<br><b>Subtítulo 0:11–0:14:</b> ¡Y aquí está la erupción!', c: 2, why: 'Aparece antes de que se diga: arruina la sorpresa.', hint: 'Compara cuándo empieza cada uno.' },
+        { html: '<b>Audio 0:19–0:22:</b> «Gracias por vernos.»<br><b>Subtítulo 0:19–0:22:</b> Gracias por vernos.', c: 0, hint: 'Compara tiempos y largo.' },
+      ] } },
+    { t: 'Audio básico', p: { type: 'sliders', kind: 'audio',
+      intro: 'Mezcla las tres pistas del video: la voz debe entenderse claramente, la música quedarse de fondo y el ruido casi desaparecer.',
+      lead: '<p>Un video con mal audio se siente poco profesional aunque la imagen sea excelente.</p>',
+      sliders: [
+        { id: 'voz', label: 'Voz', min: 0, max: 100, step: 1, start: 50, target: [70, 90], hint: 'súbela entre 70 y 90' },
+        { id: 'musica', label: 'Música', min: 0, max: 100, step: 1, start: 70, target: [15, 35], hint: 'déjala de fondo, entre 15 y 35' },
+        { id: 'ruido', label: 'Ruido de fondo', min: 0, max: 100, step: 1, start: 30, target: [0, 10], hint: 'redúcelo a 10 o menos' },
+      ] } },
+  ] },
+  /* ---------------- M3 ---------------- */
+  { name: 'Hojas de cálculo II', hilo: 'datos', temas: [
+    { t: 'Referencias absolutas y mixtas', p: { type: 'sheet', cols: 8, rows: 8, tools: ['fill'], widths: { A: 150 },
+      intro: 'Un <code>$</code> fija la columna, la fila o ambas al copiar una fórmula. <code>$B$1</code> es absoluta; <code>$D4</code> fija la columna; <code>E$3</code> fija la fila.',
+      tip: 'Para la tabla de multiplicar escribe en E4 <code>=$D4*E$3</code> y usa Rellenar → «A todo un rango» con <code>E4:H7</code>.',
+      lead: '<p>Parte 1: convierte precios de dólares a pesos con un tipo de cambio fijo. Parte 2: construye una tabla de multiplicar con una sola fórmula.</p>',
+      bold: ['A1', 'A3', 'B3', 'D3', 'E3', 'F3', 'G3', 'H3', 'D4', 'D5', 'D6', 'D7'],
+      cells: { A1: 'Tipo de cambio del ejercicio', B1: '18', A3: 'Precio en USD', B3: 'Precio en MXN', A4: '5', A5: '12', A6: '20', A7: '35', A8: '50', D3: '×', E3: '2', F3: '3', G3: '4', H3: '5', D4: '2', D5: '3', D6: '4', D7: '5' },
+      tasks: [
+        { text: 'En <code>B4</code> convierte el precio a pesos usando el tipo de cambio fijo de <code>B1</code>.', check: { type: 'formula', cell: 'B4', includes: ['$B$1'], equals: 90 }, hint: '=A4*$B$1' },
+        { text: 'Rellena <code>B5:B8</code>: todas deben seguir usando <code>$B$1</code>.', check: { type: 'cells', range: 'B5:B8', formula: true, includes: ['$B$1'], expect: (c, a) => num(c.v('A' + row(a))) * num(c.v('B1')) }, hint: 'Si salen ceros, te faltó el $: la referencia se movió a B2, B3…' },
+        { text: 'En <code>E4</code> escribe la fórmula de la tabla con referencias mixtas.', check: { type: 'expr', f: (c) => c.isF('E4') && c.rawU('E4').includes('$D4') && c.rawU('E4').includes('E$3') && c.eqv(c.v('E4'), 4) }, hint: '=$D4*E$3' },
+        { text: 'Completa toda la tabla <code>E4:H7</code> copiando esa misma fórmula.', check: { type: 'cells', range: 'E4:H7', formula: true, includes: ['$D', '$3'], expect: (c, a) => num(c.v('D' + row(a))) * num(c.v(col(a) + '3')) }, hint: 'Selecciona E4 → Rellenar → A todo un rango → E4:H7.' },
+      ] } },
+    { t: 'Funciones lógicas SI, Y, O', p: { type: 'sheet', cols: 6, rows: 10, tools: ['fill'], widths: { A: 110, D: 120, E: 130, F: 130 },
+      intro: '<code>SI</code> elige entre dos resultados según una condición. <code>Y</code> exige que se cumplan todas las condiciones; <code>O</code>, al menos una.',
+      tip: '<code>=SI(Y(B2>=9,C2>=90),"Sí","No")</code> · <code>=SI(O(B2<6,C2<80),"Citar a tutor","Sin aviso")</code>. Los textos van entre comillas.',
+      lead: '<p>Arma la boleta automática del grupo: estado, reconocimiento y aviso a tutores.</p>',
+      bold: ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'A9'],
+      cells: { A1: 'Alumno', B1: 'Promedio', C1: 'Asistencia %', D1: 'Estado', E1: 'Reconocimiento', F1: 'Aviso', A2: 'Ana', B2: '9.2', C2: '95', A3: 'Luis', B3: '5.4', C3: '88', A4: 'Sofía', B4: '7.8', C4: '70', A5: 'Diego', B5: '8.6', C5: '92', A6: 'Valeria', B6: '6', C6: '98', A7: 'Emilio', B7: '9.6', C7: '79', A9: 'Aprobados' },
+      tasks: [
+        { text: 'En <code>D2:D7</code> escribe «Aprobado» si el promedio es 6 o más; si no, «Reprobado».', check: { type: 'cells', range: 'D2:D7', formula: true, includes: ['SI('], expect: (c, a) => (num(c.v('B' + row(a))) >= 6 ? 'Aprobado' : 'Reprobado') }, hint: '=SI(B2>=6,"Aprobado","Reprobado") y rellena.' },
+        { text: 'En <code>E2:E7</code> escribe «Sí» si el promedio es 9 o más <b>y</b> la asistencia es 90 o más; si no, «No».', check: { type: 'cells', range: 'E2:E7', formula: true, includes: ['Y('], expect: (c, a) => (num(c.v('B' + row(a))) >= 9 && num(c.v('C' + row(a))) >= 90 ? 'Sí' : 'No') }, hint: '=SI(Y(B2>=9,C2>=90),"Sí","No")' },
+        { text: 'En <code>F2:F7</code> escribe «Citar a tutor» si el promedio es menor que 6 <b>o</b> la asistencia menor que 80; si no, «Sin aviso».', check: { type: 'cells', range: 'F2:F7', formula: true, includes: ['O('], expect: (c, a) => (num(c.v('B' + row(a))) < 6 || num(c.v('C' + row(a))) < 80 ? 'Citar a tutor' : 'Sin aviso') }, hint: '=SI(O(B2<6,C2<80),"Citar a tutor","Sin aviso")' },
+        { text: 'En <code>B9</code> cuenta los aprobados con una fórmula.', check: { type: 'formula', cell: 'B9', includes: ['CONTAR.SI('], equals: 5 }, hint: '=CONTAR.SI(D2:D7,"Aprobado")' },
+      ] } },
+    { t: 'Ordenar, filtrar y formato condicional', p: { type: 'sheet', cols: 6, rows: 11, tools: ['fill', 'cf', 'sort', 'filter'], widths: { A: 160, B: 110, F: 140 },
+      sortRange: 'A2:E11', filterRange: 'A2:E11', cfDefault: 'C2:C11',
+      intro: 'Organiza el inventario de la cooperativa: un semáforo de existencias, el orden por existencias, un filtro por categoría y el valor total del inventario.',
+      tip: 'Formato condicional: agrega dos reglas en C2:C11 (rojo si es menor que 5; verde si es mayor o igual que 10). Ordenar: rango A2:E11, columna C, de menor a mayor.',
+      lead: '<p>Primero calcula la columna Valor; después ordena y filtra. Al ordenar, las fórmulas viajan con su fila.</p>',
+      bold: ['A1', 'B1', 'C1', 'D1', 'E1', 'F1'],
+      cells: { A1: 'Producto', B1: 'Categoría', C1: 'Existencias', D1: 'Precio', E1: 'Valor', F1: 'Total inventario',
+        A2: 'Agua 600 ml', B2: 'Bebidas', C2: '24', D2: '12', A3: 'Jugo de naranja', B3: 'Bebidas', C3: '6', D3: '18', A4: 'Galletas integrales', B4: 'Snacks', C4: '15', D4: '14', A5: 'Palomitas', B5: 'Snacks', C5: '3', D5: '10', A6: 'Manzana', B6: 'Fruta', C6: '20', D6: '8', A7: 'Plátano', B7: 'Fruta', C7: '4', D7: '6', A8: 'Sándwich', B8: 'Comida', C8: '8', D8: '30', A9: 'Torta de jamón', B9: 'Comida', C9: '2', D9: '35', A10: 'Yogur', B10: 'Lácteos', C10: '10', D10: '16', A11: 'Leche con chocolate', B11: 'Lácteos', C11: '5', D11: '15' },
+      tasks: [
+        { text: 'En <code>E2:E11</code> calcula el valor de cada producto (existencias × precio) y en <code>F2</code> el total del inventario.', checks: [{ type: 'cells', range: 'E2:E11', formula: true, expect: (c, a) => num(c.v('C' + row(a))) * num(c.v('D' + row(a))) }, { type: 'formula', cell: 'F2', includes: ['SUMA('], equals: 1365 }], hint: '=C2*D2 y rellena; =SUMA(E2:E11)' },
+        { text: 'Aplica un semáforo a <code>C2:C11</code>: rojo si es menor que 5 y verde si es mayor o igual que 10.', check: { type: 'cf', range: 'C2:C11', rules: [{ op: '<', value: 5, color: 'rojo' }, { op: '>=', value: 10, color: 'verde' }] }, hint: 'Formato condicional: dos reglas en el rango C2:C11.' },
+        { text: 'Ordena los productos por existencias, de menor a mayor.', check: { type: 'sorted', col: 'C', from: 2, to: 11, dir: 'asc', keep: (c) => { for (let r = 2; r <= 11; r++) if (c.v('A' + r) === 'Torta de jamón') return c.v('D' + r) === 35; return false; } }, hint: 'Ordenar → rango A2:E11 → columna C → de menor a mayor. Incluye todas las columnas en el rango.' },
+        { text: 'Filtra la tabla para ver solo la categoría «Snacks».', check: { type: 'filter', col: 'B', value: 'Snacks' }, hint: 'Filtrar → columna B → Snacks.' },
+      ] } },
+    { t: 'Estadística con Matemáticas', p: { type: 'sheet', cols: 11, rows: 13, tools: ['fill', 'chart'], widths: { D: 130, J: 120 },
+      intro: 'Parte 1: analiza las horas de sueño del grupo con medidas de tendencia central y dispersión. Parte 2: compara dos planes de celular y encuentra dónde cuestan lo mismo (un sistema de ecuaciones).',
+      tip: '<code>=ABS(B2-$E$2)</code> calcula qué tan lejos está cada dato de la media. Plan A: 150 + 10 por GB; Plan B: 90 + 20 por GB.',
+      lead: '<p>Esto es lo que verás en Matemáticas de 2°: media, mediana, moda, rango, desviación media y sistemas de ecuaciones resueltos con gráfica.</p>',
+      bold: ['A1', 'B1', 'C1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'G1', 'H1', 'I1', 'J2'],
+      cells: Object.assign({ A1: 'Alumno', B1: 'Horas de sueño', C1: 'Distancia a la media', D2: 'Media', D3: 'Mediana', D4: 'Moda', D5: 'Máximo', D6: 'Mínimo', D7: 'Rango', D8: 'Desviación media', G1: 'GB', H1: 'Plan A', I1: 'Plan B', J2: 'Cuestan igual con GB:' },
+        Object.fromEntries(sleep.flatMap((h, i) => [['A' + (i + 2), String(i + 1)], ['B' + (i + 2), String(h)]])),
+        Object.fromEntries(Array.from({ length: 11 }, (_, i) => ['G' + (i + 2), String(i)]))),
+      tasks: [
+        { text: 'En <code>E2:E4</code> calcula media, mediana y moda de las horas de sueño.', checks: [{ type: 'formula', cell: 'E2', includes: ['PROMEDIO('], equals: mean, tol: 0.01 }, { type: 'formula', cell: 'E3', includes: ['MEDIANA('], equals: 7 }, { type: 'formula', cell: 'E4', includes: ['MODA'], equals: 7 }], hint: '=PROMEDIO(B2:B13), =MEDIANA(B2:B13), =MODA(B2:B13)' },
+        { text: 'En <code>E5:E7</code> calcula máximo, mínimo y rango (máximo − mínimo).', checks: [{ type: 'formula', cell: 'E5', includes: ['MAX('], equals: 10 }, { type: 'formula', cell: 'E6', includes: ['MIN('], equals: 5 }, { type: 'formula', cell: 'E7', equals: 5 }], hint: 'Rango: =E5-E6' },
+        { text: 'En <code>C2:C13</code> calcula la distancia de cada dato a la media y en <code>E8</code> la desviación media.', checks: [{ type: 'cells', range: 'C2:C13', formula: true, includes: ['ABS(', '$E$2'], expect: (c, a) => Math.abs(num(c.v('B' + row(a))) - mean), tol: 0.01 }, { type: 'formula', cell: 'E8', includes: ['PROMEDIO('], equals: desv, tol: 0.01 }], hint: '=ABS(B2-$E$2) y rellena; =PROMEDIO(C2:C13)' },
+        { text: 'En <code>H2:H12</code> y <code>I2:I12</code> calcula el costo de cada plan según los GB de la columna G.', checks: [{ type: 'cells', range: 'H2:H12', formula: true, expect: (c, a) => 150 + 10 * num(c.v('G' + row(a))) }, { type: 'cells', range: 'I2:I12', formula: true, expect: (c, a) => 90 + 20 * num(c.v('G' + row(a))) }], hint: 'H2: =150+10*G2 · I2: =90+20*G2' },
+        { text: 'Inserta una gráfica de líneas con los dos planes (etiquetas <code>G2:G12</code>, valores <code>H2:I12</code>) y título.', check: { type: 'chart', chartType: 'lineas', labels: 'G2:G12', values: 'H2:I12', title: true }, hint: 'Valores H2:I12 dibuja una línea por plan.' },
+        { text: 'En <code>K2</code> escribe con cuántos GB los dos planes cuestan lo mismo.', check: { type: 'value', cell: 'K2', equals: 6 }, hint: 'Busca en la gráfica o en la tabla dónde se cruzan las líneas.' },
+      ] } },
+  ] },
+  /* ---------------- M4 ---------------- */
+  { name: 'Pensamiento computacional II', hilo: 'codigo', temas: [
+    { t: 'Variables y operadores', p: { type: 'trace',
+      intro: 'Sigue cada programa como lo haría la computadora y escribe lo que dice el personaje.',
+      tip: '«mod» da el residuo de una división: 17 mod 5 = 2. «unir» pega textos.',
+      items: [
+        { code: 'fijar precio a 25\nfijar cantidad a 4\nfijar total a precio * cantidad\ndecir total', q: '¿Qué dice?', a: 100, fb: '25 × 4 = 100.' },
+        { code: 'fijar a a 7\nfijar b a 3\nfijar a a a + b\nfijar b a a - b\ndecir unir(a, " y ", b)', q: '¿Qué dice?', a: '10 y 7', fb: 'Primero a = 10; luego b = 10 − 3 = 7.' },
+        { code: 'fijar puntos a 0\nrepetir 5 veces\n  cambiar puntos por 2\nfijar puntos a puntos * 3\ndecir puntos', q: '¿Qué dice?', a: 30, fb: '5 × 2 = 10; luego 10 × 3 = 30.' },
+        { code: 'fijar nombre a "Ana"\nfijar saludo a unir("Hola, ", nombre)\ndecir saludo', q: '¿Qué dice?', a: 'Hola, Ana', fb: 'unir pega los dos textos.' },
+        { code: 'fijar x a 17\nfijar resto a x mod 5\ndecir resto', q: '¿Qué dice?', a: 2, fb: '17 = 5 × 3 + 2.' },
+      ] } },
+    { t: 'Aleatoriedad y simulación', p: { type: 'simulate',
+      intro: 'Simula 1 000 lanzamientos de un dado y 1 000 de dos dados. Observa las frecuencias y responde las preguntas.',
+      lead: '<p>En Scratch, el bloque «número aleatorio entre 1 y 6» hace exactamente esto. En la hoja de cálculo, la función es <code>ALEATORIO.ENTRE(1,6)</code>.</p>',
+      qs: [
+        { q: 'Con 1 dado y 1 000 lanzamientos, ¿qué observas?', opts: ['Todas las caras quedan cerca de 16.7%', 'El 6 siempre sale más', 'El 1 casi nunca sale', 'Cambian sin ningún patrón'], a: 0, fb: 'Cada cara tiene probabilidad 1/6 ≈ 16.7%.' },
+        { q: 'Con la suma de 2 dados, ¿qué resultado aparece más?', opts: ['2', '7', '12', 'Todos por igual'], a: 1, fb: 'Hay 6 combinaciones que suman 7, de 36 posibles.' },
+        { q: '¿Por qué conviene lanzar 1 000 veces y no solo 10?', opts: ['Con más lanzamientos las frecuencias se acercan a la probabilidad teórica', 'Porque el dado se desgasta', 'Para que salga más el 6', 'No hay diferencia'], a: 0, fb: 'Es la ley de los grandes números.' },
+        { q: 'Para un juego en Scratch donde un enemigo aparece en un lugar al azar, ¿qué bloque usarías?', opts: ['ir a x: (número aleatorio entre -200 y 200)', 'repetir 10 veces', 'esperar 1 segundo', 'decir «hola»'], a: 0 },
+      ] } },
+    { t: 'Depuración', p: { type: 'trace',
+      intro: 'Depurar es encontrar y corregir errores. Cada programa tiene un objetivo (en la primera línea) y un error. Encuéntralo.',
+      items: [
+        { code: '// Objetivo: dibujar un cuadrado\nrepetir 4 veces\n  avanzar 100 pasos\n  girar 45 grados', q: '¿Qué línea tiene el error?', opts: ['Línea 2', 'Línea 3', 'Línea 4'], a: 2, fb: 'Para un cuadrado se gira 90°.' },
+        { code: '// Objetivo: sumar 1 punto por cada moneda\nal presionar ▶\n  fijar puntos a 0\n  por siempre\n    si toca moneda entonces\n      fijar puntos a 1', q: '¿Qué línea tiene el error?', opts: ['Línea 3', 'Línea 5', 'Línea 6'], a: 2, fb: 'Debe ser «cambiar puntos por 1»: «fijar» siempre lo regresa a 1.' },
+        { code: '// Objetivo: decir «Ganaste» al llegar a 10 puntos\nsi puntos > 10 entonces\n  decir "Ganaste"', q: '¿Qué corrección funciona?', opts: ['Cambiar > por ≥ (mayor o igual)', 'Cambiar 10 por 100', 'Quitar el «si»'], a: 0, fb: 'Con > el jugador necesitaría 11 puntos.' },
+        { code: '// Objetivo: decir del 1 al 5\nfijar n a 0\nrepetir 5 veces\n  decir n\n  cambiar n por 1', q: '¿Qué números dice realmente?', opts: ['1 2 3 4 5', '0 1 2 3 4', '0 1 2 3 4 5'], a: 1, fb: 'Dice n antes de aumentarlo; debería empezar en 1.' },
+      ] } },
+  ] },
+  /* ---------------- M5 ---------------- */
+  { name: 'Introducción a la IA', hilo: 'ciudadania', temas: [
+    { t: 'Qué es y cómo funciona', p: { type: 'classify', cats: ['Usa IA', 'No usa IA'],
+      intro: 'La IA reconoce patrones en datos para predecir o generar algo. ¿Cuáles de estas herramientas probablemente usan IA?',
+      items: [
+        { t: 'Recomendaciones de videos en una plataforma', c: 0, why: 'Aprende de lo que ves para predecir qué te gustará.', hint: '¿Aprende de tus hábitos?' },
+        { t: 'La calculadora del celular', c: 1, why: 'Sigue reglas fijas, no aprende de datos.', hint: '¿Siempre da el mismo resultado con la misma operación?' },
+        { t: 'Filtro de fotos que reconoce tu cara', c: 0, why: 'Reconoce patrones en imágenes.', hint: '¿Tiene que «reconocer» algo?' },
+        { t: 'Traductor automático de textos', c: 0, why: 'Fue entrenado con millones de textos.', hint: '¿Cómo sabe traducir frases nuevas?' },
+        { t: 'Despertador que suena a las 7:00', c: 1, why: 'Es una regla programada.', hint: '¿Decide algo por sí mismo?' },
+        { t: 'Teclado que sugiere cómo terminar tu frase', c: 0, why: 'Predice la palabra más probable.', hint: '¿Predice algo?' },
+        { t: 'Semáforo con temporizador fijo', c: 1, why: 'Cambia con un tiempo fijo.', hint: '¿Se adapta a algo?' },
+        { t: 'Asistente de voz que responde preguntas', c: 0, why: 'Reconoce voz y genera respuestas.', hint: '¿Entiende lenguaje?' },
+      ] } },
+    { t: 'Usos y límites', p: { type: 'spot',
+      intro: 'Le pediste a una IA información sobre el ajolote. Compárala con la ficha verificada y marca las afirmaciones falsas o inventadas.',
+      tip: 'Una «alucinación» es información inventada que suena convincente, como citas o fechas que no existen.',
+      sets: [
+        { frame: 'doc', head: '<b>Ficha verificada (libro de Biología):</b> El ajolote es un anfibio endémico de los canales de Xochimilco, en la Ciudad de México. Puede regenerar extremidades. Está en peligro crítico de extinción. Conserva rasgos de larva en su etapa adulta.', parts: [] },
+        { frame: 'chat', head: 'Respuesta de la IA', parts: [
+          ['El ajolote es un pez de agua dulce', true, 'Es un anfibio, no un pez'], ' que vive de forma natural ', ['solo en los canales de Xochimilco', false], '. ',
+          ['Puede regenerar sus extremidades', false], ' y ', ['conserva rasgos de larva en su etapa adulta', false], '. ',
+          ['Su población está creciendo gracias al turismo', true, 'La ficha dice que está en peligro crítico'], '. ',
+          ['Fue descubierto en 2015 por científicos de la NASA', true, 'Dato inventado'], '. ',
+          ['Según el Dr. Martín Solís (2019), puede vivir hasta 200 años', true, 'Cita y dato inventados: alucinación'], '.',
+        ] },
+      ] } },
+    { t: 'Uso ético', p: { type: 'quiz',
+      intro: 'Elige la decisión más responsable en cada situación.',
+      qs: [
+        { q: 'Tu maestra pide un ensayo propio. Una IA puede escribirlo completo en segundos. ¿Qué haces?', opts: ['Uso la IA para generar ideas o aclarar dudas, escribo yo el ensayo y declaro el apoyo si me lo piden', 'Entrego el texto de la IA tal cual', 'Cambio algunas palabras para que no se note', 'Mejor no hago el ensayo'], a: 0, fb: 'La IA apoya tu aprendizaje; no lo reemplaza.' },
+        { q: 'Quieres que una IA te ayude con un mensaje para un amigo que está triste. ¿Qué NO escribes en la herramienta?', opts: ['Su nombre completo, dónde vive y lo que le pasó', 'Que quieres un mensaje amable', 'Que el tono sea cálido', 'Que sea breve'], a: 0, fb: 'Nunca compartas datos personales tuyos o de otros.' },
+        { q: 'La IA te dio un dato para tu exposición. ¿Qué haces antes de usarlo?', opts: ['Lo verifico en una fuente confiable', 'Lo uso porque las IA no se equivocan', 'Le pregunto a la misma IA si es cierto', 'Lo pongo en letra pequeña'], a: 0, fb: 'La IA puede inventar datos.' },
+        { q: 'Un compañero hace con IA una imagen falsa y vergonzosa de otro alumno. ¿Qué haces?', opts: ['No la comparto y la reporto a un adulto de confianza', 'La comparto solo con mis amigos', 'Le pongo un comentario chistoso', 'La guardo por si acaso'], a: 0, fb: 'Compartirla también hace daño.' },
+        { q: '¿Quién es responsable de lo que entregas aunque uses IA?', opts: ['Yo', 'La IA', 'La empresa que hizo la IA', 'Nadie'], a: 0 },
+      ] } },
+  ] },
+  /* ---------------- M6 ---------------- */
+  { name: 'Identidad digital', hilo: 'creacion', temas: [
+    { t: 'Identidad visual', p: { type: 'contrast',
+      intro: 'Elige la paleta de tu campaña: un color de fondo, uno de texto y uno de acento. El texto debe leerse bien en un celular.',
+      tip: 'El contraste mínimo recomendado para texto es 4.5 : 1. Un texto amarillo sobre blanco casi no se lee.',
+      lead: '<p>Tus colores y tipografías se repetirán en todas las publicaciones: así la gente reconoce tu campaña.</p>',
+      palette: ['#FFFFFF', '#F6EFD9', '#1F2A44', '#0E7C66', '#F2B134', '#E4572E', '#9AA5B1', '#6C4AB6', '#D9E7F2', '#2B2B2B'],
+      title: 'Cuidemos el agua', body: 'Cierra la llave mientras te lavas los dientes: ahorras varios litros cada día.', cta: 'Súmate' } },
+    { t: 'Diseño de publicaciones', p: { type: 'quiz',
+      intro: 'Analiza cada publicación y elige el diagnóstico correcto.',
+      qs: [
+        { q: '¿Cuál es el problema principal?', html: post('<b style="font-size:15px">¡Recicla!</b><span style="font-size:11px">También cuida el agua. Inscríbete al torneo. Trae tu termo. Vota por la mesa directiva. La cooperativa abre a las 10.</span>', 'background:#fff;color:#1f2a44'), opts: ['Mezcla varios mensajes en una sola publicación', 'Le falta un color de fondo', 'Tiene muy poco texto', 'No usa mayúsculas'], a: 0, fb: 'Un mensaje principal por publicación.' },
+        { q: '¿Qué falla aquí?', html: post('<b style="font-size:20px">Feria de Ciencias</b><span>Viernes 10:00 · Patio central</span>', 'background:#fff;color:#F2D24A'), opts: ['El texto tiene muy poco contraste con el fondo', 'Tiene demasiada información', 'Falta la fecha', 'El título es muy grande'], a: 0, fb: 'Amarillo claro sobre blanco no se lee.' },
+        { q: '¿Qué hace bien esta publicación?', html: post('<div style="height:8px;background:#0E7C66;margin:-14px -14px 6px"></div><b style="font-size:22px">Cuidemos el agua</b><span style="font-size:13px">Cierra la llave mientras te lavas los dientes.</span><span style="margin-top:auto;align-self:flex-start;background:#0E7C66;color:#fff;border-radius:99px;padding:4px 12px;font-weight:bold">Súmate</span>', 'background:#F6EFD9;color:#1F2A44'), opts: ['Un mensaje claro, jerarquía visible y buen contraste', 'Usa muchos colores distintos', 'Incluye toda la información de la campaña', 'Es horizontal, ideal para celular'], a: 0 },
+      ] } },
+    { t: 'Comunicación responsable', p: { type: 'classify', cats: ['Publicar así', 'Corregir antes'],
+      intro: 'Revisa cada pieza de la campaña de reciclaje. ¿Está verificada y su tono respeta a todos?',
+      items: [
+        { t: '«El 70% de los alumnos no recicla» (el dato lo inventaste para que suene impactante)', c: 1, why: 'Un dato inventado es desinformación.', hint: '¿De dónde sale el dato?' },
+        { t: '«En la encuesta que aplicamos a 120 alumnos, 62% separa su basura»', c: 0, why: 'Dato propio, con fuente clara.', hint: '¿Se sabe de dónde viene?' },
+        { t: '«Los de primero son unos cochinos que tiran todo al piso»', c: 1, why: 'Ridiculiza y estereotipa a un grupo.', hint: '¿Cómo se sentirían los de primero?' },
+        { t: '«Cada salón ya tiene botes de colores. ¡Úsalos!»', c: 0, hint: '¿Es claro y respetuoso?' },
+        { t: 'Foto de un compañero tirando basura, con su cara visible, «para exhibirlo»', c: 1, why: 'Expone a una persona sin permiso.', hint: '¿Pidieron su permiso?' },
+        { t: '«Si no reciclas eres un mal ciudadano y nadie te va a querer»', c: 1, why: 'Culpa y excluye; mejor invita.', hint: '¿Invita o culpa?' },
+        { t: 'Dato de la autoridad ambiental, citado: un envase de plástico tarda cientos de años en degradarse', c: 0, why: 'Información verificada y con fuente.', hint: '¿Tiene fuente?' },
+      ] } },
+  ] },
+  /* ---------------- M7 ---------------- */
+  { name: 'Integrador', hilo: 'integra', temas: [
+    { t: 'Organización del equipo', p: { type: 'classify', cats: ['Nombre correcto', 'Nombre incorrecto'],
+      intro: 'Tu equipo acordó nombrar los archivos así: <code>Proyecto_v#_fecha</code>. ¿Cuáles siguen el acuerdo?',
+      tip: 'Nombres claros evitan sobrescribir el trabajo de otros. Nunca borres una versión hasta confirmar que la nueva funciona.',
+      items: [
+        { t: 'Campana_agua_v1_02sep.docx', c: 0, hint: 'Revisa: proyecto, versión y fecha.' },
+        { t: 'final final ahora sí.docx', c: 1, why: 'No dice proyecto, versión ni fecha.', hint: '¿Sabrías qué versión es?' },
+        { t: 'Campana_agua_v2_09sep.docx', c: 0, hint: 'Revisa: proyecto, versión y fecha.' },
+        { t: 'Documento1.docx', c: 1, why: 'Nombre genérico.', hint: '¿Dice algo del proyecto?' },
+        { t: 'campaña agua (copia).docx', c: 1, why: '«Copia» no indica la versión ni la fecha.', hint: '¿Qué versión es?' },
+        { t: 'Campana_agua_v3_16sep.pptx', c: 0, hint: 'Revisa: proyecto, versión y fecha.' },
+        { t: 'Campana_agua_v2_FINAL.docx', c: 1, why: 'Falta la fecha; «FINAL» confunde.', hint: '¿Tiene fecha?' },
+      ] } },
+    { t: 'Planeación y métricas', p: { type: 'sheet', cols: 6, rows: 10, tools: ['fill', 'cf'], widths: { A: 130, F: 150 }, cfDefault: 'F2:F6',
+      intro: 'Mide los resultados de tu campaña. La tasa de interacción indica qué parte de quienes vieron una publicación reaccionó a ella.',
+      tip: 'Tasa = interacciones ÷ alcance. Formato condicional en F2:F6: verde si es mayor o igual que 0.25.',
+      lead: '<p>Alcance: cuántas personas vieron la publicación. Interacciones: cuántas reaccionaron, comentaron o compartieron.</p>',
+      bold: ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'A8', 'A10'],
+      cells: { A1: 'Publicación', B1: 'Fecha', C1: 'Formato', D1: 'Alcance', E1: 'Interacciones', F1: 'Tasa de interacción', A2: 'Cartel 1', B2: '2 oct', C2: 'Imagen', D2: '320', E2: '48', A3: 'Video 1', B3: '5 oct', C3: 'Video', D3: '540', E3: '135', A4: 'Cartel 2', B4: '9 oct', C4: 'Imagen', D4: '300', E4: '30', A5: 'Encuesta', B5: '12 oct', C5: 'Imagen', D5: '410', E5: '82', A6: 'Video 2', B6: '16 oct', C6: 'Video', D6: '600', E6: '180', A8: 'Totales', A10: 'Formato que funcionó mejor:' },
+      tasks: [
+        { text: 'En <code>F2:F6</code> calcula la tasa de interacción de cada publicación.', check: { type: 'cells', range: 'F2:F6', formula: true, expect: (c, a) => num(c.v('E' + row(a))) / num(c.v('D' + row(a))) }, hint: '=E2/D2 y rellena.' },
+        { text: 'En <code>D8</code> y <code>E8</code> suma el alcance y las interacciones totales.', checks: [{ type: 'formula', cell: 'D8', includes: ['SUMA('], equals: 2170 }, { type: 'formula', cell: 'E8', includes: ['SUMA('], equals: 475 }], hint: '=SUMA(D2:D6)' },
+        { text: 'En <code>F8</code> calcula la tasa promedio de la campaña.', check: { type: 'formula', cell: 'F8', includes: ['PROMEDIO('], equals: 0.2, tol: 0.001 }, hint: '=PROMEDIO(F2:F6)' },
+        { text: 'Resalta en verde las tasas de 0.25 o más.', check: { type: 'cf', range: 'F2:F6', rules: [{ op: '>=', value: 0.25, color: 'verde' }] }, hint: 'Formato condicional → F2:F6 → mayor o igual que → 0.25 → verde.' },
+        { text: 'En <code>B10</code> escribe qué formato funcionó mejor: Imagen o Video.', check: { type: 'value', cell: 'B10', equals: 'Video' }, hint: 'Mira cuáles quedaron en verde.' },
+      ] } },
+  ] },
+  ],
+};
+})();
+
+</script>
+<script>
+/* ===== Simulador Tech Kids — aplicación ===== */
+(() => {
+  const G = window.GRADE;
+  const KEY = 'techkids-sim-' + G.id;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const shuffle = (n) => { const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const shuffleNot = (n) => { if (n < 2) return [...Array(n).keys()]; let a; do { a = shuffle(n); } while (a.every((v, i) => v === i)); return a; };
+  const LET = 'ABCDEFGHIJ';
+
+  /* ---------- almacenamiento ---------- */
+  let store;
+  try { store = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { store = null; }
+  if (!store || typeof store !== 'object') store = {};
+  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || '';
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
+
+  const all = []; G.modules.forEach((m, mi) => m.temas.forEach((t, ti) => all.push({ pid: `m${mi + 1}t${ti + 1}`, m, mi, t, ti })));
+  const byPid = Object.fromEntries(all.map((x) => [x.pid, x]));
+  const status = (pid) => { const p = store.prog[pid]; if (!p) return 'nuevo'; if (p.best >= 1) return 'dominado'; if (p.best >= 0.8) return 'hecho'; return 'intentado'; };
+  const doneCount = () => all.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length;
+
+  /* ---------- gráficas SVG compartidas ---------- */
+  const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
+  function svgChart(cfg) {
+    const W = 520, H = 300, P = { l: 48, r: 16, t: 40, b: 56 };
+    const title = cfg.title ? `<text x="${W / 2}" y="24" text-anchor="middle" class="ch-title">${esc(cfg.title)}</text>` : '';
+    const labels = cfg.labels.map((x) => String(x ?? ''));
+    const ser = cfg.series.map((s) => ({ name: s.name, values: s.values.map((v) => (typeof v === 'number' && isFinite(v) ? v : 0)) }));
+    if (cfg.type === 'circular') {
+      const vals = ser[0].values; const tot = vals.reduce((a, b) => a + Math.max(0, b), 0) || 1;
+      let a0 = -Math.PI / 2; const cx = 170, cy = 165, R = 105; let out = '';
+      vals.forEach((v, i) => {
+        const a1 = a0 + (Math.max(0, v) / tot) * Math.PI * 2; const large = a1 - a0 > Math.PI ? 1 : 0;
+        const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0), x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+        const path = vals.filter((x) => x > 0).length === 1 && v > 0 ? `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${SERIES[i % 6]}"/>` : `<path d="M${cx},${cy} L${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1} Z" fill="${SERIES[i % 6]}" stroke="var(--surface)" stroke-width="2"/>`;
+        out += path; a0 = a1;
+      });
+      const leg = labels.map((l, i) => `<rect x="310" y="${70 + i * 24}" width="14" height="14" rx="3" fill="${SERIES[i % 6]}"/><text x="332" y="${82 + i * 24}" class="ch-lab">${esc(l)} (${Math.round((Math.max(0, vals[i] || 0) / tot) * 100)}%)</text>`).join('');
+      return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="${esc(cfg.title || 'Gráfica circular')}">${title}${out}${leg}</svg>`;
+    }
+    const allV = ser.flatMap((s) => s.values); const max = Math.max(1, ...allV); const min = Math.min(0, ...allV);
+    const step = niceStep((max - min) / 5); const top = Math.ceil(max / step) * step; const bot = Math.floor(min / step) * step;
+    const iw = W - P.l - P.r, ih = H - P.t - P.b; const y = (v) => P.t + ih - ((v - bot) / (top - bot || 1)) * ih;
+    let grid = '';
+    for (let v = bot; v <= top + 1e-9; v += step) grid += `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}" class="ch-grid"/><text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end" class="ch-ax">${+v.toFixed(2)}</text>`;
+    const n = labels.length || 1; const bw = iw / n; let body = '';
+    if (cfg.type === 'lineas') {
+      ser.forEach((s, si) => { const pts = s.values.map((v, i) => `${P.l + bw * i + bw / 2},${y(v)}`); body += `<polyline points="${pts.join(' ')}" fill="none" stroke="${SERIES[si % 6]}" stroke-width="3" stroke-linejoin="round"/>` + s.values.map((v, i) => `<circle cx="${P.l + bw * i + bw / 2}" cy="${y(v)}" r="3.5" fill="${SERIES[si % 6]}"/>`).join(''); });
+    } else {
+      const k = ser.length; const gw = bw * 0.72, cw = gw / k;
+      ser.forEach((s, si) => s.values.forEach((v, i) => { const x = P.l + bw * i + (bw - gw) / 2 + cw * si; const y0 = y(Math.max(0, v)), y1 = y(Math.min(0, v)); body += `<rect x="${x}" y="${y0}" width="${Math.max(2, cw - 2)}" height="${Math.max(0, y1 - y0)}" rx="3" fill="${SERIES[si % 6]}"/>`; }));
+    }
+    const xl = labels.map((l, i) => `<text x="${P.l + bw * i + bw / 2}" y="${H - P.b + 18}" text-anchor="middle" class="ch-ax">${esc(l.length > 10 ? l.slice(0, 9) + '…' : l)}</text>`).join('');
+    const leg = ser.length > 1 ? ser.map((s, i) => `<rect x="${P.l + i * 130}" y="${H - 22}" width="12" height="12" rx="3" fill="${SERIES[i % 6]}"/><text x="${P.l + i * 130 + 18}" y="${H - 12}" class="ch-lab">${esc(s.name || 'Serie ' + (i + 1))}</text>`).join('') : '';
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="${esc(cfg.title || 'Gráfica')}">${title}${grid}<line x1="${P.l}" x2="${W - P.r}" y1="${y(0)}" y2="${y(0)}" class="ch-axis"/>${body}${xl}${leg}</svg>`;
+  }
+  function niceStep(x) { if (x <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(x))); const f = x / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
+
+  /* ================= MOTORES ================= */
+  const E = {};
+
+  /* --- clasificar --- */
+  E.classify = (host, d, api) => {
+    const st = api.load() || { order: d.keepOrder ? [...Array(d.items.length).keys()] : shuffle(d.items.length), ans: Array(d.items.length).fill(-1) };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + `<div class="cls">${st.order.map((ix, k) => {
+        const it = d.items[ix];
+        return `<div class="cls-item" data-ix="${ix}"><div class="cls-text">${it.html || esc(it.t)}</div><div class="seg" role="group" aria-label="Clasificar">${d.cats.map((c, ci) => `<button type="button" data-k="${k}" data-c="${ci}" aria-pressed="${st.ans[ix] === ci}">${esc(c)}</button>`).join('')}</div><div class="cls-fb" aria-live="polite"></div></div>`;
+      }).join('')}</div>` + (d.preview === 'doc' ? `<div class="toc"><strong>Tabla de contenido automática</strong><div class="toc-body"></div></div>` : '');
+      if (d.preview === 'doc') drawToc();
+    };
+    const drawToc = () => {
+      const out = d.items.map((it, ix) => ({ it, c: st.ans[ix] })).filter((x) => x.c === 0 || x.c === 1);
+      $('.toc-body', host).innerHTML = out.length ? out.map((x) => `<div class="toc-l${x.c + 1}">${esc(x.it.t)}</div>`).join('') : '<em>Aún no hay títulos. Asigna Título 1 o Título 2 a los encabezados.</em>';
+    };
+    host.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-c]'); if (!b) return;
+      const ix = st.order[+b.dataset.k]; st.ans[ix] = +b.dataset.c; api.save(st);
+      $$(`button[data-k="${b.dataset.k}"]`, host).forEach((x) => x.setAttribute('aria-pressed', x === b));
+      const item = b.closest('.cls-item'); item.classList.remove('ok', 'bad'); $('.cls-fb', item).textContent = '';
+      if (d.preview === 'doc') drawToc();
+    });
+    draw();
+    return {
+      check() {
+        let ok = 0, miss = 0;
+        $$('.cls-item', host).forEach((el) => {
+          const ix = +el.dataset.ix, it = d.items[ix]; const a = st.ans[ix];
+          el.classList.remove('ok', 'bad');
+          if (a === -1) { miss++; return; }
+          if (a === it.c) { ok++; el.classList.add('ok'); $('.cls-fb', el).textContent = it.why ? '✓ ' + it.why : ''; }
+          else { el.classList.add('bad'); $('.cls-fb', el).textContent = it.hint ? 'Revisa: ' + it.hint : 'Revisa esta opción.'; }
+        });
+        const n = d.items.length;
+        return { score: ok / n, msg: miss ? `Te faltan ${miss} por clasificar. Llevas ${ok} de ${n} correctas.` : `${ok} de ${n} correctas.` };
+      }
+    };
+  };
+
+  /* --- opción múltiple --- */
+  E.quiz = (host, d, api) => {
+    const st = api.load() || { ans: Array(d.qs.length).fill(-1) };
+    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.qs.map((q, qi) => `<fieldset class="q" data-q="${qi}"><legend>${qi + 1}. ${esc(q.q)}</legend>${q.html ? `<div class="q-art">${q.html}</div>` : ''}${q.opts.map((o, oi) => `<label class="opt"><input type="radio" name="q${api.pid}_${qi}" value="${oi}" ${st.ans[qi] === oi ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('')}<div class="q-fb" aria-live="polite"></div></fieldset>`).join('');
+    host.addEventListener('change', (e) => { const f = e.target.closest('fieldset'); if (!f) return; st.ans[+f.dataset.q] = +e.target.value; f.classList.remove('ok', 'bad'); $('.q-fb', f).textContent = ''; api.save(st); });
+    return {
+      check() {
+        let ok = 0, miss = 0;
+        d.qs.forEach((q, qi) => {
+          const f = $(`fieldset[data-q="${qi}"]`, host); f.classList.remove('ok', 'bad'); const a = st.ans[qi];
+          if (a === -1) { miss++; return; }
+          if (a === q.a) { ok++; f.classList.add('ok'); $('.q-fb', f).textContent = '✓ ' + (q.fb || 'Correcto.'); }
+          else { f.classList.add('bad'); $('.q-fb', f).textContent = q.hint ? 'Pista: ' + q.hint : 'No es la mejor opción; vuelve a leer la situación.'; }
+        });
+        return { score: ok / d.qs.length, msg: miss ? `Responde todas las preguntas. Llevas ${ok} de ${d.qs.length} correctas.` : `${ok} de ${d.qs.length} correctas.` };
+      }
+    };
+  };
+
+  /* --- encontrar señales en un texto --- */
+  E.spot = (host, d, api) => {
+    const st = api.load() || { on: [] };
+    const sets = d.sets || [d];
+    let k = 0; const marks = [];
+    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + sets.map((s) => {
+      const head = s.head ? `<div class="spot-head">${s.head}</div>` : '';
+      const body = s.parts.map((p) => {
+        if (typeof p === 'string') return esc(p).replace(/\n/g, '<br>');
+        const id = k++; marks.push({ ok: !!p[1], why: p[2] || '' });
+        return `<button type="button" class="spot" data-i="${id}" aria-pressed="${st.on.includes(id)}">${esc(p[0])}</button>`;
+      }).join('');
+      return `<div class="spot-frame frame-${s.frame || 'doc'}">${head}<div class="spot-body">${body}</div></div>`;
+    }).join('') + `<p class="muted small">Toca las partes que te parezcan sospechosas o problemáticas. Vuelve a tocar para desmarcar.</p>`;
+    host.addEventListener('click', (e) => {
+      const b = e.target.closest('.spot'); if (!b) return; const i = +b.dataset.i;
+      st.on = st.on.includes(i) ? st.on.filter((x) => x !== i) : [...st.on, i]; b.setAttribute('aria-pressed', st.on.includes(i)); b.classList.remove('ok', 'bad'); b.removeAttribute('title'); api.save(st);
+    });
+    return {
+      check() {
+        const total = marks.filter((m) => m.ok).length; let tp = 0, fp = 0;
+        $$('.spot', host).forEach((b) => { const i = +b.dataset.i; b.classList.remove('ok', 'bad'); const fb = b.nextElementSibling && b.nextElementSibling.classList.contains('spot-why') ? b.nextElementSibling : null; if (fb) fb.remove();
+          if (st.on.includes(i)) { if (marks[i].ok) { tp++; b.classList.add('ok'); if (marks[i].why) b.insertAdjacentHTML('afterend', `<span class="spot-why">${esc(marks[i].why)}</span>`); } else { fp++; b.classList.add('bad'); } } });
+        const score = Math.max(0, tp - fp) / total;
+        let msg = `Encontraste ${tp} de ${total} señales.`; if (fp) msg += ` Marcaste ${fp} parte(s) que no son un problema.`; if (tp < total) msg += ` Te faltan ${total - tp}.`;
+        return { score, msg };
+      }
+    };
+  };
+
+  /* --- ordenar (con vista previa de capas opcional) --- */
+  E.order = (host, d, api) => {
+    const sets = d.sets;
+    const st = api.load() || { ord: sets.map((s) => shuffleNot(s.items.length)) };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + sets.map((s, si) => `<div class="ord-set" data-s="${si}"><p class="ord-prompt">${esc(s.prompt)}</p><div class="ord-wrap ${s.layers ? 'with-prev' : ''}"><ol class="ord">${st.ord[si].map((ix, pos) => `<li><span class="ord-t">${s.html ? s.items[ix] : esc(s.items[ix])}</span><span class="ord-btns"><button type="button" data-s="${si}" data-p="${pos}" data-d="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>↑</button><button type="button" data-s="${si}" data-p="${pos}" data-d="1" aria-label="Bajar" ${pos === s.items.length - 1 ? 'disabled' : ''}>↓</button></span></li>`).join('')}</ol>${s.layers ? `<div class="layer-prev"><svg viewBox="0 0 300 200">${[...st.ord[si]].reverse().map((ix) => s.layers[ix]).join('')}</svg><span class="muted small">Vista del lienzo: la capa de arriba en la lista se dibuja encima.</span></div>` : ''}</div></div>`).join('');
+    };
+    host.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-d]'); if (!b) return; const si = +b.dataset.s, p = +b.dataset.p, dd = +b.dataset.d; const o = st.ord[si]; const q = p + dd; if (q < 0 || q >= o.length) return;
+      [o[p], o[q]] = [o[q], o[p]]; api.save(st); draw(); const nb = $(`button[data-s="${si}"][data-p="${q}"][data-d="${dd}"]`, host) || $(`button[data-s="${si}"][data-p="${q}"]`, host); if (nb && !nb.disabled) nb.focus();
+    });
+    draw();
+    return {
+      check() {
+        let tot = 0, allOk = 0;
+        sets.forEach((s, si) => { const o = st.ord[si]; const c = o.filter((ix, pos) => ix === pos).length; tot += c / o.length; const el = $(`.ord-set[data-s="${si}"]`, host); el.classList.remove('ok', 'bad'); el.classList.add(c === o.length ? 'ok' : 'bad'); if (c === o.length) allOk++; });
+        return { score: tot / sets.length, msg: allOk === sets.length ? 'El orden es correcto.' : `${allOk} de ${sets.length} secuencia(s) en orden correcto. Los elementos en su lugar suman puntos.` };
+      }
+    };
+  };
+
+  /* --- contraseñas --- */
+  E.password = (host, d, api) => {
+    const st = api.load() || { pw: '', order: shuffle(d.samples.length), ans: Array(d.samples.length).fill(-1) };
+    const rules = [
+      ['Al menos 12 caracteres', (p) => p.length >= 12],
+      ['Una mayúscula', (p) => /[A-ZÁÉÍÓÚÑ]/.test(p)],
+      ['Una minúscula', (p) => /[a-záéíóúñ]/.test(p)],
+      ['Un número', (p) => /\d/.test(p)],
+      ['Un símbolo (por ejemplo ! ? # -)', (p) => /[^A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s]/.test(p)],
+      ['Sin patrones obvios (123, qwerty, password, tu nombre…)', (p) => p && !d.common.some((c) => norm(p).includes(c))],
+    ];
+    host.innerHTML = `<div class="lead-card">${d.lead}</div>
+      <label class="fld"><span>Escribe una contraseña de práctica (inventada, nunca una real)</span><input class="pw" type="text" autocomplete="off" spellcheck="false" value="${esc(st.pw)}"></label>
+      <div class="meter"><div class="meter-bar"></div></div><p class="meter-t" aria-live="polite"></p>
+      <ul class="rules">${rules.map((r, i) => `<li data-r="${i}">${esc(r[0])}</li>`).join('')}</ul>
+      <h3 class="sub">Ahora clasifica estas contraseñas de ejemplo</h3><div class="pw-cls"></div>`;
+    const upd = () => {
+      const p = st.pw; const ok = rules.map((r) => r[1](p)); const n = ok.filter(Boolean).length;
+      $$('.rules li', host).forEach((li, i) => li.classList.toggle('on', ok[i]));
+      const pct = p ? Math.round((n / rules.length) * 100) : 0; const bar = $('.meter-bar', host); bar.style.width = pct + '%'; bar.dataset.lv = n <= 3 ? 'low' : n <= 5 ? 'mid' : 'high';
+      $('.meter-t', host).textContent = !p ? 'Escribe para medir.' : n <= 3 ? 'Débil' : n <= 5 ? 'Aceptable' : 'Segura';
+    };
+    $('.pw', host).addEventListener('input', (e) => { st.pw = e.target.value; api.save(st); upd(); });
+    upd();
+    const sub = { load: () => st, save: () => api.save(st), pid: api.pid };
+    const cls = E.classify($('.pw-cls', host), { cats: d.cats, items: d.samples.map((s) => ({ html: `<code>${esc(s.p)}</code>`, c: s.c, why: s.why, hint: s.hint })) }, { load: () => ({ order: st.order, ans: st.ans }), save: (x) => { st.order = x.order; st.ans = x.ans; api.save(st); }, pid: api.pid });
+    return {
+      check() {
+        const okRules = rules.every((r) => r[1](st.pw)); const c = cls.check();
+        const score = (okRules ? 0.5 : 0) + c.score * 0.5;
+        return { score, msg: (okRules ? 'Tu contraseña de práctica cumple todos los criterios. ' : 'Tu contraseña de práctica aún no cumple todos los criterios. ') + 'Clasificación: ' + c.msg };
+      }
+    };
+  };
+
+  /* --- reescribir mensajes con netiqueta --- */
+  E.rewrite = (host, d, api) => {
+    const st = api.load() || { txt: d.msgs.map(() => '') };
+    const insults = d.insults || [];
+    const polite = ['por favor', 'gracias', 'podrias', 'podriamos', 'te parece', 'propongo', 'me gustaria', 'creo que', 'que opinas', 'disculpa', 'perdon', 'seria bueno', 'te pido', '¿'];
+    host.innerHTML = `<div class="lead-card">${d.lead}</div>` + d.msgs.map((m, i) => `<div class="rw" data-i="${i}"><div class="bubble bad-b">${esc(m.orig)}</div><label class="fld"><span>Tu versión respetuosa</span><textarea rows="3">${esc(st.txt[i])}</textarea></label><ul class="rules small"></ul></div>`).join('');
+    const test = (t, m) => {
+      const n = norm(t);
+      return [
+        ['Tiene al menos 20 caracteres', t.trim().length >= 20],
+        ['No usa palabras completas en MAYÚSCULAS (se lee como gritar)', !/\b[A-ZÁÉÍÓÚÑ]{4,}\b/.test(t)],
+        ['No repite signos !! o ??', !/[!¡]{2,}|[?¿]{2,}/.test(t)],
+        ['No contiene insultos ni burlas', !insults.some((w) => n.includes(w))],
+        ['Conserva la intención: ' + m.intent, m.keep.some((w) => n.includes(norm(w)))],
+        ['Usa una fórmula amable (por favor, gracias, ¿te parece…?)', polite.some((w) => n.includes(w) || t.includes(w))],
+      ];
+    };
+    const upd = (i) => { const el = $(`.rw[data-i="${i}"]`, host); const r = test(st.txt[i], d.msgs[i]); $('.rules', el).innerHTML = r.map(([t, ok]) => `<li class="${ok ? 'on' : ''}">${esc(t)}</li>`).join(''); };
+    d.msgs.forEach((_, i) => upd(i));
+    host.addEventListener('input', (e) => { const el = e.target.closest('.rw'); if (!el) return; const i = +el.dataset.i; st.txt[i] = e.target.value; api.save(st); upd(i); });
+    return { check() { let s = 0; d.msgs.forEach((m, i) => { const r = test(st.txt[i], m); s += r.filter((x) => x[1]).length / r.length; }); s /= d.msgs.length; return { score: s, msg: s >= 1 ? 'Los tres mensajes cumplen todas las reglas de netiqueta.' : 'Revisa los criterios sin palomita en cada mensaje.' }; } };
+  };
+
+  /* --- regla de los tercios --- */
+  E.thirds = (host, d, api) => {
+    const st = api.load() || { hy: 300, sx: 300, sy: 240, grid: true };
+    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="thirds"><svg viewBox="0 0 600 400" class="th-svg" role="img" aria-label="Lienzo de composición"></svg>
+      <div class="th-ctl"><label class="fld"><span>Horizonte (altura)</span><input type="range" min="40" max="360" data-k="hy"></label>
+      <label class="fld"><span>Faro: posición horizontal</span><input type="range" min="40" max="560" data-k="sx"></label>
+      <label class="fld"><span>Faro: posición vertical</span><input type="range" min="80" max="340" data-k="sy"></label>
+      <label class="chk"><input type="checkbox" data-k="grid"> Mostrar cuadrícula 3×3</label><p class="muted small">También puedes arrastrar el faro y la línea del horizonte con el mouse o el dedo.</p></div></div>`;
+    const svg = $('.th-svg', host);
+    const draw = () => {
+      const g = st.grid ? [200, 400].map((x) => `<line x1="${x}" x2="${x}" y1="0" y2="400" class="th-g"/>`).join('') + [133.3, 266.7].map((y) => `<line y1="${y}" y2="${y}" x1="0" x2="600" class="th-g"/>`).join('') + [200, 400].flatMap((x) => [133.3, 266.7].map((y) => `<circle cx="${x}" cy="${y}" r="5" class="th-dot"/>`)).join('') : '';
+      svg.innerHTML = `<defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB3E8"/><stop offset="1" stop-color="#F7C59F"/></linearGradient></defs>
+      <rect width="600" height="${st.hy}" fill="url(#sky)"/><circle cx="470" cy="${Math.max(30, st.hy - 40)}" r="26" fill="#FFE08A" opacity=".9"/><rect y="${st.hy}" width="600" height="${400 - st.hy}" fill="#2E6F8E"/>
+      <rect y="${st.hy}" width="600" height="6" fill="#ffffff" opacity=".25"/>
+      <g class="th-sub" transform="translate(${st.sx},${st.sy})" style="cursor:grab"><rect x="-14" y="-6" width="28" height="70" fill="#F4F4F4" stroke="#33415C"/><rect x="-14" y="10" width="28" height="12" fill="#D64545"/><rect x="-14" y="36" width="28" height="12" fill="#D64545"/><rect x="-18" y="-22" width="36" height="16" fill="#33415C"/><path d="M-12,-22 L0,-40 L12,-22Z" fill="#D64545"/><rect x="-26" y="62" width="52" height="10" fill="#5B4636"/><circle r="5" fill="#FFE08A"/></g>
+      <rect class="th-hz" y="${st.hy - 10}" width="600" height="20" fill="transparent" style="cursor:ns-resize"/>${g}`;
+      $$('input[type=range]', host).forEach((r) => { r.value = st[r.dataset.k]; });
+      $('input[type=checkbox]', host).checked = st.grid;
+    };
+    host.addEventListener('input', (e) => { const k = e.target.dataset.k; if (!k) return; st[k] = e.target.type === 'checkbox' ? e.target.checked : +e.target.value; api.save(st); draw(); });
+    let drag = null;
+    const pt = (e) => { const r = svg.getBoundingClientRect(); return { x: ((e.clientX - r.left) / r.width) * 600, y: ((e.clientY - r.top) / r.height) * 400 }; };
+    svg.addEventListener('pointerdown', (e) => { if (e.target.closest('.th-sub')) drag = 'sub'; else if (e.target.closest('.th-hz')) drag = 'hz'; else return; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+    svg.addEventListener('pointermove', (e) => { if (!drag) return; const p = pt(e); if (drag === 'sub') { st.sx = Math.round(Math.min(560, Math.max(40, p.x))); st.sy = Math.round(Math.min(340, Math.max(80, p.y))); } else st.hy = Math.round(Math.min(360, Math.max(40, p.y))); draw(); });
+    svg.addEventListener('pointerup', () => { if (drag) { drag = null; api.save(st); } });
+    draw();
+    return {
+      check() {
+        const hOk = Math.min(Math.abs(st.hy - 133.3), Math.abs(st.hy - 266.7)) <= 22;
+        const cy = st.sy + 20; const dist = Math.min(...[200, 400].flatMap((x) => [133.3, 266.7].map((y) => Math.hypot(st.sx - x, cy - y))));
+        const sOk = dist <= 40;
+        return { score: (hOk ? 0.5 : 0) + (sOk ? 0.5 : 0), msg: `${hOk ? '✓ El horizonte está sobre una línea de los tercios.' : '✗ Mueve el horizonte a una de las líneas horizontales (arriba o abajo), no al centro.'} ${sOk ? '✓ El faro está en una intersección.' : '✗ Lleva el centro del faro a uno de los cuatro puntos de intersección.'}` };
+      }
+    };
+  };
+
+  /* --- deslizadores: foto o mezcla de audio --- */
+  E.sliders = (host, d, api) => {
+    const st = api.load() || Object.fromEntries(d.sliders.map((s) => [s.id, s.start]));
+    const ctl = d.sliders.map((s) => `<label class="fld"><span>${esc(s.label)}: <b data-o="${s.id}"></b></span><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" data-k="${s.id}" value="${st[s.id]}"></label>`).join('');
+    if (d.kind === 'photo') {
+      const scene = `<rect width="300" height="120" fill="#8EC5F0"/><circle cx="235" cy="45" r="20" fill="#FFD25E"/><path d="M0,120 L60,70 L110,110 L170,55 L240,115 L300,85 L300,200 L0,200Z" fill="#3E8E5E"/><rect y="150" width="300" height="50" fill="#5DAE62"/><rect x="40" y="130" width="40" height="34" fill="#E86A4A"/><path d="M34,132 L60,112 L86,132Z" fill="#8C3B2F"/><circle cx="200" cy="160" r="12" fill="#E8C547"/><circle cx="222" cy="168" r="9" fill="#D94F8C"/>`;
+      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ph-row"><figure><svg viewBox="0 0 300 200" class="ph ph-you">${scene}</svg><figcaption>Tu ajuste</figcaption></figure><figure><svg viewBox="0 0 300 200" class="ph">${scene}</svg><figcaption>Referencia</figcaption></figure></div><div class="ctl-grid">${ctl}</div>`;
+    } else {
+      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="mixer">${d.sliders.map((s) => `<div class="trk" data-t="${s.id}"><span class="trk-n">${esc(s.label)}</span><div class="wave">${Array.from({ length: 48 }, (_, i) => `<i style="--h:${(0.25 + 0.75 * Math.abs(Math.sin(i * (s.id === 'voz' ? 0.9 : s.id === 'musica' ? 0.35 : 2.3) + s.id.length))).toFixed(2)}"></i>`).join('')}</div></div>`).join('')}</div><p class="mix-t" aria-live="polite"></p><div class="ctl-grid">${ctl}</div>`;
+    }
+    const upd = () => {
+      d.sliders.forEach((s) => { const o = $(`[data-o="${s.id}"]`, host); o.textContent = s.fmt ? s.fmt(st[s.id]) : st[s.id]; });
+      if (d.kind === 'photo') { const df = d.defect; $('.ph-you', host).style.filter = `brightness(${df.b * st.b}) contrast(${df.c * st.c}) saturate(${df.s * st.s})`; }
+      else {
+        d.sliders.forEach((s) => { $(`.trk[data-t="${s.id}"] .wave`, host).style.setProperty('--lv', st[s.id] / 100); });
+        const tot = d.sliders.reduce((a, s) => a + st[s.id], 0);
+        const v = st.voz, m = st.musica;
+        $('.mix-t', host).textContent = tot > 140 ? 'Hay picos: la suma de pistas satura el audio.' : v <= m + 30 ? 'La música compite con la voz; cuesta entender lo que se dice.' : st.ruido > 10 ? 'El ruido de fondo todavía se escucha.' : 'La voz se entiende con claridad.';
+      }
+    };
+    host.addEventListener('input', (e) => { const k = e.target.dataset.k; if (!k) return; st[k] = +e.target.value; api.save(st); upd(); });
+    upd();
+    return {
+      check() {
+        const res = d.sliders.map((s) => ({ s, ok: st[s.id] >= s.target[0] && st[s.id] <= s.target[1] }));
+        const n = res.filter((r) => r.ok).length;
+        return { score: n / res.length, msg: res.map((r) => (r.ok ? '✓ ' : '✗ ') + r.s.label + (r.ok ? '' : ': ' + r.s.hint)).join(' · ') };
+      }
+    };
+  };
+
+  /* --- robot en cuadrícula (programación por bloques) --- */
+  E.robot = (host, d, api) => {
+    let uid = 1;
+    const st = api.load() || { lv: 0, progs: d.levels.map(() => []), solved: d.levels.map(() => 0) };
+    st.progs.forEach((p) => { const walk = (l) => l.forEach((b) => { uid = Math.max(uid, b.id + 1); if (b.body) walk(b.body); }); walk(p); });
+    let dest = null, running = false;
+    const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+    const NAMES = { avanzar: 'Avanzar 1 casilla', izq: 'Girar a la izquierda', der: 'Girar a la derecha', rep: 'Repetir' };
+    const count = (l) => l.reduce((a, b) => a + 1 + (b.body ? count(b.body) : 0), 0);
+    const find = (l, id) => { for (const b of l) { if (b.id === id) return b; if (b.body) { const r = find(b.body, id); if (r) return r; } } return null; };
+    const remove = (l, id) => { const i = l.findIndex((b) => b.id === id); if (i >= 0) { l.splice(i, 1); return true; } return l.some((b) => b.body && remove(b.body, id)); };
+    const draw = (pos) => {
+      const L = d.levels[st.lv]; const prog = st.progs[st.lv]; const S = 44;
+      const p = pos || { x: L.start[0], y: L.start[1], d: L.start[2], got: [] };
+      let cells = '';
+      for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) { const wall = L.walls.some((w) => w[0] === x && w[1] === y); cells += `<rect x="${x * S}" y="${y * S}" width="${S}" height="${S}" class="${wall ? 'rb-wall' : 'rb-cell'}"/>`; }
+      const goal = `<g transform="translate(${L.goal[0] * S + S / 2},${L.goal[1] * S + S / 2})"><rect x="-4" y="-16" width="3" height="32" fill="var(--ink)"/><path d="M-1,-16 L15,-10 L-1,-4Z" fill="var(--creacion)"/></g>`;
+      const stars = (L.stars || []).filter((s, i) => !p.got.includes(i)).map((s) => `<text x="${s[0] * S + S / 2}" y="${s[1] * S + S / 2 + 7}" text-anchor="middle" font-size="22">★</text>`).join('');
+      const bot = `<g transform="translate(${p.x * S + S / 2},${p.y * S + S / 2}) rotate(${p.d * 90})"><circle r="15" fill="var(--codigo)"/><path d="M0,-12 L7,2 L-7,2Z" fill="#fff"/></g>`;
+      const rb = (l, depth) => `<ul class="rb-prog ${depth ? 'nested' : ''}">${l.map((b) => `<li class="rb-b k-${b.k} ${dest === b.id ? 'dest' : ''}" data-id="${b.id}"><span>${b.k === 'rep' ? `Repetir <button type="button" class="mini" data-act="minus" data-id="${b.id}" aria-label="Menos">−</button><b>${b.n}</b><button type="button" class="mini" data-act="plus" data-id="${b.id}" aria-label="Más">+</button> veces ${dest === b.id ? '<em>(agregando aquí)</em>' : `<button type="button" class="mini txt" data-act="into" data-id="${b.id}">agregar dentro</button>`}` : NAMES[b.k]}</span><button type="button" class="mini x" data-act="del" data-id="${b.id}" aria-label="Quitar bloque">×</button>${b.k === 'rep' ? rb(b.body, depth + 1) : ''}</li>`).join('')}</ul>`;
+      host.innerHTML = `<div class="lead-card">${d.lead}</div>
+        <div class="lv-tabs" role="tablist">${d.levels.map((l, i) => `<button type="button" role="tab" aria-selected="${i === st.lv}" data-lv="${i}">Nivel ${i + 1}${st.solved[i] >= 1 ? ' ✓' : ''}</button>`).join('')}</div>
+        <p class="lv-goal">${esc(L.goalText)}${L.max ? ` Usa como máximo <b>${L.max}</b> bloques.` : ''}</p>
+        <div class="rb-wrap"><svg viewBox="0 0 ${L.w * S} ${L.h * S}" class="rb-svg" style="max-width:${L.w * S * 1.3}px">${cells}${goal}${stars}${bot}</svg>
+        <div class="rb-side"><div class="rb-pal">${(L.blocks || ['avanzar', 'izq', 'der']).map((k) => `<button type="button" class="pal k-${k}" data-add="${k}" ${running ? 'disabled' : ''}>${NAMES[k]}</button>`).join('')}</div>
+        <div class="rb-head">Al presionar ▶ <span class="muted small">(${count(prog)} bloques)</span>${dest ? ` <button type="button" class="mini txt" data-act="out">volver al programa principal</button>` : ''}</div>${prog.length ? rb(prog, 0) : '<p class="muted small rb-empty">Agrega bloques desde la paleta.</p>'}
+        <div class="row"><button type="button" class="btn primary" data-act="run" ${running ? 'disabled' : ''}>▶ Ejecutar</button><button type="button" class="btn" data-act="clear" ${running ? 'disabled' : ''}>Borrar programa</button></div><p class="rb-msg" aria-live="polite"></p></div></div>`;
+    };
+    host.addEventListener('click', (e) => {
+      if (running) return;
+      const t = e.target.closest('button'); if (!t) return; const prog = st.progs[st.lv];
+      if (t.dataset.lv) { st.lv = +t.dataset.lv; dest = null; api.save(st); draw(); return; }
+      if (t.dataset.add) { const b = { id: uid++, k: t.dataset.add }; if (b.k === 'rep') { b.n = 2; b.body = []; } const target = dest ? find(prog, dest) : null; (target ? target.body : prog).push(b); if (b.k === 'rep') dest = b.id; api.save(st); draw(); return; }
+      const act = t.dataset.act, id = +t.dataset.id;
+      if (act === 'del') { remove(prog, id); if (dest && !find(prog, dest)) dest = null; }
+      if (act === 'plus') { const b = find(prog, id); b.n = Math.min(9, b.n + 1); }
+      if (act === 'minus') { const b = find(prog, id); b.n = Math.max(2, b.n - 1); }
+      if (act === 'into') dest = id;
+      if (act === 'out') dest = null;
+      if (act === 'clear') { st.progs[st.lv] = []; dest = null; }
+      if (act === 'run') { run(); return; }
+      api.save(st); draw();
+    });
+    function run() {
+      const L = d.levels[st.lv]; const lvl = st.lv; const steps = [];
+      const flat = (l) => { for (const b of l) { if (steps.length > 300) return; if (b.k === 'rep') for (let i = 0; i < b.n; i++) flat(b.body); else steps.push(b.k); } };
+      flat(st.progs[lvl]);
+      const pos = { x: L.start[0], y: L.start[1], d: L.start[2], got: [] };
+      running = true; draw(pos); let i = 0;
+      const msg = (t, cls) => { const m = $('.rb-msg', host); m.textContent = t; m.className = 'rb-msg ' + (cls || ''); };
+      if (!steps.length) { running = false; draw(); msg('El programa está vacío.', 'bad'); return; }
+      const tick = () => {
+        if (i >= steps.length) {
+          running = false; const allStars = (L.stars || []).length === pos.got.length; const atGoal = pos.x === L.goal[0] && pos.y === L.goal[1];
+          let sc = 0, txt;
+          if (atGoal && allStars) { const n = count(st.progs[lvl]); if (L.max && n > L.max) { sc = 0.7; txt = `¡Llegó! Pero usaste ${n} bloques y el reto pide ${L.max} como máximo. Usa “Repetir” para acortar el programa.`; } else { sc = 1; txt = '¡Lo lograste! El robot llegó a la meta.'; } }
+          else if (atGoal) txt = 'Llegó a la meta, pero le faltan estrellas por recoger.'; else txt = 'El programa terminó y el robot no está en la meta. Ajusta los bloques.';
+          st.solved[lvl] = Math.max(st.solved[lvl], sc); api.save(st); draw(pos); msg(txt, sc >= 1 ? 'ok' : 'bad'); api.autoCheck(); return;
+        }
+        const k = steps[i++];
+        if (k === 'izq') pos.d = (pos.d + 3) % 4; else if (k === 'der') pos.d = (pos.d + 1) % 4;
+        else { const nx = pos.x + DIRS[pos.d][0], ny = pos.y + DIRS[pos.d][1]; if (nx < 0 || ny < 0 || nx >= L.w || ny >= L.h || L.walls.some((w) => w[0] === nx && w[1] === ny)) { running = false; draw(pos); msg(`¡Choque en el paso ${i}! Hay una pared o el borde enfrente.`, 'bad'); return; } pos.x = nx; pos.y = ny; (L.stars || []).forEach((s, si) => { if (s[0] === nx && s[1] === ny && !pos.got.includes(si)) pos.got.push(si); }); }
+        draw(pos); setTimeout(tick, matchMedia('(prefers-reduced-motion: reduce)').matches ? 60 : 280);
+      };
+      setTimeout(tick, 200);
+    }
+    draw();
+    return { check() { const s = st.solved.reduce((a, b) => a + b, 0) / st.solved.length; return { score: s, msg: `Niveles resueltos: ${st.solved.filter((x) => x >= 1).length} de ${st.solved.length}. Ejecuta el programa de cada nivel para que cuente.` }; } };
+  };
+
+  /* --- rastrear programas: predecir el resultado --- */
+  E.trace = (host, d, api) => {
+    const st = api.load() || { ans: d.items.map(() => '') };
+    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.items.map((it, i) => `<div class="tr" data-i="${i}"><pre class="code">${it.code.split('\n').map((l, n) => `<span class="ln">${n + 1}</span>${esc(l)}`).join('\n')}</pre><div class="tr-q"><p>${esc(it.q)}</p>${it.opts ? it.opts.map((o, oi) => `<label class="opt"><input type="radio" name="tr${api.pid}_${i}" value="${oi}" ${String(st.ans[i]) === String(oi) ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('') : `<input class="tr-in" type="text" value="${esc(st.ans[i])}" placeholder="Tu respuesta" autocomplete="off">`}<p class="q-fb" aria-live="polite"></p></div></div>`).join('');
+    host.addEventListener('input', (e) => { const el = e.target.closest('.tr'); if (!el) return; st.ans[+el.dataset.i] = e.target.value; el.classList.remove('ok', 'bad'); $('.q-fb', el).textContent = ''; api.save(st); });
+    return {
+      check() {
+        let ok = 0;
+        d.items.forEach((it, i) => { const el = $(`.tr[data-i="${i}"]`, host); const a = String(st.ans[i] ?? '').trim(); const good = it.opts ? a === String(it.a) : norm(a).replace(/\s+/g, '') === norm(String(it.a)).replace(/\s+/g, '') || (it.alt || []).some((x) => norm(a).replace(/\s+/g, '') === norm(x).replace(/\s+/g, '')); el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (a ? 'Sigue el programa línea por línea anotando el valor de cada variable.' : 'Falta tu respuesta.'); if (good) ok++; });
+        return { score: ok / d.items.length, msg: `${ok} de ${d.items.length} correctas.` };
+      }
+    };
+  };
+
+  /* --- simulación con dados --- */
+  E.simulate = (host, d, api) => {
+    const st = api.load() || { mode: 1, c1: Array(6).fill(0), c2: Array(11).fill(0), ans: d.qs.map(() => -1) };
+    const draw = () => {
+      const one = st.mode === 1; const c = one ? st.c1 : st.c2; const n = c.reduce((a, b) => a + b, 0);
+      const labels = one ? ['1', '2', '3', '4', '5', '6'] : Array.from({ length: 11 }, (_, i) => String(i + 2));
+      $('.sim-out', host).innerHTML = `<div class="seg" role="group" aria-label="Modo"><button type="button" data-m="1" aria-pressed="${one}">1 dado</button><button type="button" data-m="2" aria-pressed="${!one}">Suma de 2 dados</button></div>
+        <div class="row"><button type="button" class="btn" data-r="10">Lanzar 10</button><button type="button" class="btn" data-r="100">Lanzar 100</button><button type="button" class="btn primary" data-r="1000">Lanzar 1000</button><button type="button" class="btn ghost" data-r="0">Reiniciar conteo</button></div>
+        <p><b>${n}</b> lanzamientos en este modo.</p>
+        <div class="tbl-wrap"><table class="freq"><tr><th>Resultado</th>${labels.map((l) => `<th>${l}</th>`).join('')}</tr><tr><th>Frecuencia</th>${c.map((x) => `<td>${x}</td>`).join('')}</tr><tr><th>Relativa</th>${c.map((x) => `<td>${n ? Math.round((x / n) * 1000) / 10 + '%' : '—'}</td>`).join('')}</tr></table></div>
+        ${n ? svgChart({ type: 'columnas', labels, series: [{ name: 'Frecuencia', values: c }], title: one ? 'Frecuencia de cada cara' : 'Frecuencia de cada suma' }) : ''}`;
+    };
+    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="sim-out"></div><h3 class="sub">Preguntas</h3><div class="sim-q"></div>`;
+    host.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.m) { st.mode = +b.dataset.m; api.save(st); draw(); }
+      if (b.dataset.r !== undefined) { const r = +b.dataset.r; if (r === 0) { if (st.mode === 1) st.c1 = Array(6).fill(0); else st.c2 = Array(11).fill(0); } else for (let i = 0; i < r; i++) { const a = 1 + Math.floor(Math.random() * 6); if (st.mode === 1) st.c1[a - 1]++; else st.c2[a + 1 + Math.floor(Math.random() * 6) - 2]++; } api.save(st); draw(); }
+    });
+    draw();
+    const q = E.quiz($('.sim-q', host), { qs: d.qs }, { load: () => ({ ans: st.ans }), save: (x) => { st.ans = x.ans; api.save(st); }, pid: api.pid });
+    return {
+      check() {
+        const n1 = st.c1.reduce((a, b) => a + b, 0), n2 = st.c2.reduce((a, b) => a + b, 0); const r = q.check();
+        const s = (n1 >= 1000 ? 0.25 : 0) + (n2 >= 1000 ? 0.25 : 0) + r.score * 0.5;
+        return { score: s, msg: `${n1 >= 1000 ? '✓' : '✗'} 1 000 o más lanzamientos con 1 dado (${n1}). ${n2 >= 1000 ? '✓' : '✗'} 1 000 o más con 2 dados (${n2}). Preguntas: ${r.msg}` };
+      }
+    };
+  };
+
+  /* --- paleta con contraste --- */
+  E.contrast = (host, d, api) => {
+    const st = api.load() || { bg: -1, tx: -1, ac: -1 };
+    const lum = (hex) => { const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+    const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const roles = [['bg', 'Fondo'], ['tx', 'Texto'], ['ac', 'Acento (botón o franja)']];
+    const draw = () => {
+      const P = d.palette; const bg = P[st.bg] || '#ffffff', tx = P[st.tx] || '#999999', ac = P[st.ac] || '#cccccc';
+      const r1 = st.bg >= 0 && st.tx >= 0 ? ratio(bg, tx) : 0, r2 = st.bg >= 0 && st.ac >= 0 ? ratio(bg, ac) : 0;
+      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ct-grid"><div>${roles.map(([k, n]) => `<div class="ct-role"><span>${n}</span><div class="sw-row">${P.map((c, i) => `<button type="button" class="sw" data-k="${k}" data-i="${i}" style="background:${c}" aria-pressed="${st[k] === i}" aria-label="${n}: color ${c}"></button>`).join('')}</div></div>`).join('')}
+        <ul class="rules small"><li class="${r1 >= 4.5 ? 'on' : ''}">Contraste texto/fondo de al menos 4.5 : 1 (llevas ${r1 ? r1.toFixed(1) : '—'})</li><li class="${r2 >= 3 ? 'on' : ''}">Contraste acento/fondo de al menos 3 : 1 (llevas ${r2 ? r2.toFixed(1) : '—'})</li><li class="${new Set([st.bg, st.tx, st.ac]).size === 3 && st.ac >= 0 && st.bg >= 0 && st.tx >= 0 ? 'on' : ''}">Tres colores distintos</li></ul></div>
+        <div class="post" style="background:${bg};color:${tx}"><div class="post-band" style="background:${ac}"></div><h4>${esc(d.title)}</h4><p>${esc(d.body)}</p><span class="post-btn" style="background:${ac};color:${bg}">${esc(d.cta)}</span></div></div>`;
+    };
+    host.addEventListener('click', (e) => { const b = e.target.closest('.sw'); if (!b) return; st[b.dataset.k] = +b.dataset.i; api.save(st); draw(); const nb = $(`.sw[data-k="${b.dataset.k}"][data-i="${b.dataset.i}"]`, host); if (nb) nb.focus(); });
+    draw();
+    return {
+      check() {
+        const P = d.palette; if (st.bg < 0 || st.tx < 0 || st.ac < 0) return { score: 0, msg: 'Elige un color para cada uno de los tres papeles.' };
+        const a = ratio(P[st.bg], P[st.tx]) >= 4.5, b = ratio(P[st.bg], P[st.ac]) >= 3, c = new Set([st.bg, st.tx, st.ac]).size === 3;
+        return { score: [a, b, c].filter(Boolean).length / 3, msg: a && b && c ? 'Tu paleta es legible y coherente.' : 'Ajusta los criterios sin palomita: un texto con poco contraste no se lee en el celular.' };
+      }
+    };
+  };
+
+  /* --- editor HTML/CSS/JS con vista previa --- */
+  E.html = (host, d, api) => {
+    const st = api.load() || { code: d.starter };
+    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ed"><label class="fld ed-code"><span>Tu código</span><textarea spellcheck="false" autocapitalize="off" autocomplete="off">${esc(st.code)}</textarea></label><div class="ed-prev"><span class="muted small">Vista previa</span><iframe sandbox="allow-scripts" title="Vista previa de tu página"></iframe></div></div><ul class="rules small ed-rules">${d.checks.map((c) => `<li>${esc(c.t)}</li>`).join('')}</ul>`;
+    const ta = $('textarea', host), fr = $('iframe', host);
+    let tmr; const render = () => { fr.srcdoc = st.code; };
+    ta.addEventListener('input', () => { st.code = ta.value; api.save(st); clearTimeout(tmr); tmr = setTimeout(render, 450); });
+    ta.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText('  ', s, ta.selectionEnd, 'end'); st.code = ta.value; api.save(st); } });
+    render();
+    return {
+      check() {
+        const doc = new DOMParser().parseFromString(st.code, 'text/html'); const res = d.checks.map((c) => { try { return !!c.f(doc, st.code); } catch (e) { return false; } });
+        $$('.ed-rules li', host).forEach((li, i) => li.classList.toggle('on', res[i]));
+        const n = res.filter(Boolean).length; return { score: n / res.length, msg: `${n} de ${res.length} requisitos cumplidos.` };
+      }
+    };
+  };
+
+  /* --- respuesta abierta guiada --- */
+  E.form = (host, d, api) => {
+    const st = api.load() || { v: d.fields.map(() => '') };
+    host.innerHTML = `<div class="lead-card">${d.lead}</div>` + d.fields.map((f, i) => `<label class="fld" data-i="${i}"><span>${esc(f.label)}</span>${f.rows === 1 ? `<input type="text" value="${esc(st.v[i])}" placeholder="${esc(f.ph || '')}">` : `<textarea rows="${f.rows || 3}" placeholder="${esc(f.ph || '')}">${esc(st.v[i])}</textarea>`}<small class="muted cnt"></small></label>`).join('') + `<div class="row"><button type="button" class="btn ghost" data-act="copy">Copiar mis respuestas</button><span class="muted small copy-t" aria-live="polite"></span></div>`;
+    const ok = (i) => { const f = d.fields[i], v = st.v[i]; const n = norm(v); return v.trim().length >= (f.min || 1) && (f.need || []).every((w) => n.includes(norm(w))); };
+    const upd = (i) => { const f = d.fields[i]; const el = $(`.fld[data-i="${i}"]`, host); $('.cnt', el).textContent = `${st.v[i].trim().length} caracteres${f.min ? ` (mínimo ${f.min})` : ''}${f.need ? ` · debe mencionar: ${f.need.join(', ')}` : ''}`; el.classList.toggle('ok', ok(i)); };
+    d.fields.forEach((_, i) => upd(i));
+    host.addEventListener('input', (e) => { const el = e.target.closest('.fld'); if (!el) return; const i = +el.dataset.i; st.v[i] = e.target.value; api.save(st); upd(i); });
+    host.addEventListener('click', async (e) => { if (e.target.dataset.act !== 'copy') return; const t = d.fields.map((f, i) => `${f.label}\n${st.v[i]}`).join('\n\n'); try { await navigator.clipboard.writeText(t); $('.copy-t', host).textContent = 'Copiado. Pégalo en tu documento de entrega.'; } catch (err) { $('.copy-t', host).textContent = 'No se pudo copiar automáticamente; selecciona el texto y cópialo.'; } });
+    return { check() { const n = d.fields.filter((_, i) => ok(i)).length; return { score: n / d.fields.length, msg: n === d.fields.length ? 'Todas tus respuestas cumplen con lo que se pide.' : `${n} de ${d.fields.length} respuestas completas. Revisa la extensión mínima y las palabras que deben aparecer.` }; } };
+  };
+
+  /* ================= HOJA DE CÁLCULO ================= */
+  E.sheet = (host, d, api) => {
+    const fresh = () => ({ raw: { ...d.cells }, cf: [], chart: null, filter: null, pivot: null, val: [] });
+    const st = api.load() || fresh();
+    const C = d.cols, R = d.rows; let sel = 'A1'; let sheet; let pickerOpen = null;
+    const tools = d.tools || [];
+    const TOOLN = { fill: 'Rellenar', cf: 'Formato condicional', chart: 'Insertar gráfica', sort: 'Ordenar', filter: 'Filtrar', pivot: 'Tabla dinámica', validation: 'Validación de datos' };
+    host.innerHTML = `<div class="lead-card">${d.lead}</div>
+      <div class="xl">
+        <div class="fbar"><span class="addr" aria-live="polite">A1</span><span class="fx">fx</span><input class="finput" type="text" spellcheck="false" autocomplete="off" aria-label="Barra de fórmulas"><button type="button" class="btn sm" data-act="commit">Aceptar</button></div>
+        <div class="valpick" hidden></div>
+        <div class="gridwrap"><table class="grid" tabindex="0" aria-label="Hoja de cálculo"></table></div>
+        ${tools.length ? `<div class="toolbar">${tools.map((t) => `<button type="button" class="btn sm" data-tool="${t}">${TOOLN[t]}</button>`).join('')}</div><div class="toolpanel" hidden></div>` : ''}
+        <div class="outputs"></div>
+      </div>
+      <h3 class="sub">Tareas</h3><ol class="tasks">${d.tasks.map((t, i) => `<li data-t="${i}"><span class="tk-t">${t.text}</span><span class="tk-h muted small"></span></li>`).join('')}</ol>
+      <p class="muted small">Escribe en la barra de fórmulas y presiona Enter. Mientras escribes una fórmula, toca una celda para insertar su referencia; escribe “:” y toca otra celda para formar un rango.</p>`;
+    const grid = $('.grid', host), inp = $('.finput', host);
+    const hidden = () => { if (!st.filter) return new Set(); const g = FX.parseRange(d.filterRange || 'A2:A' + R); const col = FX.colToNum(st.filter.col); const s = new Set(); for (let r = g.r1; r <= g.r2; r++) { const v = sheet.value(FX.addr(col, r)); if (FX.norm(FX.fmt(v)) !== FX.norm(st.filter.value)) s.add(r); } return s; };
+    const cfColor = (a, v) => { for (const rule of st.cf) { if (!FX.rangeCells(rule.range).includes(a)) continue; if (matchRule(rule, v)) return rule.color; } return null; };
+    function matchRule(rule, v) { if (v === null || v === '') return false; if (rule.op === 'contiene') return FX.norm(FX.fmt(v)).includes(FX.norm(rule.value)); const f = FX.crit(rule.op + rule.value); return f(v); }
+    const valRule = (a) => st.val.find((r) => FX.rangeCells(r.range).includes(a));
+    function renderGrid() {
+      sheet = FX.makeSheet(st.raw); const hid = hidden(); const w = d.widths || {};
+      let h = `<thead><tr><th class="corner"></th>${Array.from({ length: C }, (_, c) => `<th style="${w[FX.numToCol(c + 1)] ? `min-width:${w[FX.numToCol(c + 1)]}px` : ''}">${FX.numToCol(c + 1)}${st.filter && st.filter.col === FX.numToCol(c + 1) ? ' ⏷' : ''}</th>`).join('')}</tr></thead><tbody>`;
+      for (let r = 1; r <= R; r++) {
+        if (hid.has(r)) continue;
+        h += `<tr><th>${r}</th>`;
+        for (let c = 1; c <= C; c++) {
+          const a = FX.addr(c, r); const v = sheet.value(a); const raw = st.raw[a];
+          const cls = [typeof v === 'number' ? 'num' : '', FX.isErr(v) ? 'err' : '', a === sel ? 'sel' : '', typeof raw === 'string' && raw.startsWith('=') ? 'f' : '', (d.bold || []).includes(a) ? 'b' : '', valRule(a) ? 'hasval' : ''].join(' ');
+          const col = cfColor(a, v);
+          h += `<td data-a="${a}" class="${cls}" ${col ? `data-cf="${col}"` : ''}>${esc(FX.fmt(v))}</td>`;
+        }
+        h += '</tr>';
+      }
+      grid.innerHTML = h + '</tbody>';
+      renderOutputs();
+    }
+    function select(a, focusInput) {
+      sel = a; $('.addr', host).textContent = a; inp.value = st.raw[a] ?? '';
+      $$('td.sel', grid).forEach((x) => x.classList.remove('sel')); const td = $(`td[data-a="${a}"]`, grid); if (td) { td.classList.add('sel'); td.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+      const vr = valRule(a); const vp = $('.valpick', host);
+      if (vr) { vp.hidden = false; vp.innerHTML = `<label>Elige un valor para ${a}: <select>${['', ...vr.list].map((o) => `<option ${FX.norm(o) === FX.norm(st.raw[a] ?? '') ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`; } else { vp.hidden = true; vp.innerHTML = ''; }
+      if (focusInput) inp.focus();
+    }
+    function commit(move) {
+      let v = inp.value; const vr = valRule(sel);
+      if (vr && v.trim() && !v.startsWith('=') && !vr.list.some((o) => FX.norm(o) === FX.norm(v))) { flash(`“${v}” no está en la lista permitida de ${sel}. Elige un valor de la lista.`); return; }
+      if (v.startsWith('=')) { try { FX.parse(v.slice(1)); } catch (e) { flash('La fórmula tiene un error de escritura: revisa paréntesis, comillas y separadores.'); return; } v = v.replace(/^=\s*/, '=').replace(/([A-Za-zÁÉÍÓÚÑáéíóúñ._]+)\s*\(/g, (m, n) => n.toUpperCase() + '(').replace(/(?<![A-Za-z])([a-z]{1,2})(\$?\d+)/g, (m, c, r) => c.toUpperCase() + r); }
+      if (v === '') delete st.raw[sel]; else st.raw[sel] = v; api.save(st); renderGrid();
+      const p = FX.parseAddr(sel); if (move === 'down' && p.r < R) select(FX.addr(p.c, p.r + 1)); else if (move === 'right' && p.c < C) select(FX.addr(p.c + 1, p.r)); else select(sel);
+    }
+    const flash = (t) => { let f = $('.xl-flash', host); if (!f) { f = document.createElement('p'); f.className = 'xl-flash'; f.setAttribute('role', 'alert'); $('.fbar', host).after(f); } f.textContent = t; clearTimeout(f._t); f._t = setTimeout(() => f.remove(), 4500); };
+    const inserting = () => document.activeElement === inp && inp.value.startsWith('=') && /[=(+\-*/^,;:<>&]\s*$/.test(inp.value.slice(0, inp.selectionStart));
+    grid.addEventListener('mousedown', (e) => { const td = e.target.closest('td[data-a]'); if (!td) return; if (inserting()) { e.preventDefault(); const s = inp.selectionStart; inp.setRangeText(td.dataset.a, s, inp.selectionEnd, 'end'); } });
+    grid.addEventListener('click', (e) => { const td = e.target.closest('td[data-a]'); if (!td) return; if (document.activeElement === inp && inp.value.startsWith('=') && inp.value !== (st.raw[sel] ?? '')) return; select(td.dataset.a); grid.focus(); });
+    grid.addEventListener('dblclick', (e) => { const td = e.target.closest('td[data-a]'); if (td) { select(td.dataset.a, true); } });
+    grid.addEventListener('keydown', (e) => {
+      const p = FX.parseAddr(sel); let n = null;
+      if (e.key === 'ArrowDown' && p.r < R) n = FX.addr(p.c, p.r + 1); if (e.key === 'ArrowUp' && p.r > 1) n = FX.addr(p.c, p.r - 1); if (e.key === 'ArrowRight' && p.c < C) n = FX.addr(p.c + 1, p.r); if (e.key === 'ArrowLeft' && p.c > 1) n = FX.addr(p.c - 1, p.r);
+      if (n) { e.preventDefault(); select(n); return; }
+      if (e.key === 'Enter' || e.key === 'F2') { e.preventDefault(); select(sel, true); return; }
+      if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delete st.raw[sel]; api.save(st); renderGrid(); select(sel); return; }
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); inp.value = e.key; inp.focus(); }
+    });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit('down'); grid.focus(); } else if (e.key === 'Tab') { e.preventDefault(); commit('right'); grid.focus(); } else if (e.key === 'Escape') { inp.value = st.raw[sel] ?? ''; grid.focus(); } });
+    host.addEventListener('change', (e) => { if (e.target.closest('.valpick')) { inp.value = e.target.value; commit(); } });
+    host.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.act === 'commit') { commit(); return; }
+      if (b.dataset.tool) { openTool(b.dataset.tool); return; }
+      if (b.dataset.apply) { applyTool(b.dataset.apply); return; }
+      if (b.dataset.delcf !== undefined) { st.cf.splice(+b.dataset.delcf, 1); api.save(st); renderGrid(); openTool('cf'); }
+      if (b.dataset.delval !== undefined) { st.val.splice(+b.dataset.delval, 1); api.save(st); renderGrid(); openTool('validation'); }
+    });
+    const colOpts = (sel0) => Array.from({ length: C }, (_, c) => FX.numToCol(c + 1)).map((l) => `<option ${l === sel0 ? 'selected' : ''}>${l}</option>`).join('');
+    function headers() { const g = FX.parseRange(d.pivotSource || d.filterRange || 'A1:A1'); const out = []; for (let c = g.c1; c <= g.c2; c++) out.push(String(FX.fmt(sheet.value(FX.addr(c, d.pivotSource ? g.r1 : g.r1 - 1))))); return out; }
+    function openTool(t) {
+      const p = $('.toolpanel', host); if (pickerOpen === t) { p.hidden = true; pickerOpen = null; return; } pickerOpen = t; p.hidden = false; const sp = FX.parseAddr(sel);
+      if (t === 'fill') p.innerHTML = `<p>Copia el contenido de <b>${sel}</b> a las celdas siguientes. Las referencias sin $ se ajustan; las que tienen $ se quedan fijas.</p><div class="row"><label>Hacia abajo hasta la fila <input type="number" class="sm-in" data-f="row" min="${sp.r + 1}" max="${R}" value="${Math.min(R, sp.r + 4)}"></label><button type="button" class="btn sm primary" data-apply="filldown">Rellenar ↓</button></div><div class="row"><label>Hacia la derecha hasta la columna <select data-f="col">${colOpts(FX.numToCol(Math.min(C, sp.c + 1)))}</select></label><button type="button" class="btn sm" data-apply="fillright">Rellenar →</button></div><div class="row"><label>A todo un rango (por ejemplo E4:H7) <input class="sm-in w8" data-f="frange" placeholder="E4:H7"></label><button type="button" class="btn sm" data-apply="fillrange">Rellenar rango</button></div>`;
+      if (t === 'cf') p.innerHTML = `<div class="row wrap"><label>Rango <input class="sm-in w8" data-f="range" value="${esc(d.cfDefault || sel)}"></label><label>Si el valor es <select data-f="op"><option value=">">mayor que</option><option value=">=">mayor o igual que</option><option value="<">menor que</option><option value="<=">menor o igual que</option><option value="=">igual a</option><option value="<>">distinto de</option><option value="contiene">contiene el texto</option></select></label><label>valor <input class="sm-in w6" data-f="value"></label><label>color <select data-f="color"><option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option></select></label><button type="button" class="btn sm primary" data-apply="cf">Agregar regla</button></div>${st.cf.length ? `<ul class="rulelist">${st.cf.map((r, i) => `<li>${esc(r.range)}: ${esc(r.op)} ${esc(r.value)} → ${r.color} <button type="button" class="mini x" data-delcf="${i}" aria-label="Quitar regla">×</button></li>`).join('')}</ul>` : ''}`;
+      if (t === 'chart') p.innerHTML = `<div class="row wrap"><label>Tipo <select data-f="type"><option value="columnas">Columnas</option><option value="circular">Circular</option><option value="lineas">Líneas</option></select></label><label>Etiquetas <input class="sm-in w8" data-f="labels" placeholder="A2:A6"></label><label>Valores <input class="sm-in w8" data-f="values" placeholder="B2:B6"></label><label>Título <input class="sm-in w12" data-f="title"></label><button type="button" class="btn sm primary" data-apply="chart">Insertar</button></div><p class="muted small">Si los valores ocupan varias columnas, cada columna será una serie; su nombre se toma de la fila de encabezado de arriba.</p>`;
+      if (t === 'sort') p.innerHTML = `<div class="row wrap"><label>Rango de datos (sin encabezados) <input class="sm-in w8" data-f="range" value="${esc(d.sortRange || '')}"></label><label>Ordenar por la columna <select data-f="col">${colOpts('B')}</select></label><label><select data-f="dir"><option value="asc">De menor a mayor (A→Z)</option><option value="desc">De mayor a menor (Z→A)</option></select></label><button type="button" class="btn sm primary" data-apply="sort">Ordenar</button></div>`;
+      if (t === 'filter') { const g = FX.parseRange(d.filterRange); const hd = []; for (let c = g.c1; c <= g.c2; c++) hd.push(FX.numToCol(c)); p.innerHTML = `<div class="row wrap"><label>Columna <select data-f="col" class="flt-col">${hd.map((l) => `<option ${st.filter && st.filter.col === l ? 'selected' : ''}>${l}</option>`).join('')}</select></label><label>Mostrar solo <select data-f="value" class="flt-val"></select></label><button type="button" class="btn sm primary" data-apply="filter">Aplicar filtro</button><button type="button" class="btn sm" data-apply="unfilter">Mostrar todo</button></div>`; const fillVals = () => { const col = FX.colToNum($('.flt-col', p).value); const set = new Set(); for (let r = g.r1; r <= g.r2; r++) { const v = FX.fmt(sheet.value(FX.addr(col, r))); if (v !== '') set.add(v); } $('.flt-val', p).innerHTML = [...set].sort().map((v) => `<option>${esc(v)}</option>`).join(''); }; fillVals(); $('.flt-col', p).addEventListener('change', fillVals); }
+      if (t === 'pivot') { const hd = headers(); p.innerHTML = `<p>Datos de origen: <b>${esc(d.pivotSource)}</b></p><div class="row wrap"><label>Filas <select data-f="row">${hd.map((x) => `<option>${esc(x)}</option>`).join('')}</select></label><label>Valores <select data-f="value">${hd.map((x) => `<option>${esc(x)}</option>`).join('')}</select></label><label>Operación <select data-f="agg"><option>SUMA</option><option>CONTAR</option><option>PROMEDIO</option></select></label><button type="button" class="btn sm primary" data-apply="pivot">Crear tabla dinámica</button></div>`; }
+      if (t === 'validation') p.innerHTML = `<div class="row wrap"><label>Rango <input class="sm-in w8" data-f="range" value="${esc(d.valDefault || sel)}"></label><label>Lista de valores permitidos, separados por coma <input class="sm-in w16" data-f="list" placeholder="Pendiente, Pagado"></label><button type="button" class="btn sm primary" data-apply="validation">Aplicar</button></div>${st.val.length ? `<ul class="rulelist">${st.val.map((r, i) => `<li>${esc(r.range)}: ${r.list.map(esc).join(', ')} <button type="button" class="mini x" data-delval="${i}" aria-label="Quitar validación">×</button></li>`).join('')}</ul>` : ''}`;
+    }
+    const fv = (k) => { const el = $(`.toolpanel [data-f="${k}"]`, host); return el ? el.value.trim() : ''; };
+    const okRange = (s) => !!FX.parseRange(s) && /^\$?[A-Za-z]{1,2}\$?\d+(:\$?[A-Za-z]{1,2}\$?\d+)?$/.test(s.trim());
+    function applyTool(a) {
+      if (a === 'filldown' || a === 'fillright') {
+        const src = st.raw[sel]; if (src === undefined) { flash(`${sel} está vacía: primero escribe algo en ella.`); return; }
+        const p = FX.parseAddr(sel);
+        if (a === 'filldown') { const to = Math.min(R, +fv('row')); for (let r = p.r + 1; r <= to; r++) st.raw[FX.addr(p.c, r)] = FX.shift(src, r - p.r, 0); }
+        else { const to = FX.colToNum(fv('col')); for (let c = p.c + 1; c <= to; c++) st.raw[FX.addr(c, p.r)] = FX.shift(src, 0, c - p.c); }
+      }
+      if (a === 'fillrange') {
+        const src = st.raw[sel]; if (src === undefined) { flash(`${sel} está vacía: primero escribe algo en ella.`); return; }
+        if (!okRange(fv('frange'))) { flash('Escribe un rango válido, por ejemplo E4:H7.'); return; }
+        const p = FX.parseAddr(sel); FX.rangeCells(fv('frange')).forEach((ad) => { const q = FX.parseAddr(ad); if (q.r > R || q.c > C) return; st.raw[ad] = FX.shift(src, q.r - p.r, q.c - p.c); });
+      }
+      if (a === 'cf') { const r = fv('range').toUpperCase(); if (!okRange(r)) { flash('Escribe un rango válido, por ejemplo E2:E6.'); return; } if (fv('value') === '') { flash('Escribe el valor de la condición.'); return; } st.cf.push({ range: r, op: fv('op'), value: fv('value'), color: fv('color') }); }
+      if (a === 'chart') { const L = fv('labels').toUpperCase(), V = fv('values').toUpperCase(); if (!okRange(L) || !okRange(V)) { flash('Escribe rangos válidos para etiquetas y valores, por ejemplo A2:A6 y B2:B6.'); return; } st.chart = { type: fv('type'), labels: L, values: V, title: fv('title') }; }
+      if (a === 'sort') {
+        const g = FX.parseRange(fv('range')); if (!g || !okRange(fv('range'))) { flash('Escribe el rango de datos sin encabezados, por ejemplo A2:D9.'); return; }
+        const col = FX.colToNum(fv('col')); const desc = fv('dir') === 'desc';
+        const rows = []; for (let r = g.r1; r <= g.r2; r++) { const row = {}; for (let c = g.c1; c <= g.c2; c++) row[c] = st.raw[FX.addr(c, r)]; rows.push({ r, row, key: sheet.value(FX.addr(col, r)) }); }
+        rows.sort((x, y) => { const a1 = x.key, b1 = y.key; let o; if (typeof a1 === 'number' && typeof b1 === 'number') o = a1 - b1; else o = String(FX.fmt(a1)).localeCompare(String(FX.fmt(b1)), 'es', { numeric: true }); return desc ? -o : o; });
+        rows.forEach((x, i) => { const nr = g.r1 + i; for (let c = g.c1; c <= g.c2; c++) { const v = x.row[c]; const ad = FX.addr(c, nr); if (v === undefined) delete st.raw[ad]; else st.raw[ad] = FX.shift(v, nr - x.r, 0); } });
+      }
+      if (a === 'filter') st.filter = { col: fv('col'), value: fv('value') };
+      if (a === 'unfilter') st.filter = null;
+      if (a === 'pivot') st.pivot = { row: fv('row'), value: fv('value'), agg: fv('agg') };
+      if (a === 'validation') { const r = fv('range').toUpperCase(); const list = fv('list').split(',').map((x) => x.trim()).filter(Boolean); if (!okRange(r) || !list.length) { flash('Escribe un rango válido y al menos un valor en la lista.'); return; } st.val = st.val.filter((x) => x.range !== r); st.val.push({ range: r, list }); }
+      api.save(st); renderGrid(); select(sel); if (['cf', 'validation'].includes(a)) { pickerOpen = null; openTool(a); }
+    }
+    function rangeVals(s) { const g = FX.parseRange(s); const cols = []; for (let c = g.c1; c <= g.c2; c++) { const v = []; for (let r = g.r1; r <= g.r2; r++) v.push(sheet.value(FX.addr(c, r))); cols.push({ c, v }); } return { g, cols }; }
+    function pivotData() { const hd = headers(); const g = FX.parseRange(d.pivotSource); const rc = g.c1 + hd.indexOf(st.pivot.row), vc = g.c1 + hd.indexOf(st.pivot.value); const m = new Map(); for (let r = g.r1 + 1; r <= g.r2; r++) { const k = FX.fmt(sheet.value(FX.addr(rc, r))); if (k === '') continue; const v = sheet.value(FX.addr(vc, r)); const e = m.get(k) || { s: 0, n: 0, c: 0 }; e.c++; if (typeof v === 'number') { e.s += v; e.n++; } m.set(k, e); } return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([k, e]) => [k, st.pivot.agg === 'SUMA' ? e.s : st.pivot.agg === 'CONTAR' ? e.c : (e.n ? e.s / e.n : 0)]); }
+    function renderOutputs() {
+      const o = $('.outputs', host); let h = '';
+      if (st.chart) { try { const L = rangeVals(st.chart.labels).cols[0].v.map((x) => FX.fmt(x)); const V = rangeVals(st.chart.values); const series = V.cols.map((cc) => ({ name: V.g.r1 > 1 ? FX.fmt(sheet.value(FX.addr(cc.c, V.g.r1 - 1))) : '', values: cc.v.map((x) => (typeof x === 'number' ? x : 0)) })); h += `<div class="out-card"><div class="out-h">Gráfica <button type="button" class="mini x" data-act="delchart" aria-label="Quitar gráfica">×</button></div>${svgChart({ type: st.chart.type, labels: L, series, title: st.chart.title })}</div>`; } catch (e) { h += '<p class="xl-flash">No se pudo dibujar la gráfica con esos rangos.</p>'; } }
+      if (st.pivot) { const rows = pivotData(); h += `<div class="out-card"><div class="out-h">Tabla dinámica: ${esc(st.pivot.agg)} de ${esc(st.pivot.value)} por ${esc(st.pivot.row)} <button type="button" class="mini x" data-act="delpivot" aria-label="Quitar tabla dinámica">×</button></div><table class="pivot"><tr><th>${esc(st.pivot.row)}</th><th>${esc(st.pivot.agg)} de ${esc(st.pivot.value)}</th></tr>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="num">${FX.fmt(v)}</td></tr>`).join('')}<tr class="tot"><td>Total general</td><td class="num">${FX.fmt(st.pivot.agg === 'PROMEDIO' ? '' : rows.reduce((a, r) => a + r[1], 0))}</td></tr></table></div>`; }
+      o.innerHTML = h;
+    }
+    host.addEventListener('click', (e) => { const b = e.target.closest('[data-act="delchart"],[data-act="delpivot"]'); if (!b) return; if (b.dataset.act === 'delchart') st.chart = null; else st.pivot = null; api.save(st); renderGrid(); });
+    renderGrid(); select('A1');
+
+    const eqv = (v, x, tol = 0.011) => (typeof x === 'number' ? typeof v === 'number' && Math.abs(v - x) <= tol : FX.norm(FX.fmt(v)) === FX.norm(x));
+    const rawU = (a) => String(st.raw[a] ?? '').toUpperCase().replace(/\s+/g, '').replace(/;/g, ',');
+    const ctx = { v: (a) => sheet.value(a), raw: (a) => st.raw[a], rawU, cells: FX.rangeCells, st, isF: (a) => String(st.raw[a] ?? '').startsWith('='), eqv };
+    function test(c) {
+      switch (c.type) {
+        case 'value': return eqv(sheet.value(c.cell), c.equals, c.tol);
+        case 'formula': return ctx.isF(c.cell) && (c.includes || []).every((s) => rawU(c.cell).includes(s.toUpperCase().replace(/\s+/g, ''))) && (c.equals === undefined || eqv(sheet.value(c.cell), c.equals, c.tol));
+        case 'cells': return FX.rangeCells(c.range).every((a, i) => (!c.formula || ctx.isF(a)) && (c.includes || []).every((s) => rawU(a).includes(s.toUpperCase())) && (c.expect ? eqv(sheet.value(a), c.expect(ctx, a, i), c.tol) : true) && (c.notIncludes || []).every((s) => !rawU(a).includes(s.toUpperCase())));
+        case 'cf': return FX.rangeCells(c.range).every((a) => { const v = sheet.value(a); const want = c.rules.find((r) => matchRule(r, v)); const got = cfColor(a, v); return want ? got === want.color : !got; }) && st.cf.length > 0;
+        case 'chart': return !!st.chart && (!c.chartType || st.chart.type === c.chartType) && (!c.values || st.chart.values.replace(/\$/g, '') === c.values) && (!c.labels || st.chart.labels.replace(/\$/g, '') === c.labels) && (!c.title || st.chart.title.length >= 3);
+        case 'sorted': { const col = FX.colToNum(c.col); const vals = []; for (let r = c.from; r <= c.to; r++) vals.push(sheet.value(FX.addr(col, r))); return vals.every((v, i) => i === 0 || (c.dir === 'desc' ? (typeof v === 'number' ? v <= vals[i - 1] : String(v).localeCompare(String(vals[i - 1]), 'es') <= 0) : (typeof v === 'number' ? v >= vals[i - 1] : String(v).localeCompare(String(vals[i - 1]), 'es') >= 0))) && (!c.keep || c.keep(ctx)); }
+        case 'filter': return !!st.filter && st.filter.col === c.col && FX.norm(st.filter.value) === FX.norm(c.value);
+        case 'pivot': return !!st.pivot && FX.norm(st.pivot.row) === FX.norm(c.row) && FX.norm(st.pivot.value) === FX.norm(c.value) && st.pivot.agg === c.agg;
+        case 'validation': return st.val.some((r) => r.range.replace(/\$/g, '') === c.range && r.list.length === c.list.length && c.list.every((x) => r.list.some((y) => FX.norm(y) === FX.norm(x))));
+        case 'expr': return !!c.f(ctx);
+      }
+      return false;
+    }
+    return {
+      check() {
+        renderGrid(); select(sel);
+        let ok = 0;
+        d.tasks.forEach((t, i) => { const li = $(`li[data-t="${i}"]`, host); let r = false; try { r = (t.checks || [t.check]).every(test); } catch (e) { r = false; } li.classList.remove('ok', 'bad'); li.classList.add(r ? 'ok' : 'bad'); $('.tk-h', li).textContent = r ? '' : (t.hint ? ' Pista: ' + t.hint : ''); if (r) ok++; });
+        return { score: ok / d.tasks.length, msg: `${ok} de ${d.tasks.length} tareas completas.` };
+      },
+      reset() { Object.assign(st, fresh()); }
+    };
+  };
+
+  /* ================= INTERFAZ ================= */
+  const app = $('#app');
+  function shell() {
+    app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
+      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Escribe tu nombre" autocomplete="name"></label><div class="prog-pill" id="pill"></div></div></header>
+      <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
+    $('#who').addEventListener('input', (e) => { store.name = e.target.value; persist(); });
+  }
+  const hiloName = { datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
+  const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
+  const stText = { nuevo: 'Sin empezar', intentado: 'Intentado', hecho: 'Completado', dominado: 'Dominado' };
+  function side(cur) {
+    $('#side').innerHTML = `<a href="#" class="side-home ${!cur ? 'on' : ''}">Mapa de prácticas</a>` + G.modules.map((m, mi) => `<section class="side-m" style="--hc:var(--${m.hilo})"><h2><span class="mcol">${LET[mi]}</span>${esc(m.name)}</h2><ul>${m.temas.map((t, ti) => { const pid = `m${mi + 1}t${ti + 1}`; const s = status(pid); return `<li><a href="#${pid}" class="st-${s} ${cur === pid ? 'on' : ''}" ${cur === pid ? 'aria-current="page"' : ''}><span class="ic" aria-label="${stText[s]}">${stIcon[s]}</span><span>${esc(t.t)}</span></a></li>`; }).join('')}</ul></section>`).join('');
+    const dn = doneCount(); $('#pill').innerHTML = `<span><b>${dn}</b> de ${all.length} temas</span><span class="pbar"><i style="width:${(dn / all.length) * 100}%"></i></span>`;
+  }
+  function home() {
+    side(null);
+    const maxT = Math.max(...G.modules.map((m) => m.temas.length));
+    const nextP = all.find((x) => !['hecho', 'dominado'].includes(status(x.pid)));
+    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const t = m.temas[ti]; if (!t) return '<div class="pcell empty" aria-hidden="true"></div>'; const pid = `m${mi + 1}t${ti + 1}`; const s = status(pid); return `<a class="pcell st-${s}" href="#${pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(t.t)}</span><span class="pst">${stIcon[s] ? stIcon[s] + ' ' : ''}${stText[s]}</span></a>`; }).join('')}</div>`).join('');
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>${esc(G.heroText)}</p><div class="row">${nextP ? `<a class="btn primary" href="#${nextP.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${esc(nextP.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+      <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
+      <p class="legend"><span>${stIcon.intentado} Intentado</span><span>${stIcon.hecho} Completado (80% o más)</span><span>${stIcon.dominado} Dominado (100%)</span></p>`;
+    $('#cert').addEventListener('click', cert);
+  }
+  function cert() {
+    const d = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${all.length} temas completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Mejor resultado</th><th>Intentos</th><th>Estado</th></tr>${all.map((x) => { const p = store.prog[x.pid]; return `<tr><td>${LET[x.mi]}. ${esc(x.m.name)}</td><td>${esc(x.t.t)}</td><td>${p ? Math.round(p.best * 100) + '%' : '—'}</td><td>${p ? p.tries : 0}</td><td>${stText[status(x.pid)]}</td></tr>`; }).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p></div>`;
+    document.body.classList.add('show-cert');
+    $('#doprint').addEventListener('click', () => window.print());
+    $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
+  }
+  let current = null;
+  function practice(pid) {
+    const x = byPid[pid]; if (!x) { home(); return; }
+    side(pid); const p = x.t.p; const idx = all.indexOf(x); const prev = all[idx - 1], next = all[idx + 1];
+    const best = store.prog[pid];
+    $('#main').innerHTML = `<article class="prac" style="--hc:var(--${x.m.hilo})"><a href="#" class="back">← Mapa de prácticas</a>
+      <p class="crumb"><span class="mcol">${LET[x.mi]}${x.ti + 1}</span> Módulo ${x.mi + 1}: ${esc(x.m.name)}</p>
+      <h2>${esc(x.t.t)}</h2><p class="intro">${p.intro}</p>
+      ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${p.tip}</div></details>` : ''}
+      <div class="engine"></div>
+      <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
+      <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">Siguiente →</a>` : ''}</div></article>`;
+    const api = {
+      pid,
+      load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null),
+      save: (s) => { store.saves[pid] = s; persist(); },
+      autoCheck: () => doCheck(true),
+    };
+    let eng;
+    try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Esta práctica no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
+    current = eng;
+    function doCheck(silent) {
+      if (!eng) return; const r = eng.check();
+      const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.best = Math.max(pr.best, r.score); store.prog[pid] = pr; persist();
+      const pct = Math.round(r.score * 100);
+      const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
+      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">Ir al siguiente tema →</a>` : ''}`;
+      side(pid);
+    }
+    $('#chk').addEventListener('click', () => doCheck(false));
+    $('#rst').addEventListener('click', () => { if (!confirm('¿Borrar tu trabajo en esta práctica y empezar de nuevo? Tu mejor resultado se conserva.')) return; delete store.saves[pid]; persist(); practice(pid); });
+    $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
+  }
+  function route() { const h = location.hash.slice(1); document.body.classList.toggle('in-prac', !!byPid[h]); if (byPid[h]) practice(h); else home(); }
+  shell(); window.addEventListener('hashchange', route); route();
+})();
+
+</script>
+</body>
+</html>
