@@ -296,6 +296,29 @@ input[type=range]{width:100%; accent-color:var(--hc,var(--ink)); min-height:32px
 .tasks li.bad .tk-t{color:var(--bad)}
 .tasks code,.intro code,.lead-card code,.tip code{font:600 .9em var(--f-mono); background:var(--sunk); padding:0 .25rem; border-radius:4px}
 
+
+/* ejercicios por tema */
+.extabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 .6rem}
+.extab{display:flex;flex-direction:column;gap:.1rem;padding:.5rem .9rem;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);text-decoration:none;min-width:9.5rem}
+.extab .exn{font-size:.78rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.extab .exl{font-weight:700}
+.extab[aria-selected="true"]{border-color:var(--hc);box-shadow:inset 0 -4px 0 var(--hc);background:color-mix(in srgb,var(--hc) 8%,var(--surface))}
+.extab.st-hecho .exl,.extab.st-dominado .exl{color:var(--hc)}
+.extitle{font-size:1.2rem;margin:.6rem 0 .2rem}
+.help{background:color-mix(in srgb,var(--hc) 7%,var(--surface));border:1px solid color-mix(in srgb,var(--hc) 30%,var(--line));border-radius:var(--r);padding:.5rem .9rem;margin-bottom:.8rem;max-width:80ch}
+.help summary{cursor:pointer;font-weight:700;color:var(--hc)}
+.help ol{margin:.4rem 0 .2rem;padding-left:1.3rem}
+.help code{font:600 .9em var(--f-mono)}
+.dots{display:inline-flex;gap:3px;margin-left:.35rem;vertical-align:middle}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--hc,var(--muted));background:transparent}
+.dot.st-intentado{background:linear-gradient(90deg,var(--hc,var(--muted)) 50%,transparent 50%)}
+.dot.st-hecho,.dot.st-dominado{background:var(--hc,var(--muted))}
+.dot.st-dominado{box-shadow:0 0 0 2px color-mix(in srgb,var(--hc,var(--muted)) 35%,transparent)}
+.legend .dot{--hc:var(--datos)}
+.side .sl{display:flex;flex-direction:column}
+.side .sl .dots{margin:.15rem 0 0}
+.spot-count{font-weight:700;margin:.2rem 0 0}
+
 /* constancia */
 #print{display:none}
 body.show-cert #print{display:block; position:fixed; inset:0; background:var(--bg); z-index:20; overflow:auto; padding:2rem}
@@ -891,6 +914,317 @@ window.GRADE = {
 };
 })();
 
+(() => {
+const row = (a) => +String(a).replace(/\D/g, '');
+const num = (v) => (typeof v === 'number' ? v : 0);
+const has = (code, re) => re.test(code);
+const Q = (q, ok, wrong, fb) => ({ q, opts: [ok, ...wrong], a: 0, fb });
+const QZ = (title, intro, qs) => ({ type: 'quiz', label: 'Comprueba', title, intro, qs });
+const CL = (title, intro, cats, items, extra = {}) => ({ type: 'classify', label: 'Aplica', title, intro, cats, items: items.map(([t, c, why, hint]) => ({ t, c, why, hint })), ...extra });
+const dir = [['M101', 'Ana', '3A', 9.1], ['M102', 'Luis', '3B', 8.4], ['M103', 'Sofía', '3A', 9.6], ['M104', 'Diego', '3C', 7.8]];
+const lookDir = (k, ci) => { const r = dir.find((x) => x[0].toLowerCase() === String(k).trim().toLowerCase()); return r ? r[ci - 1] : null; };
+
+const PAGE_START = `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Proyecto: filtro de agua</title>
+</head>
+<body>
+  <!-- Escribe aquí la página de tu proyecto -->
+
+</body>
+</html>`;
+const CARD_START = `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    /* Escribe aquí tus estilos */
+
+  </style>
+</head>
+<body>
+  <div class="tarjeta">
+    <h2>Campaña «Cuidemos el agua»</h2>
+    <p>Video con subtítulos y tres publicaciones para redes.</p>
+  </div>
+</body>
+</html>`;
+const COUNT_START = `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    #cuenta { font-size: 2rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <p>Visitas a mi portafolio: <span id="cuenta">0</span></p>
+  <button id="mas">Sumar una visita</button>
+
+  <script>
+    // Escribe aquí tu código
+
+  <\/script>
+</body>
+</html>`;
+
+const X = {
+/* ===== A · Ciberseguridad avanzada ===== */
+m1t1: [
+  CL('Más permisos por revisar', 'Aplica la pregunta del tema A1: ¿la app puede hacer su función principal sin este permiso?', ['Necesario', 'Innecesario'], [
+    ['App del clima → Ubicación aproximada', 0, 'Necesita saber en qué zona estás.', '¿Para qué sirve la app?'], ['Juego de memoria → Cámara', 1, 'El juego no usa la cámara.', '¿Lo usa para jugar?'],
+    ['Grabadora de notas de voz → Micrófono', 0, '', '¿Puede grabar sin micrófono?'], ['Lector de códigos QR → Cámara', 0, '', '¿Cómo lee el código?'],
+    ['App de horarios escolares → Contactos', 1, 'Un horario no necesita tus contactos.', '¿Para qué los usaría?'], ['Teclado de emojis → Acceso completo a todo lo que escribes', 1, 'Podría leer tus contraseñas y mensajes.', '¿Qué podría ver?'],
+  ]),
+  QZ('Permisos y privacidad', 'Responde con lo que leíste en el tema A1.', [
+    Q('¿Qué pregunta te haces antes de aceptar un permiso?', '¿La app puede funcionar sin este permiso?', ['¿La app es gratis?', '¿Mis amigos la usan?', '¿Tiene muchas estrellas?']),
+    Q('¿Qué significa la opción «solo mientras se usa la app»?', 'Que la app accede al permiso únicamente cuando la tienes abierta', ['Que la app se borra al cerrarla', 'Que el permiso se da para siempre', 'Que la app deja de funcionar']),
+    Q('¿Qué riesgo tiene dar acceso a tus contactos sin necesidad?', 'Entregas datos de otras personas que no dieron su permiso', ['Ninguno', 'Que se acabe la batería', 'Que la app se vuelva lenta']),
+  ]),
+],
+m1t2: [
+  CL('Registro del torneo de videojuegos', 'Es la actividad de tu cuaderno (tema A2). Decide qué datos son razonables para un torneo escolar en línea.', ['Razonable', 'Innecesario'], [
+    ['Apodo o nombre de jugador', 0], ['Correo para enviar el horario de las partidas', 0], ['Grupo escolar, para organizar los equipos', 0],
+    ['Dirección de tu casa', 1, 'El torneo es en línea.', '¿Para qué la usarían?'], ['Contraseña de tu cuenta del videojuego', 1, 'Nadie debe pedirte tu contraseña.', '¿Debes compartirla?'],
+    ['Foto de la identificación oficial de tus papás', 1, 'Es un dato oficial que no necesita.', '¿Es un trámite oficial?'], ['Horario en que estás solo en casa', 1, 'Pone en riesgo tu seguridad.', '¿Qué podría hacer alguien con eso?'],
+  ]),
+  QZ('Datos personales', 'Responde con lo que leíste en el tema A2.', [
+    Q('¿Qué es la minimización de datos?', 'Pedir solo los datos necesarios para que el servicio funcione', ['Borrar todos tus datos', 'Escribir los datos en letra pequeña', 'Usar un apodo en todas las redes']),
+    Q('¿Cuál de estos es un dato personal?', 'Tu CURP', ['El nombre de tu película favorita', 'La capital del país', 'El clima de hoy']),
+    Q('Un formulario pide datos que sobran. ¿Qué haces?', 'No lo lleno; busco otra opción o pido ayuda a un adulto', ['Lo lleno completo', 'Invento los datos', 'Lo lleno con los datos de un amigo']),
+  ]),
+],
+m1t3: [
+  { type: 'order', label: 'Aplica', title: 'Las cuatro acciones', intro: 'Ordena las cuatro acciones ante un riesgo en línea, como aparecen en tu cuaderno (tema A3).', sets: [{ prompt: 'De la primera a la última', items: ['No responder ni ceder a lo que te piden', 'Guardar evidencia con capturas de pantalla', 'Bloquear y reportar la cuenta', 'Contárselo a un adulto de confianza'] }] },
+  CL('¿Señal de alerta o situación normal?', 'Reconoce las situaciones de riesgo del tema A3.', ['Señal de alerta', 'Situación normal'], [
+    ['Alguien que conociste en un juego te pide que no cuentes sus mensajes', 0, 'Pedir secreto es una señal de alerta.', '¿Por qué pediría secreto?'], ['Un compañero de clase te pide los apuntes por el grupo', 1],
+    ['Una cuenta nueva te ofrece dinero a cambio de fotos', 0, '', '¿Qué quiere a cambio?'], ['Te piden tu dirección «para mandarte un regalo»', 0, '', '¿Para qué la quieren?'],
+    ['Tu tía te etiqueta en una foto familiar que tú aprobaste', 1], ['Un reto viral pide aguantar la respiración el mayor tiempo posible', 0, 'Es peligroso.', '¿Pone en riesgo tu salud?'],
+  ], { label: 'Comprueba' }),
+],
+/* ===== B · IA aplicada ===== */
+m2t1: [
+  CL('¿Buena instrucción o débil?', 'Revisa cada instrucción con los cuatro elementos del tema B1: qué quieres, sobre qué, para quién y en qué formato.', ['Buena instrucción', 'Instrucción débil'], [
+    ['volcanes', 1, 'No dice qué quieres ni para quién.', '¿Tiene los cuatro elementos?'], ['Explícame en 5 ideas, para secundaria, cómo se forman los volcanes', 0],
+    ['Haz mi reporte de Historia', 1, 'Pide que haga el trabajo por ti.', '¿Te ayuda a aprender?'], ['Dame 3 preguntas de investigación sobre la contaminación del río Lerma, para secundaria, en una lista', 0],
+    ['Me llamo Ana López, vivo en la calle Juárez 12; ayúdame con mi tarea', 1, 'Incluye datos personales.', '¿Qué datos compartiste?'], ['Resume este texto en 4 ideas clave y dime qué conceptos debo investigar más', 0],
+  ]),
+  QZ('Instrucciones para una IA', 'Responde con lo que leíste en el tema B1.', [
+    Q('¿Cuáles son los cuatro elementos de una buena instrucción?', 'Qué quieres, sobre qué, para quién y en qué formato', ['Tu nombre, tu escuela, tu grupo y tu edad', 'Muchas palabras, signos y mayúsculas', 'Solo el tema']),
+    Q('¿Qué es un «prompt»?', 'La instrucción que le escribes a la IA', ['La respuesta de la IA', 'Un tipo de virus', 'Una red social']),
+    Q('¿Qué es la respuesta de una IA en una investigación?', 'Un punto de partida que debo verificar y trabajar', ['El trabajo terminado', 'Una fuente oficial', 'Siempre la respuesta correcta']),
+  ]),
+],
+m2t2: [
+  CL('Verifica con otra fuente', 'Compara cada afirmación de una IA con la fuente (tema B2).', ['Confirmada', 'Contradicha', 'No verificable con esta fuente'], [
+    ['El Lerma nace en el Estado de México.', 0], ['El Lerma desemboca en el océano Pacífico.', 1, 'La fuente dice que desemboca en el lago de Chapala.', '¿Dónde desemboca según la fuente?'],
+    ['El Lerma es uno de los ríos más contaminados del país.', 0], ['El Lerma mide 1 000 km.', 2, 'La fuente no habla de su longitud.', '¿La fuente menciona su longitud?'],
+    ['En 2030 el Lerma estará limpio.', 2, 'Es una predicción que la fuente no incluye.', '¿La fuente habla del futuro?'], ['El Lerma nace en Jalisco.', 1, 'Nace en el Estado de México.', '¿Dónde nace según la fuente?'],
+  ], { lead: '<p><b>Fuente (libro de Geografía):</b> El río Lerma nace en el Estado de México y desemboca en el lago de Chapala, en Jalisco. Es uno de los ríos más contaminados del país.</p>' }),
+  QZ('Verificación', 'Responde con lo que leíste en el tema B2.', [
+    Q('Si 16.9 de 126 millones viven en una entidad, ¿qué porcentaje es aproximadamente?', 'Alrededor de 13%', ['La mitad', 'Alrededor de 80%', 'Alrededor de 1%']),
+    Q('Si la fuente no menciona un dato, ¿cómo lo clasificas?', 'No verificable con esta fuente', ['Confirmado', 'Contradicho', 'Falso']),
+    Q('La fuente dice 16.9 millones y la IA dice «cerca de 17 millones». ¿Cómo lo clasificas?', 'Confirmada, porque es un redondeo', ['Contradicha', 'No verificable', 'Alucinación']),
+  ]),
+],
+m2t3: [
+  CL('¿Clara o vaga?', 'Revisa estas frases de declaraciones de uso de IA (tema B3).', ['Declaración clara', 'Declaración vaga'], [
+    ['La usé un poco.', 1, 'No dice para qué ni cómo.', '¿Dice qué hiciste?'], ['Usé IA para generar 10 preguntas y elegí 2; verifiqué los datos en el INEGI.', 0],
+    ['La IA me ayudó con todo.', 1, 'No distingue qué hiciste tú.', '¿Qué parte es tuya?'], ['Pedí a la IA que me explicara qué es la inflación; la redacción es mía.', 0],
+    ['No sé si la usé.', 1, '', '¿Es honesta y específica?'], ['No escribí mi nombre ni el de mi escuela en la herramienta.', 0],
+  ]),
+],
+/* ===== C · Hojas de cálculo III ===== */
+m3t1: [
+  { type: 'sheet', label: 'Aplica', title: 'Gastos del mes', cols: 6, rows: 6, tools: [], widths: { A: 110, B: 110, E: 190 },
+    intro: 'Es la actividad de tu cuaderno (tema C1). Resume los gastos con SUMAR.SI, PROMEDIO.SI y CONTAR.SI.',
+    bold: ['A1', 'B1', 'C1', 'E2', 'E3', 'E4'],
+    cells: { A1: 'Concepto', B1: 'Tipo', C1: 'Monto', A2: 'Pasajes', B2: 'Transporte', C2: '80', A3: 'Almuerzo', B3: 'Comida', C3: '60', A4: 'Pasajes', B4: 'Transporte', C4: '80', A5: 'Cuaderno', B5: 'Escuela', C5: '45', A6: 'Almuerzo', B6: 'Comida', C6: '55', E2: 'Total en Transporte', E3: 'Promedio en Comida', E4: 'Gastos mayores a 50' },
+    tasks: [
+      { text: 'En <code>F2</code> suma el gasto en Transporte con SUMAR.SI.', check: { type: 'formula', cell: 'F2', includes: ['SUMAR.SI('], equals: 160 }, hint: '=SUMAR.SI(B2:B6,"Transporte",C2:C6)' },
+      { text: 'En <code>F3</code> calcula el promedio de Comida con PROMEDIO.SI.', check: { type: 'formula', cell: 'F3', includes: ['PROMEDIO.SI('], equals: 57.5 }, hint: '=PROMEDIO.SI(B2:B6,"Comida",C2:C6)' },
+      { text: 'En <code>F4</code> cuenta los gastos mayores a 50 con CONTAR.SI.', check: { type: 'formula', cell: 'F4', includes: ['CONTAR.SI(', '>50'], equals: 4 }, hint: '=CONTAR.SI(C2:C6,">50")' },
+    ] },
+  QZ('Funciones con criterio', 'Responde con lo que leíste en el tema C1.', [
+    Q('¿Cómo se escribe el criterio «mayor que 50» en CONTAR.SI?', '">50"', ['>50', '(mayor 50)', '50>']),
+    Q('¿Qué hace SUMAR.SI?', 'Suma solo las filas que cumplen un criterio', ['Suma todas las filas', 'Cuenta las filas vacías', 'Ordena los datos']),
+    Q('¿Por qué se fijan los rangos con signos de pesos antes de rellenar?', 'Para que el rango no se desplace y no deje fuera filas', ['Para que se vean como dinero', 'Para que la fórmula sea más corta', 'No es necesario']),
+  ]),
+],
+m3t2: [
+  { type: 'sheet', label: 'Aplica', title: 'Buscador de alumnos', cols: 7, rows: 5, tools: [], widths: { B: 110, F: 130, G: 110 },
+    intro: 'Es la actividad de tu cuaderno (tema C2). Construye un buscador: al escribir una matrícula en <code>G1</code>, aparecen el nombre y el promedio.',
+    bold: ['A1', 'B1', 'C1', 'D1', 'F1', 'F2', 'F3'],
+    cells: Object.assign({ A1: 'Matrícula', B1: 'Nombre', C1: 'Grupo', D1: 'Promedio', F1: 'Matrícula buscada', G1: 'M103', F2: 'Nombre', F3: 'Promedio' }, Object.fromEntries(dir.flatMap((d, i) => [['A' + (i + 2), d[0]], ['B' + (i + 2), d[1]], ['C' + (i + 2), d[2]], ['D' + (i + 2), String(d[3])]]))),
+    tasks: [
+      { text: 'En <code>G2</code> busca el nombre de la matrícula escrita en <code>G1</code>.', check: { type: 'expr', f: (c) => c.isF('G2') && c.rawU('G2').includes('BUSCARV(') && c.eqv(c.v('G2'), lookDir(c.v('G1'), 2)) }, hint: '=BUSCARV(G1,A2:D5,2,FALSO)' },
+      { text: 'En <code>G3</code> busca el promedio.', check: { type: 'expr', f: (c) => c.isF('G3') && c.rawU('G3').includes('BUSCARV(') && c.eqv(c.v('G3'), lookDir(c.v('G1'), 4)) }, hint: 'El promedio está en la columna 4 de la tabla.' },
+      { text: 'Cambia <code>G1</code> a <code>M102</code> y comprueba que aparece Luis.', check: { type: 'expr', f: (c) => String(c.v('G1')).toUpperCase() === 'M102' && c.eqv(c.v('G2'), 'Luis') }, hint: 'Si aparece #N/A, revisa que la clave esté bien escrita.' },
+    ] },
+  QZ('BUSCARV', 'Responde con lo que leíste en el tema C2.', [
+    Q('¿Para qué sirve el FALSO al final de BUSCARV?', 'Para pedir coincidencia exacta', ['Para borrar el resultado', 'Para que la respuesta sea falsa', 'Para buscar de abajo hacia arriba']),
+    Q('¿Qué significa que BUSCARV devuelva #N/A?', 'Que no encontró el valor buscado', ['Que la tabla está vacía', 'Que el resultado es cero', 'Que la hoja tiene un virus']),
+    Q('La tabla es A2:D7 y quieres el dato de la columna C. ¿Qué número de columna escribes?', '3', ['2', '4', 'C']),
+  ]),
+],
+m3t3: [
+  { type: 'sheet', label: 'Aplica', title: 'Préstamos de la biblioteca', cols: 6, rows: 6, tools: ['validation'], valDefault: 'C2:C6', widths: { A: 200, C: 130, E: 170 },
+    intro: 'Es la actividad de tu cuaderno (tema C3). Crea la lista de estados y úsala para registrar los préstamos.',
+    bold: ['A1', 'B1', 'C1', 'E2'],
+    cells: { A1: 'Material', B1: 'Tipo', C1: 'Estado', A2: 'El principito', B2: 'Libro', A3: 'Atlas de México', B3: 'Libro', A4: 'Revista de ciencia', B4: 'Revista', A5: 'Diccionario escolar', B5: 'Diccionario', A6: 'Cuentos mexicanos', B6: 'Libro', E2: 'Préstamos atrasados' },
+    tasks: [
+      { text: 'Crea una validación en <code>C2:C6</code> con la lista: Prestado, Devuelto, Atrasado.', check: { type: 'validation', range: 'C2:C6', list: ['Prestado', 'Devuelto', 'Atrasado'] }, hint: 'Validación de datos → rango C2:C6.' },
+      { text: 'Usa la lista: C2 Prestado, C3 Devuelto, C4 Atrasado, C5 Devuelto, C6 Atrasado.', check: { type: 'expr', f: (c) => ['Prestado', 'Devuelto', 'Atrasado', 'Devuelto', 'Atrasado'].every((v, i) => c.eqv(c.v('C' + (i + 2)), v)) }, hint: 'Selecciona cada celda y elige en el menú de arriba.' },
+      { text: 'En <code>F2</code> cuenta los préstamos atrasados con una fórmula.', check: { type: 'formula', cell: 'F2', includes: ['CONTAR.SI('], equals: 2 }, hint: '=CONTAR.SI(C2:C6,"Atrasado")' },
+    ] },
+  QZ('Validación de datos', 'Responde con lo que leíste en el tema C3.', [
+    Q('¿Qué problema resuelve la validación de datos?', 'Evita que cada quien escriba el mismo dato de forma distinta', ['Hace las cuentas más rápido', 'Colorea las celdas', 'Ordena la tabla']),
+    Q('¿Dónde se encuentra en Excel?', 'Datos → Validación de datos', ['Inicio → Fuente', 'Insertar → Gráfica', 'Revisar → Ortografía']),
+    Q('¿Qué pasa si escribes un valor que no está en la lista?', 'La hoja lo rechaza', ['Se agrega a la lista', 'Se borra la columna', 'No pasa nada']),
+  ]),
+],
+m3t4: [
+  { type: 'sheet', label: 'Aplica', title: 'Reciclaje por grupo y material', cols: 5, rows: 7, tools: ['pivot'], pivotSource: 'A1:C7', widths: { E: 120, D: 230 },
+    intro: 'Es la actividad de tu cuaderno (tema C4). Usa la tabla dinámica para responder dos preguntas con los mismos datos.',
+    bold: ['A1', 'B1', 'C1', 'D2', 'D3'],
+    cells: { A1: 'Grupo', B1: 'Material', C1: 'Kilos', A2: '1A', B2: 'PET', C2: '12', A3: '2B', B3: 'Papel', C3: '8', A4: '1A', B4: 'Papel', C4: '5', A5: '3A', B5: 'PET', C5: '15', A6: '2B', B6: 'PET', C6: '10', A7: '3A', B7: 'Papel', C7: '6', D2: 'Grupo que recicló más:', D3: 'Material que más se recicló:' },
+    tasks: [
+      { text: 'Crea una tabla dinámica con la SUMA de Kilos por Grupo y escribe en <code>E2</code> el grupo que más recicló.', check: { type: 'value', cell: 'E2', equals: '3A' }, hint: 'Filas: Grupo · Valores: Kilos · SUMA.' },
+      { text: 'Cambia la tabla dinámica a la SUMA de Kilos por Material.', check: { type: 'pivot', row: 'Material', value: 'Kilos', agg: 'SUMA' }, hint: 'Vuelve a crearla con Filas: Material.' },
+      { text: 'En <code>E3</code> escribe el material que más se recicló.', check: { type: 'value', cell: 'E3', equals: 'PET' }, hint: 'Busca el valor más alto.' },
+    ] },
+  QZ('Tablas dinámicas', 'Responde con lo que leíste en el tema C4.', [
+    Q('Quieres saber cuánto dinero sumaron las ventas. ¿Qué operación eliges?', 'SUMA', ['CONTAR', 'PROMEDIO', 'MAX']),
+    Q('¿Qué tres campos eliges al crear una tabla dinámica?', 'Filas, valores y operación', ['Título, color y tamaño', 'Fecha, hora y lugar', 'Nombre, grupo y edad']),
+    Q('¿Por qué se llama «dinámica»?', 'Porque puedes cambiar los campos en segundos para responder otra pregunta', ['Porque se mueve sola', 'Porque tiene animaciones', 'Porque cambia de color']),
+  ]),
+],
+/* ===== D · Emprendimiento ===== */
+m4t1: [
+  CL('Modelo de negocio: aguas frescas', 'Clasifica los enunciados del modelo de negocio de una venta de aguas frescas en la feria escolar (tema D1).', ['Problema', 'Cliente', 'Propuesta de valor'], [
+    ['Hace calor y la cooperativa se queda sin bebidas frías', 0], ['Alumnos y familias que visitan la feria', 1], ['Aguas naturales, más baratas que los refrescos y servidas frías', 2],
+    ['No hay bebidas saludables en la feria', 0], ['Maestros que atienden los puestos', 1], ['Descuento si traes tu propio vaso', 2],
+  ]),
+  QZ('Modelo de negocio', 'Responde con lo que leíste en el tema D1.', [
+    Q('¿Qué debe decir una buena propuesta de valor?', 'Qué gana concretamente el cliente al elegirte', ['Que eres el mejor', 'Cuánto dinero quieres ganar', 'El nombre del negocio']),
+    Q('¿Cuál es el error de empezar con «quiero vender pulseras»?', 'No pensar qué problema resuelves ni a quién', ['Que las pulseras no se venden', 'Que es muy caro', 'Ninguno']),
+    Q('¿Qué describe el «cliente» en un modelo de negocio?', 'Quién tiene el problema que resuelves', ['Quién pone el dinero', 'Quién hace el producto', 'Quién compite contigo']),
+  ]),
+],
+m4t2: [
+  { type: 'sheet', label: 'Aplica', title: 'Aguas frescas en la feria', cols: 3, rows: 7, tools: [], widths: { A: 300 },
+    intro: 'Es la actividad de tu cuaderno (tema D2). Calcula el margen, el punto de equilibrio y la ganancia si vendes 50 vasos.',
+    bold: ['A1', 'B1', 'A5', 'A6', 'A7'],
+    cells: { A1: 'Concepto', B1: 'Monto', A2: 'Garrafones y cucharones (costo fijo)', B2: '300', A3: 'Vasos, fruta y azúcar por vaso (costo variable)', B3: '6', A4: 'Precio por vaso', B4: '15', A5: 'Margen por vaso', A6: 'Punto de equilibrio (vasos)', A7: 'Ganancia con 50 vasos' },
+    tasks: [
+      { text: 'En <code>B5</code> calcula el margen por vaso (precio menos costo variable).', check: { type: 'formula', cell: 'B5', equals: 9 }, hint: '=B4-B3' },
+      { text: 'En <code>B6</code> calcula el punto de equilibrio (costo fijo entre margen).', check: { type: 'formula', cell: 'B6', equals: 33.33, tol: 0.01 }, hint: '=B2/B5. Como no se venden fracciones de vaso, necesitas vender 34.' },
+      { text: 'En <code>B7</code> calcula la ganancia si vendes 50 vasos.', check: { type: 'formula', cell: 'B7', equals: 150 }, hint: '=50*B5-B2' },
+    ] },
+  QZ('Costos y punto de equilibrio', 'Responde con lo que leíste en el tema D2.', [
+    Q('Costos fijos de 500, precio de 20 y costo variable de 10. ¿Cuál es el punto de equilibrio?', '50 ventas', ['25 ventas', '10 ventas', '500 ventas'], '500 ÷ (20 − 10) = 50.'),
+    Q('¿Cuál es un costo fijo?', 'Las herramientas que compras una sola vez', ['El material de cada producto', 'Los vasos de cada venta', 'La fruta de cada agua']),
+    Q('¿Cómo es la ganancia antes de llegar al punto de equilibrio?', 'Negativa: todavía pierdes dinero', ['Positiva', 'Siempre cero', 'No se puede saber']),
+  ]),
+],
+m4t3: [
+  CL('Mensaje, canal o métrica', 'Clasifica cada decisión de la estrategia de venta de las aguas frescas (tema D3).', ['Mensaje', 'Canal', 'Métrica'], [
+    ['«¿Sed en la feria? Agua de jamaica fría por 15 pesos»', 0], ['Cartel en la entrada de la feria', 1], ['Vasos vendidos por hora', 2],
+    ['Aviso en el grupo de mensajes de las familias', 1], ['Número de clientes que traen su propio vaso', 2], ['«Trae tu vaso y ahorra 3 pesos»', 0],
+  ]),
+  QZ('Estrategia de venta', 'Responde con lo que leíste en el tema D3.', [
+    Q('Si los resultados no son los esperados, ¿qué haces?', 'Reviso los datos, pregunto a clientes y ajusto una cosa a la vez', ['Cambio todo al mismo tiempo', 'Cierro el negocio', 'Subo el precio al doble']),
+    Q('¿Dónde conviene anunciar un negocio escolar?', 'Donde ya están tus clientes, como la escuela', ['En televisión nacional', 'En otra ciudad', 'En un periódico extranjero']),
+    Q('¿Qué hace buena a una métrica?', 'Que sea un número que puedas comparar', ['Que sea una opinión', 'Que sea muy difícil de medir', 'Que la decida otra persona']),
+  ]),
+],
+/* ===== E · Portafolio web ===== */
+m5t1: [
+  { type: 'html', label: 'Aplica', title: 'Página de un proyecto', starter: PAGE_START, intro: 'Escribe la estructura de la página de uno de tus proyectos, ahora con una lista <b>numerada</b> de pasos (tema E1).', lead: '<p><code>&lt;ol&gt;</code> es una lista numerada; cada paso va en un <code>&lt;li&gt;</code>.</p>',
+    checks: [
+      { t: 'Un título principal <h1> con el nombre del proyecto', f: (d) => d.querySelector('h1') && d.querySelector('h1').textContent.trim().length >= 3 },
+      { t: 'Un subtítulo <h2> (por ejemplo, «Objetivo»)', f: (d) => d.querySelector('h2') && d.querySelector('h2').textContent.trim().length >= 3 },
+      { t: 'Un párrafo <p> de al menos 30 caracteres', f: (d) => [...d.querySelectorAll('p')].some((p) => p.textContent.trim().length >= 30) },
+      { t: 'Una lista numerada <ol> con al menos 3 pasos <li>', f: (d) => [...d.querySelectorAll('ol')].some((o) => o.querySelectorAll('li').length >= 3) },
+      { t: 'Un enlace <a> con href', f: (d) => [...d.querySelectorAll('a')].some((a) => (a.getAttribute('href') || '').trim().length > 0) },
+    ] },
+  QZ('Etiquetas HTML', 'Responde con lo que leíste en el tema E1.', [
+    Q('¿Qué etiqueta se usa para el título principal de la página?', '<h1>', ['<p>', '<title1>', '<head>']),
+    Q('¿Para qué sirve el atributo alt de una imagen?', 'Describe la imagen para quien no puede verla', ['Cambia el tamaño de la imagen', 'Le pone un borde', 'Hace que cargue más rápido']),
+    Q('¿Qué pasa si abres <p> y olvidas cerrarlo?', 'El resto de la página puede quedar dentro de ese párrafo', ['La página se borra', 'No pasa nada', 'El texto se pone en negritas']),
+    Q('¿Qué etiqueta crea una lista numerada?', '<ol>', ['<ul>', '<li>', '<list>']),
+  ]),
+],
+m5t2: [
+  { type: 'html', label: 'Aplica', title: 'Diseña una tarjeta', starter: CARD_START, intro: 'Da estilo a la tarjeta de un proyecto con CSS (tema E2).', lead: '<p>La tarjeta tiene <code>class="tarjeta"</code>: su selector en CSS es <code>.tarjeta</code>.</p>',
+    tip: '<code>.tarjeta { background-color: #E8F5E9; padding: 16px; border-radius: 12px; }</code> · <code>h2 { font-size: 24px; }</code> · <code>p { color: #333333; }</code>',
+    checks: [
+      { t: '.tarjeta tiene color de fondo (background-color)', f: (d, c) => has(c, /\.tarjeta\s*\{[^}]*background(-color)?\s*:/i) },
+      { t: '.tarjeta tiene relleno (padding)', f: (d, c) => has(c, /\.tarjeta\s*\{[^}]*padding\s*:/i) },
+      { t: '.tarjeta tiene esquinas redondeadas (border-radius)', f: (d, c) => has(c, /\.tarjeta\s*\{[^}]*border-radius\s*:/i) },
+      { t: 'h2 tiene un tamaño de letra (font-size)', f: (d, c) => has(c, /h2[^{]*\{[^}]*font-size\s*:/i) },
+      { t: 'p tiene un color de texto', f: (d, c) => has(c, /(^|[\s}])p\s*\{[^}]*?(?<![-\w])color\s*:/i) },
+    ] },
+  QZ('Reglas CSS', 'Responde con lo que leíste en el tema E2.', [
+    Q('¿Cómo se escribe el selector de la clase «proyecto»?', '.proyecto', ['proyecto', '#proyecto', '<proyecto>']),
+    Q('¿Qué propiedad cambia el color de fondo?', 'background-color', ['color', 'font-family', 'border']),
+    Q('¿Qué hace la propiedad padding?', 'Agrega espacio interior entre el borde y el contenido', ['Cambia el color del texto', 'Cambia la tipografía', 'Agrega una imagen']),
+  ]),
+],
+m5t3: [
+  { type: 'html', label: 'Aplica', title: 'Contador de visitas', starter: COUNT_START, intro: 'Programa un contador: cada clic en el botón suma 1 al número (tema E3). Prueba tu botón en la vista previa.',
+    tip: '<code>let visitas = 0;</code><br><code>document.getElementById("mas").addEventListener("click", () => {</code><br><code>&nbsp;&nbsp;visitas = visitas + 1;</code><br><code>&nbsp;&nbsp;document.getElementById("cuenta").textContent = visitas;</code><br><code>});</code>',
+    checks: [
+      { t: 'Crea una variable para contar (let o var)', f: (d, c) => has(c, /\b(let|var)\s+\w+\s*=\s*0/) },
+      { t: 'Encuentra el botón y escucha el clic', f: (d, c) => has(c, /getElementById\s*\(\s*['"]mas['"]\s*\)[\s\S]*addEventListener\s*\(\s*['"]click['"]|getElementById\s*\(\s*['"]mas['"]\s*\)\.onclick/) },
+      { t: 'Suma 1 a la variable', f: (d, c) => has(c, /\+\+|\+=\s*1|=\s*\w+\s*\+\s*1/) },
+      { t: 'Muestra el número en el elemento «cuenta»', f: (d, c) => has(c, /getElementById\s*\(\s*['"]cuenta['"]\s*\)\.(textContent|innerText|innerHTML)\s*=/) },
+    ] },
+  { type: 'order', label: 'Comprueba', title: 'El patrón de la interactividad', intro: 'Ordena los tres pasos del patrón de JavaScript del tema E3.', sets: [{ prompt: 'Del primer paso al último', items: ['Encontrar el elemento: document.getElementById("saludo")', 'Escuchar un evento: .addEventListener("click", …)', 'Cambiar algo: .textContent = "Nuevo texto"'] }] },
+],
+/* ===== F · Orientación vocacional ===== */
+m6t1: [
+  QZ('¿Qué perfil te queda?', 'Elige el perfil profesional que corresponde a cada interés (tema F1).', [
+    Q('Disfrutas resolver problemas paso a paso y escribir código.', 'Desarrollo de software', ['Diseño digital', 'Ciberseguridad', 'Análisis de datos']),
+    Q('Te interesan lo visual y cómo las personas usan las apps.', 'Diseño digital', ['Desarrollo de software', 'Ciberseguridad', 'Análisis de datos']),
+    Q('Te gusta investigar y anticiparte a los ataques.', 'Ciberseguridad', ['Diseño digital', 'Desarrollo de software', 'Análisis de datos']),
+    Q('Te gustan los números y responder preguntas con datos.', 'Análisis de datos', ['Diseño digital', 'Ciberseguridad', 'Desarrollo de software']),
+  ]),
+],
+m6t2: [
+  QZ('¿Qué ruta conviene?', 'Aplica la comparación del tema F2.', [
+    Q('Quieres titularte como técnico en programación al terminar el bachillerato.', 'Bachillerato tecnológico', ['Bachillerato general', 'Ninguno lo ofrece', 'Cualquiera de los dos']),
+    Q('Todavía no sabes qué carrera estudiar y quieres explorar varias materias.', 'Bachillerato general', ['Bachillerato tecnológico', 'Ninguno', 'No importa']),
+    Q('¿Ambas rutas permiten continuar a la universidad?', 'Sí, las dos', ['Solo el general', 'Solo el tecnológico', 'Ninguna']),
+  ]),
+],
+m6t3: [
+  CL('¿Abierta o cerrada?', 'Clasifica las preguntas para tu entrevista (tema F3). Las abiertas no se responden con sí o no.', ['Pregunta abierta', 'Pregunta cerrada'], [
+    ['¿Qué es lo que más disfrutas de tu trabajo?', 0], ['¿Trabajas en una oficina?', 1], ['¿Cómo aprendiste a programar?', 0],
+    ['¿Usas computadora?', 1], ['¿Qué consejo le darías a alguien de mi edad?', 0], ['¿Te gusta tu trabajo?', 1],
+  ]),
+],
+/* ===== G · Integrador final ===== */
+m7t1: [
+  { type: 'form', label: 'Aplica', title: 'Mi proyecto destacado', intro: 'Prepara la parte central de tu presentación (tema G1): el panel quiere saber qué aprendiste, no solo qué hiciste.', fields: [
+    { label: '¿Cuál es tu proyecto destacado y qué hiciste?', min: 60 }, { label: '¿Qué aprendiste al hacerlo?', min: 50 }, { label: '¿Qué cambiarías si lo hicieras de nuevo?', min: 40 },
+  ] },
+],
+m7t2: [
+  CL('Buenas prácticas para presentar', 'Clasifica cada acción con lo que leíste en el tema G2.', ['Buena práctica', 'Mala práctica'], [
+    ['Ensayar en voz alta con un compañero', 0], ['Memorizar las respuestas palabra por palabra', 1, 'Si olvidas una palabra, te bloqueas.', '¿Qué pasa si olvidas una palabra?'],
+    ['Anticipar las preguntas del panel', 0], ['Leer todo desde las diapositivas', 1, 'Pierdes contacto con el público.', '¿Hacia dónde miras?'],
+    ['Decir «no lo había pensado; creo que…» si no sabes algo', 0], ['Hablar muy rápido para terminar pronto', 1, 'No se entiende el mensaje.', '¿Se entiende así?'],
+  ]),
+],
+};
+
+GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi + 1}t${ti + 1}`; t.ps = [Object.assign({ label: 'Práctica guiada' }, t.p)].concat(X[k] || []); }));
+})();
+
 </script>
 <script>
 /* ===== Simulador Tech Kids — aplicación ===== */
@@ -912,10 +1246,25 @@ window.GRADE = {
   store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || '';
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
-  const all = []; G.modules.forEach((m, mi) => m.temas.forEach((t, ti) => all.push({ pid: `m${mi + 1}t${ti + 1}`, m, mi, t, ti })));
-  const byPid = Object.fromEntries(all.map((x) => [x.pid, x]));
+  /* migración: avance guardado antes de que hubiera varios ejercicios por tema */
+  for (const k of Object.keys(store.prog)) if (/^m\d+t\d+$/.test(k)) { if (!store.prog[k + 'e1']) store.prog[k + 'e1'] = store.prog[k]; delete store.prog[k]; }
+  for (const k of Object.keys(store.saves)) if (/^m\d+t\d+$/.test(k)) { if (!store.saves[k + 'e1']) store.saves[k + 'e1'] = store.saves[k]; delete store.saves[k]; }
+  /* temas y ejercicios */
+  const LABELS = ['Práctica guiada', 'Aplica', 'Comprueba'];
+  const temas = []; const exs = [];
+  G.modules.forEach((m, mi) => m.temas.forEach((t, ti) => {
+    const tid = `m${mi + 1}t${ti + 1}`; const ps = t.ps || [t.p];
+    const tema = { tid, m, mi, t, ti, ex: [] };
+    ps.forEach((p, ei) => { const x = { pid: `${tid}e${ei + 1}`, tid, tema, p, ei, label: p.label || LABELS[ei] || 'Ejercicio' }; tema.ex.push(x); exs.push(x); });
+    temas.push(tema);
+  }));
+  const byPid = Object.fromEntries(exs.map((x) => [x.pid, x]));
+  const byTid = Object.fromEntries(temas.map((x) => [x.tid, x]));
   const status = (pid) => { const p = store.prog[pid]; if (!p) return 'nuevo'; if (p.best >= 1) return 'dominado'; if (p.best >= 0.8) return 'hecho'; return 'intentado'; };
-  const doneCount = () => all.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length;
+  const temaStatus = (tm) => { const st = tm.ex.map((x) => status(x.pid)); if (st.every((v) => v === 'dominado')) return 'dominado'; if (st.every((v) => v === 'hecho' || v === 'dominado')) return 'hecho'; if (st.some((v) => v !== 'nuevo')) return 'intentado'; return 'nuevo'; };
+  const exDone = (tm) => tm.ex.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length;
+  const all = temas;
+  const doneCount = () => temas.filter((tm) => ['hecho', 'dominado'].includes(temaStatus(tm))).length;
 
   /* ---------- gráficas SVG compartidas ---------- */
   const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
@@ -961,7 +1310,7 @@ window.GRADE = {
   E.classify = (host, d, api) => {
     const st = api.load() || { order: d.keepOrder ? [...Array(d.items.length).keys()] : shuffle(d.items.length), ans: Array(d.items.length).fill(-1) };
     const draw = () => {
-      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + `<div class="cls">${st.order.map((ix, k) => {
+      host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + `<div class="cls">${st.order.map((ix, k) => {
         const it = d.items[ix];
         return `<div class="cls-item" data-ix="${ix}"><div class="cls-text">${it.html || esc(it.t)}</div><div class="seg" role="group" aria-label="Clasificar">${d.cats.map((c, ci) => `<button type="button" data-k="${k}" data-c="${ci}" aria-pressed="${st.ans[ix] === ci}">${esc(c)}</button>`).join('')}</div><div class="cls-fb" aria-live="polite"></div></div>`;
       }).join('')}</div>` + (d.preview === 'doc' ? `<div class="toc"><strong>Tabla de contenido automática</strong><div class="toc-body"></div></div>` : '');
@@ -998,7 +1347,9 @@ window.GRADE = {
   /* --- opción múltiple --- */
   E.quiz = (host, d, api) => {
     const st = api.load() || { ans: Array(d.qs.length).fill(-1) };
-    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.qs.map((q, qi) => `<fieldset class="q" data-q="${qi}"><legend>${qi + 1}. ${esc(q.q)}</legend>${q.html ? `<div class="q-art">${q.html}</div>` : ''}${q.opts.map((o, oi) => `<label class="opt"><input type="radio" name="q${api.pid}_${qi}" value="${oi}" ${st.ans[qi] === oi ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('')}<div class="q-fb" aria-live="polite"></div></fieldset>`).join('');
+    if (!st.ord || st.ord.length !== d.qs.length) st.ord = d.qs.map((q) => (q.keep ? [...q.opts.keys()] : shuffle(q.opts.length)));
+    host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + d.qs.map((q, qi) => `<fieldset class="q" data-q="${qi}"><legend>${qi + 1}. ${esc(q.q)}</legend>${q.html ? `<div class="q-art">${q.html}</div>` : ''}${st.ord[qi].map((oi) => `<label class="opt"><input type="radio" name="q${api.pid}_${qi}" value="${oi}" ${st.ans[qi] === oi ? 'checked' : ''}><span>${esc(q.opts[oi])}</span></label>`).join('')}<div class="q-fb" aria-live="polite"></div></fieldset>`).join('');
+    api.save(st);
     host.addEventListener('change', (e) => { const f = e.target.closest('fieldset'); if (!f) return; st.ans[+f.dataset.q] = +e.target.value; f.classList.remove('ok', 'bad'); $('.q-fb', f).textContent = ''; api.save(st); });
     return {
       check() {
@@ -1019,7 +1370,7 @@ window.GRADE = {
     const st = api.load() || { on: [] };
     const sets = d.sets || [d];
     let k = 0; const marks = [];
-    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + sets.map((s) => {
+    host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + sets.map((s) => {
       const head = s.head ? `<div class="spot-head">${s.head}</div>` : '';
       const body = s.parts.map((p) => {
         if (typeof p === 'string') return esc(p).replace(/\n/g, '<br>');
@@ -1027,7 +1378,7 @@ window.GRADE = {
         return `<button type="button" class="spot" data-i="${id}" aria-pressed="${st.on.includes(id)}">${esc(p[0])}</button>`;
       }).join('');
       return `<div class="spot-frame frame-${s.frame || 'doc'}">${head}<div class="spot-body">${body}</div></div>`;
-    }).join('') + `<p class="muted small">Toca las partes que te parezcan sospechosas o problemáticas. Vuelve a tocar para desmarcar.</p>`;
+    }).join('') + `<p class="spot-count">Hay <b>${marks.filter((m) => m.ok).length}</b> señales por encontrar.</p>`;
     host.addEventListener('click', (e) => {
       const b = e.target.closest('.spot'); if (!b) return; const i = +b.dataset.i;
       st.on = st.on.includes(i) ? st.on.filter((x) => x !== i) : [...st.on, i]; b.setAttribute('aria-pressed', st.on.includes(i)); b.classList.remove('ok', 'bad'); b.removeAttribute('title'); api.save(st);
@@ -1049,7 +1400,7 @@ window.GRADE = {
     const sets = d.sets;
     const st = api.load() || { ord: sets.map((s) => shuffleNot(s.items.length)) };
     const draw = () => {
-      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + sets.map((s, si) => `<div class="ord-set" data-s="${si}"><p class="ord-prompt">${esc(s.prompt)}</p><div class="ord-wrap ${s.layers ? 'with-prev' : ''}"><ol class="ord">${st.ord[si].map((ix, pos) => `<li><span class="ord-t">${s.html ? s.items[ix] : esc(s.items[ix])}</span><span class="ord-btns"><button type="button" data-s="${si}" data-p="${pos}" data-d="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>↑</button><button type="button" data-s="${si}" data-p="${pos}" data-d="1" aria-label="Bajar" ${pos === s.items.length - 1 ? 'disabled' : ''}>↓</button></span></li>`).join('')}</ol>${s.layers ? `<div class="layer-prev"><svg viewBox="0 0 300 200">${[...st.ord[si]].reverse().map((ix) => s.layers[ix]).join('')}</svg><span class="muted small">Vista del lienzo: la capa de arriba en la lista se dibuja encima.</span></div>` : ''}</div></div>`).join('');
+      host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + sets.map((s, si) => `<div class="ord-set" data-s="${si}"><p class="ord-prompt">${esc(s.prompt)}</p><div class="ord-wrap ${s.layers ? 'with-prev' : ''}"><ol class="ord">${st.ord[si].map((ix, pos) => `<li><span class="ord-t">${s.html ? s.items[ix] : esc(s.items[ix])}</span><span class="ord-btns"><button type="button" data-s="${si}" data-p="${pos}" data-d="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>↑</button><button type="button" data-s="${si}" data-p="${pos}" data-d="1" aria-label="Bajar" ${pos === s.items.length - 1 ? 'disabled' : ''}>↓</button></span></li>`).join('')}</ol>${s.layers ? `<div class="layer-prev"><svg viewBox="0 0 300 200">${[...st.ord[si]].reverse().map((ix) => s.layers[ix]).join('')}</svg><span class="muted small">Vista del lienzo: la capa de arriba en la lista se dibuja encima.</span></div>` : ''}</div></div>`).join('');
     };
     host.addEventListener('click', (e) => {
       const b = e.target.closest('button[data-d]'); if (!b) return; const si = +b.dataset.s, p = +b.dataset.p, dd = +b.dataset.d; const o = st.ord[si]; const q = p + dd; if (q < 0 || q >= o.length) return;
@@ -1076,7 +1427,7 @@ window.GRADE = {
       ['Un símbolo (por ejemplo ! ? # -)', (p) => /[^A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s]/.test(p)],
       ['Sin patrones obvios (123, qwerty, password, tu nombre…)', (p) => p && !d.common.some((c) => norm(p).includes(c))],
     ];
-    host.innerHTML = `<div class="lead-card">${d.lead}</div>
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}
       <label class="fld"><span>Escribe una contraseña de práctica (inventada, nunca una real)</span><input class="pw" type="text" autocomplete="off" spellcheck="false" value="${esc(st.pw)}"></label>
       <div class="meter"><div class="meter-bar"></div></div><p class="meter-t" aria-live="polite"></p>
       <ul class="rules">${rules.map((r, i) => `<li data-r="${i}">${esc(r[0])}</li>`).join('')}</ul>
@@ -1105,7 +1456,7 @@ window.GRADE = {
     const st = api.load() || { txt: d.msgs.map(() => '') };
     const insults = d.insults || [];
     const polite = ['por favor', 'gracias', 'podrias', 'podriamos', 'te parece', 'propongo', 'me gustaria', 'creo que', 'que opinas', 'disculpa', 'perdon', 'seria bueno', 'te pido', '¿'];
-    host.innerHTML = `<div class="lead-card">${d.lead}</div>` + d.msgs.map((m, i) => `<div class="rw" data-i="${i}"><div class="bubble bad-b">${esc(m.orig)}</div><label class="fld"><span>Tu versión respetuosa</span><textarea rows="3">${esc(st.txt[i])}</textarea></label><ul class="rules small"></ul></div>`).join('');
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` + d.msgs.map((m, i) => `<div class="rw" data-i="${i}"><div class="bubble bad-b">${esc(m.orig)}</div><label class="fld"><span>${esc(d.fieldLabel || 'Tu versión respetuosa')}</span><textarea rows="3">${esc(st.txt[i])}</textarea></label><ul class="rules small"></ul></div>`).join('');
     const test = (t, m) => {
       const n = norm(t);
       return [
@@ -1114,8 +1465,7 @@ window.GRADE = {
         ['No repite signos !! o ??', !/[!¡]{2,}|[?¿]{2,}/.test(t)],
         ['No contiene insultos ni burlas', !insults.some((w) => n.includes(w))],
         ['Conserva la intención: ' + m.intent, m.keep.some((w) => n.includes(norm(w)))],
-        ['Usa una fórmula amable (por favor, gracias, ¿te parece…?)', polite.some((w) => n.includes(w) || t.includes(w))],
-      ];
+        ['Usa una fórmula amable (por favor, gracias, ¿te parece…?)', polite.some((w) => n.includes(w) || t.includes(w))]].filter((x) => !(d.noPolite && x[0].startsWith('Usa una fórmula')));
     };
     const upd = (i) => { const el = $(`.rw[data-i="${i}"]`, host); const r = test(st.txt[i], d.msgs[i]); $('.rules', el).innerHTML = r.map(([t, ok]) => `<li class="${ok ? 'on' : ''}">${esc(t)}</li>`).join(''); };
     d.msgs.forEach((_, i) => upd(i));
@@ -1126,7 +1476,7 @@ window.GRADE = {
   /* --- regla de los tercios --- */
   E.thirds = (host, d, api) => {
     const st = api.load() || { hy: 300, sx: 300, sy: 240, grid: true };
-    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="thirds"><svg viewBox="0 0 600 400" class="th-svg" role="img" aria-label="Lienzo de composición"></svg>
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="thirds"><svg viewBox="0 0 600 400" class="th-svg" role="img" aria-label="Lienzo de composición"></svg>
       <div class="th-ctl"><label class="fld"><span>Horizonte (altura)</span><input type="range" min="40" max="360" data-k="hy"></label>
       <label class="fld"><span>Faro: posición horizontal</span><input type="range" min="40" max="560" data-k="sx"></label>
       <label class="fld"><span>Faro: posición vertical</span><input type="range" min="80" max="340" data-k="sy"></label>
@@ -1165,9 +1515,9 @@ window.GRADE = {
     const ctl = d.sliders.map((s) => `<label class="fld"><span>${esc(s.label)}: <b data-o="${s.id}"></b></span><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" data-k="${s.id}" value="${st[s.id]}"></label>`).join('');
     if (d.kind === 'photo') {
       const scene = `<rect width="300" height="120" fill="#8EC5F0"/><circle cx="235" cy="45" r="20" fill="#FFD25E"/><path d="M0,120 L60,70 L110,110 L170,55 L240,115 L300,85 L300,200 L0,200Z" fill="#3E8E5E"/><rect y="150" width="300" height="50" fill="#5DAE62"/><rect x="40" y="130" width="40" height="34" fill="#E86A4A"/><path d="M34,132 L60,112 L86,132Z" fill="#8C3B2F"/><circle cx="200" cy="160" r="12" fill="#E8C547"/><circle cx="222" cy="168" r="9" fill="#D94F8C"/>`;
-      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ph-row"><figure><svg viewBox="0 0 300 200" class="ph ph-you">${scene}</svg><figcaption>Tu ajuste</figcaption></figure><figure><svg viewBox="0 0 300 200" class="ph">${scene}</svg><figcaption>Referencia</figcaption></figure></div><div class="ctl-grid">${ctl}</div>`;
+      host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="ph-row"><figure><svg viewBox="0 0 300 200" class="ph ph-you">${scene}</svg><figcaption>Tu ajuste</figcaption></figure><figure><svg viewBox="0 0 300 200" class="ph">${scene}</svg><figcaption>Referencia</figcaption></figure></div><div class="ctl-grid">${ctl}</div>`;
     } else {
-      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="mixer">${d.sliders.map((s) => `<div class="trk" data-t="${s.id}"><span class="trk-n">${esc(s.label)}</span><div class="wave">${Array.from({ length: 48 }, (_, i) => `<i style="--h:${(0.25 + 0.75 * Math.abs(Math.sin(i * (s.id === 'voz' ? 0.9 : s.id === 'musica' ? 0.35 : 2.3) + s.id.length))).toFixed(2)}"></i>`).join('')}</div></div>`).join('')}</div><p class="mix-t" aria-live="polite"></p><div class="ctl-grid">${ctl}</div>`;
+      host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="mixer">${d.sliders.map((s) => `<div class="trk" data-t="${s.id}"><span class="trk-n">${esc(s.label)}</span><div class="wave">${Array.from({ length: 48 }, (_, i) => `<i style="--h:${(0.25 + 0.75 * Math.abs(Math.sin(i * (s.id === 'voz' ? 0.9 : s.id === 'musica' ? 0.35 : 2.3) + s.id.length))).toFixed(2)}"></i>`).join('')}</div></div>`).join('')}</div><p class="mix-t" aria-live="polite"></p><div class="ctl-grid">${ctl}</div>`;
     }
     const upd = () => {
       d.sliders.forEach((s) => { const o = $(`[data-o="${s.id}"]`, host); o.textContent = s.fmt ? s.fmt(st[s.id]) : st[s.id]; });
@@ -1210,7 +1560,7 @@ window.GRADE = {
       const stars = (L.stars || []).filter((s, i) => !p.got.includes(i)).map((s) => `<text x="${s[0] * S + S / 2}" y="${s[1] * S + S / 2 + 7}" text-anchor="middle" font-size="22">★</text>`).join('');
       const bot = `<g transform="translate(${p.x * S + S / 2},${p.y * S + S / 2}) rotate(${p.d * 90})"><circle r="15" fill="var(--codigo)"/><path d="M0,-12 L7,2 L-7,2Z" fill="#fff"/></g>`;
       const rb = (l, depth) => `<ul class="rb-prog ${depth ? 'nested' : ''}">${l.map((b) => `<li class="rb-b k-${b.k} ${dest === b.id ? 'dest' : ''}" data-id="${b.id}"><span>${b.k === 'rep' ? `Repetir <button type="button" class="mini" data-act="minus" data-id="${b.id}" aria-label="Menos">−</button><b>${b.n}</b><button type="button" class="mini" data-act="plus" data-id="${b.id}" aria-label="Más">+</button> veces ${dest === b.id ? '<em>(agregando aquí)</em>' : `<button type="button" class="mini txt" data-act="into" data-id="${b.id}">agregar dentro</button>`}` : NAMES[b.k]}</span><button type="button" class="mini x" data-act="del" data-id="${b.id}" aria-label="Quitar bloque">×</button>${b.k === 'rep' ? rb(b.body, depth + 1) : ''}</li>`).join('')}</ul>`;
-      host.innerHTML = `<div class="lead-card">${d.lead}</div>
+      host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}
         <div class="lv-tabs" role="tablist">${d.levels.map((l, i) => `<button type="button" role="tab" aria-selected="${i === st.lv}" data-lv="${i}">Nivel ${i + 1}${st.solved[i] >= 1 ? ' ✓' : ''}</button>`).join('')}</div>
         <p class="lv-goal">${esc(L.goalText)}${L.max ? ` Usa como máximo <b>${L.max}</b> bloques.` : ''}</p>
         <div class="rb-wrap"><svg viewBox="0 0 ${L.w * S} ${L.h * S}" class="rb-svg" style="max-width:${L.w * S * 1.3}px">${cells}${goal}${stars}${bot}</svg>
@@ -1263,7 +1613,7 @@ window.GRADE = {
   /* --- rastrear programas: predecir el resultado --- */
   E.trace = (host, d, api) => {
     const st = api.load() || { ans: d.items.map(() => '') };
-    host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.items.map((it, i) => `<div class="tr" data-i="${i}"><pre class="code">${it.code.split('\n').map((l, n) => `<span class="ln">${n + 1}</span>${esc(l)}`).join('\n')}</pre><div class="tr-q"><p>${esc(it.q)}</p>${it.opts ? it.opts.map((o, oi) => `<label class="opt"><input type="radio" name="tr${api.pid}_${i}" value="${oi}" ${String(st.ans[i]) === String(oi) ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('') : `<input class="tr-in" type="text" value="${esc(st.ans[i])}" placeholder="Tu respuesta" autocomplete="off">`}<p class="q-fb" aria-live="polite"></p></div></div>`).join('');
+    host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + d.items.map((it, i) => `<div class="tr" data-i="${i}"><pre class="code">${it.code.split('\n').map((l, n) => `<span class="ln">${n + 1}</span>${esc(l)}`).join('\n')}</pre><div class="tr-q"><p>${esc(it.q)}</p>${it.opts ? it.opts.map((o, oi) => `<label class="opt"><input type="radio" name="tr${api.pid}_${i}" value="${oi}" ${String(st.ans[i]) === String(oi) ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('') : `<input class="tr-in" type="text" value="${esc(st.ans[i])}" placeholder="Tu respuesta" autocomplete="off">`}<p class="q-fb" aria-live="polite"></p></div></div>`).join('');
     host.addEventListener('input', (e) => { const el = e.target.closest('.tr'); if (!el) return; st.ans[+el.dataset.i] = e.target.value; el.classList.remove('ok', 'bad'); $('.q-fb', el).textContent = ''; api.save(st); });
     return {
       check() {
@@ -1286,7 +1636,7 @@ window.GRADE = {
         <div class="tbl-wrap"><table class="freq"><tr><th>Resultado</th>${labels.map((l) => `<th>${l}</th>`).join('')}</tr><tr><th>Frecuencia</th>${c.map((x) => `<td>${x}</td>`).join('')}</tr><tr><th>Relativa</th>${c.map((x) => `<td>${n ? Math.round((x / n) * 1000) / 10 + '%' : '—'}</td>`).join('')}</tr></table></div>
         ${n ? svgChart({ type: 'columnas', labels, series: [{ name: 'Frecuencia', values: c }], title: one ? 'Frecuencia de cada cara' : 'Frecuencia de cada suma' }) : ''}`;
     };
-    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="sim-out"></div><h3 class="sub">Preguntas</h3><div class="sim-q"></div>`;
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="sim-out"></div><h3 class="sub">Preguntas</h3><div class="sim-q"></div>`;
     host.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.m) { st.mode = +b.dataset.m; api.save(st); draw(); }
@@ -1312,7 +1662,7 @@ window.GRADE = {
     const draw = () => {
       const P = d.palette; const bg = P[st.bg] || '#ffffff', tx = P[st.tx] || '#999999', ac = P[st.ac] || '#cccccc';
       const r1 = st.bg >= 0 && st.tx >= 0 ? ratio(bg, tx) : 0, r2 = st.bg >= 0 && st.ac >= 0 ? ratio(bg, ac) : 0;
-      host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ct-grid"><div>${roles.map(([k, n]) => `<div class="ct-role"><span>${n}</span><div class="sw-row">${P.map((c, i) => `<button type="button" class="sw" data-k="${k}" data-i="${i}" style="background:${c}" aria-pressed="${st[k] === i}" aria-label="${n}: color ${c}"></button>`).join('')}</div></div>`).join('')}
+      host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="ct-grid"><div>${roles.map(([k, n]) => `<div class="ct-role"><span>${n}</span><div class="sw-row">${P.map((c, i) => `<button type="button" class="sw" data-k="${k}" data-i="${i}" style="background:${c}" aria-pressed="${st[k] === i}" aria-label="${n}: color ${c}"></button>`).join('')}</div></div>`).join('')}
         <ul class="rules small"><li class="${r1 >= 4.5 ? 'on' : ''}">Contraste texto/fondo de al menos 4.5 : 1 (llevas ${r1 ? r1.toFixed(1) : '—'})</li><li class="${r2 >= 3 ? 'on' : ''}">Contraste acento/fondo de al menos 3 : 1 (llevas ${r2 ? r2.toFixed(1) : '—'})</li><li class="${new Set([st.bg, st.tx, st.ac]).size === 3 && st.ac >= 0 && st.bg >= 0 && st.tx >= 0 ? 'on' : ''}">Tres colores distintos</li></ul></div>
         <div class="post" style="background:${bg};color:${tx}"><div class="post-band" style="background:${ac}"></div><h4>${esc(d.title)}</h4><p>${esc(d.body)}</p><span class="post-btn" style="background:${ac};color:${bg}">${esc(d.cta)}</span></div></div>`;
     };
@@ -1330,7 +1680,7 @@ window.GRADE = {
   /* --- editor HTML/CSS/JS con vista previa --- */
   E.html = (host, d, api) => {
     const st = api.load() || { code: d.starter };
-    host.innerHTML = `<div class="lead-card">${d.lead}</div><div class="ed"><label class="fld ed-code"><span>Tu código</span><textarea spellcheck="false" autocapitalize="off" autocomplete="off">${esc(st.code)}</textarea></label><div class="ed-prev"><span class="muted small">Vista previa</span><iframe sandbox="allow-scripts" title="Vista previa de tu página"></iframe></div></div><ul class="rules small ed-rules">${d.checks.map((c) => `<li>${esc(c.t)}</li>`).join('')}</ul>`;
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}<div class="ed"><label class="fld ed-code"><span>Tu código</span><textarea spellcheck="false" autocapitalize="off" autocomplete="off">${esc(st.code)}</textarea></label><div class="ed-prev"><span class="muted small">Vista previa</span><iframe sandbox="allow-scripts" title="Vista previa de tu página"></iframe></div></div><ul class="rules small ed-rules">${d.checks.map((c) => `<li>${esc(c.t)}</li>`).join('')}</ul>`;
     const ta = $('textarea', host), fr = $('iframe', host);
     let tmr; const render = () => { fr.srcdoc = st.code; };
     ta.addEventListener('input', () => { st.code = ta.value; api.save(st); clearTimeout(tmr); tmr = setTimeout(render, 450); });
@@ -1348,7 +1698,7 @@ window.GRADE = {
   /* --- respuesta abierta guiada --- */
   E.form = (host, d, api) => {
     const st = api.load() || { v: d.fields.map(() => '') };
-    host.innerHTML = `<div class="lead-card">${d.lead}</div>` + d.fields.map((f, i) => `<label class="fld" data-i="${i}"><span>${esc(f.label)}</span>${f.rows === 1 ? `<input type="text" value="${esc(st.v[i])}" placeholder="${esc(f.ph || '')}">` : `<textarea rows="${f.rows || 3}" placeholder="${esc(f.ph || '')}">${esc(st.v[i])}</textarea>`}<small class="muted cnt"></small></label>`).join('') + `<div class="row"><button type="button" class="btn ghost" data-act="copy">Copiar mis respuestas</button><span class="muted small copy-t" aria-live="polite"></span></div>`;
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` + d.fields.map((f, i) => `<label class="fld" data-i="${i}"><span>${esc(f.label)}</span>${f.rows === 1 ? `<input type="text" value="${esc(st.v[i])}" placeholder="${esc(f.ph || '')}">` : `<textarea rows="${f.rows || 3}" placeholder="${esc(f.ph || '')}">${esc(st.v[i])}</textarea>`}<small class="muted cnt"></small></label>`).join('') + `<div class="row"><button type="button" class="btn ghost" data-act="copy">Copiar mis respuestas</button><span class="muted small copy-t" aria-live="polite"></span></div>`;
     const ok = (i) => { const f = d.fields[i], v = st.v[i]; const n = norm(v); return v.trim().length >= (f.min || 1) && (f.need || []).every((w) => n.includes(norm(w))); };
     const upd = (i) => { const f = d.fields[i]; const el = $(`.fld[data-i="${i}"]`, host); $('.cnt', el).textContent = `${st.v[i].trim().length} caracteres${f.min ? ` (mínimo ${f.min})` : ''}${f.need ? ` · debe mencionar: ${f.need.join(', ')}` : ''}`; el.classList.toggle('ok', ok(i)); };
     d.fields.forEach((_, i) => upd(i));
@@ -1364,7 +1714,7 @@ window.GRADE = {
     const C = d.cols, R = d.rows; let sel = 'A1'; let sheet; let pickerOpen = null;
     const tools = d.tools || [];
     const TOOLN = { fill: 'Rellenar', cf: 'Formato condicional', chart: 'Insertar gráfica', sort: 'Ordenar', filter: 'Filtrar', pivot: 'Tabla dinámica', validation: 'Validación de datos' };
-    host.innerHTML = `<div class="lead-card">${d.lead}</div>
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}
       <div class="xl">
         <div class="fbar"><span class="addr" aria-live="polite">A1</span><span class="fx">fx</span><input class="finput" type="text" spellcheck="false" autocomplete="off" aria-label="Barra de fórmulas"><button type="button" class="btn sm" data-act="commit">Aceptar</button></div>
         <div class="valpick" hidden></div>
@@ -1515,6 +1865,23 @@ window.GRADE = {
   };
 
   /* ================= INTERFAZ ================= */
+  const HELP = {
+    classify: 'Lee cada tarjeta y toca la categoría que le corresponde. Cuando hayas clasificado todas, presiona <b>Revisar</b>. Las tarjetas en rojo tienen una pista para corregir.',
+    quiz: 'Lee cada pregunta y elige una respuesta. Cuando contestes todas, presiona <b>Revisar</b>. Las opciones cambian de lugar cada vez que reinicias el ejercicio.',
+    spot: 'Lee todo el texto. Toca cada parte que sea una señal de alerta o un error: se marca en amarillo. Si te equivocas, vuelve a tocarla para desmarcarla. Al final presiona <b>Revisar</b>.',
+    order: 'Usa las flechas <b>↑</b> y <b>↓</b> para mover cada elemento hasta que queden en el orden correcto. Después presiona <b>Revisar</b>.',
+    sheet: '<ol><li>Toca una celda de la hoja.</li><li>Escribe en la barra de arriba (fx) y presiona <b>Enter</b>. Las fórmulas siempre empiezan con <code>=</code>.</li><li>Mientras escribes una fórmula, puedes tocar una celda para insertar su nombre.</li><li>Las herramientas (Rellenar, Gráfica, Formato condicional…) están debajo de la hoja.</li><li>Sigue la lista de <b>Tareas</b> y presiona <b>Revisar</b>: cada tarea se marca en verde o en rojo con una pista.</li></ol>',
+    robot: 'Agrega bloques desde la paleta de colores, presiona <b>▶ Ejecutar</b> y observa al robot. Si choca o no llega, corrige los bloques y vuelve a ejecutar. Cada nivel cuenta cuando el robot llega a la bandera.',
+    trace: 'Lee el programa línea por línea como si fueras la computadora. Anota en tu cuaderno el valor de cada variable y escribe o elige la respuesta. Después presiona <b>Revisar</b>.',
+    password: 'Escribe una contraseña inventada y observa cómo se palomean los criterios. Después clasifica las contraseñas de ejemplo y presiona <b>Revisar</b>.',
+    rewrite: 'Escribe tu versión debajo de cada mensaje. Los criterios se palomean mientras escribes. Cuando todos estén palomeados, presiona <b>Revisar</b>.',
+    thirds: 'Arrastra el horizonte y el faro, o usa los controles deslizantes. Activa la cuadrícula para ver las líneas de los tercios. Después presiona <b>Revisar</b>.',
+    sliders: 'Mueve cada control poco a poco y observa el resultado. Cuando creas que está bien, presiona <b>Revisar</b>: te dirá qué control falta ajustar.',
+    simulate: 'Elige el modo, presiona los botones de lanzar hasta llegar a 1 000 lanzamientos en cada modo, observa la tabla y la gráfica, y responde las preguntas.',
+    contrast: 'Elige un color para cada papel (fondo, texto y acento) tocando los cuadros de color. La publicación de la derecha cambia en vivo. Cuida que se palomeen los tres criterios.',
+    html: 'Escribe tu código en el recuadro de la izquierda; la vista previa de la derecha se actualiza sola. Presiona <b>Revisar</b> para ver qué requisitos ya cumples.',
+    form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
+  };
   const app = $('#app');
   function shell() {
     app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
@@ -1524,62 +1891,67 @@ window.GRADE = {
   }
   const hiloName = { datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
-  const stText = { nuevo: 'Sin empezar', intentado: 'Intentado', hecho: 'Completado', dominado: 'Dominado' };
-  function side(cur) {
-    $('#side').innerHTML = `<a href="#" class="side-home ${!cur ? 'on' : ''}">Mapa de prácticas</a>` + G.modules.map((m, mi) => `<section class="side-m" style="--hc:var(--${m.hilo})"><h2><span class="mcol">${LET[mi]}</span>${esc(m.name)}</h2><ul>${m.temas.map((t, ti) => { const pid = `m${mi + 1}t${ti + 1}`; const s = status(pid); return `<li><a href="#${pid}" class="st-${s} ${cur === pid ? 'on' : ''}" ${cur === pid ? 'aria-current="page"' : ''}><span class="ic" aria-label="${stText[s]}">${stIcon[s]}</span><span>${esc(t.t)}</span></a></li>`; }).join('')}</ul></section>`).join('');
-    const dn = doneCount(); $('#pill').innerHTML = `<span><b>${dn}</b> de ${all.length} temas</span><span class="pbar"><i style="width:${(dn / all.length) * 100}%"></i></span>`;
+  const stText = { nuevo: 'Sin empezar', intentado: 'En proceso', hecho: 'Completado', dominado: 'Dominado' };
+  const dots = (tm) => tm.ex.map((x) => `<i class="dot st-${status(x.pid)}" title="Ejercicio ${x.ei + 1}: ${stText[status(x.pid)]}"></i>`).join('');
+  function side(curTid) {
+    $('#side').innerHTML = `<a href="#" class="side-home ${!curTid ? 'on' : ''}">Mapa de prácticas</a>` + G.modules.map((m, mi) => `<section class="side-m" style="--hc:var(--${m.hilo})"><h2><span class="mcol">${LET[mi]}</span>${esc(m.name)}</h2><ul>${temas.filter((tm) => tm.mi === mi).map((tm) => { const s = temaStatus(tm); return `<li><a href="#${tm.ex[0].pid}" class="st-${s} ${curTid === tm.tid ? 'on' : ''}" ${curTid === tm.tid ? 'aria-current="page"' : ''}><span class="ic" aria-label="${stText[s]}">${stIcon[s]}</span><span class="sl">${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}<span class="dots">${dots(tm)}</span></span></a></li>`; }).join('')}</ul></section>`).join('');
+    const dn = doneCount(); $('#pill').innerHTML = `<span><b>${dn}</b> de ${temas.length} temas</span><span class="pbar"><i style="width:${(dn / temas.length) * 100}%"></i></span>`;
   }
   function home() {
     side(null);
     const maxT = Math.max(...G.modules.map((m) => m.temas.length));
-    const nextP = all.find((x) => !['hecho', 'dominado'].includes(status(x.pid)));
-    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const t = m.temas[ti]; if (!t) return '<div class="pcell empty" aria-hidden="true"></div>'; const pid = `m${mi + 1}t${ti + 1}`; const s = status(pid); return `<a class="pcell st-${s}" href="#${pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(t.t)}</span><span class="pst">${stIcon[s] ? stIcon[s] + ' ' : ''}${stText[s]}</span></a>`; }).join('')}</div>`).join('');
-    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>${esc(G.heroText)}</p><div class="row">${nextP ? `<a class="btn primary" href="#${nextP.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${esc(nextP.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+    const nextT = temas.find((tm) => !['hecho', 'dominado'].includes(temaStatus(tm)));
+    const nextX = nextT ? (nextT.ex.find((x) => !['hecho', 'dominado'].includes(status(x.pid))) || nextT.ex[0]) : null;
+    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
       <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
-      <p class="legend"><span>${stIcon.intentado} Intentado</span><span>${stIcon.hecho} Completado (80% o más)</span><span>${stIcon.dominado} Dominado (100%)</span></p>`;
+      <p class="legend"><span><i class="dot st-hecho"></i> Ejercicio completado</span><span><i class="dot st-dominado"></i> Ejercicio dominado (100%)</span><span><i class="dot st-intentado"></i> En proceso</span><span><i class="dot st-nuevo"></i> Sin empezar</span></p>`;
     $('#cert').addEventListener('click', cert);
   }
   function cert() {
     const d = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
-    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${all.length} temas completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Mejor resultado</th><th>Intentos</th><th>Estado</th></tr>${all.map((x) => { const p = store.prog[x.pid]; return `<tr><td>${LET[x.mi]}. ${esc(x.m.name)}</td><td>${esc(x.t.t)}</td><td>${p ? Math.round(p.best * 100) + '%' : '—'}</td><td>${p ? p.tries : 0}</td><td>${stText[status(x.pid)]}</td></tr>`; }).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p></div>`;
+    const avg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
+    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${temas.length} temas completados · <b>${exs.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length}</b> de ${exs.length} ejercicios completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Ejercicios completados</th><th>Promedio</th><th>Estado</th></tr>${temas.map((tm) => `<tr><td>${LET[tm.mi]}. ${esc(tm.m.name)}</td><td>${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}</td><td>${exDone(tm)} de ${tm.ex.length}</td><td>${avg(tm)}%</td><td>${stText[temaStatus(tm)]}</td></tr>`).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p></div>`;
     document.body.classList.add('show-cert');
     $('#doprint').addEventListener('click', () => window.print());
     $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
   }
-  let current = null;
   function practice(pid) {
     const x = byPid[pid]; if (!x) { home(); return; }
-    side(pid); const p = x.t.p; const idx = all.indexOf(x); const prev = all[idx - 1], next = all[idx + 1];
+    const tm = x.tema; side(tm.tid); const p = x.p; const idx = exs.indexOf(x); const prev = exs[idx - 1], next = exs[idx + 1];
     const best = store.prog[pid];
-    $('#main').innerHTML = `<article class="prac" style="--hc:var(--${x.m.hilo})"><a href="#" class="back">← Mapa de prácticas</a>
-      <p class="crumb"><span class="mcol">${LET[x.mi]}${x.ti + 1}</span> Módulo ${x.mi + 1}: ${esc(x.m.name)}</p>
-      <h2>${esc(x.t.t)}</h2><p class="intro">${p.intro}</p>
+    const nextLabel = next ? (next.tid === tm.tid ? `Ejercicio ${next.ei + 1} →` : `Siguiente tema: ${LET[next.tema.mi]}${next.tema.ti + 1} →`) : '';
+    $('#main').innerHTML = `<article class="prac" style="--hc:var(--${tm.m.hilo})"><a href="#" class="back">← Mapa de prácticas</a>
+      <p class="crumb"><span class="mcol">${LET[tm.mi]}${tm.ti + 1}</span> Módulo ${LET[tm.mi]}: ${esc(tm.m.name)} · Cuaderno de trabajo, tema ${LET[tm.mi]}${tm.ti + 1}</p>
+      <h2>${esc(tm.t.t)}</h2>
+      <div class="extabs" role="tablist">${tm.ex.map((e) => `<a role="tab" href="#${e.pid}" class="extab st-${status(e.pid)}" aria-selected="${e.pid === pid}"><span class="exn">Ejercicio ${e.ei + 1}</span><span class="exl">${esc(e.label)}${stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''}</span></a>`).join('')}</div>
+      <h3 class="extitle">Ejercicio ${x.ei + 1} de ${tm.ex.length}${p.title ? ': ' + esc(p.title) : ''}</h3>
+      <p class="intro">${p.intro}</p>
+      <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${HELP[p.type] || ''}</div></details>
       ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${p.tip}</div></details>` : ''}
       <div class="engine"></div>
-      <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
-      <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">Siguiente →</a>` : ''}</div></article>`;
-    const api = {
-      pid,
-      load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null),
-      save: (s) => { store.saves[pid] = s; persist(); },
-      autoCheck: () => doCheck(true),
-    };
+      <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado en este ejercicio: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
+      <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
+    const api = { pid, load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null), save: (s) => { store.saves[pid] = s; persist(); }, autoCheck: () => doCheck(true) };
     let eng;
-    try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Esta práctica no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
-    current = eng;
-    function doCheck(silent) {
+    try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Este ejercicio no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
+    function doCheck() {
       if (!eng) return; const r = eng.check();
       const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.best = Math.max(pr.best, r.score); store.prog[pid] = pr; persist();
-      const pct = Math.round(r.score * 100);
-      const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
-      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">Ir al siguiente tema →</a>` : ''}`;
-      side(pid);
+      const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
+      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
+      side(tm.tid); $$('.extab').forEach((el) => { const e = byPid[el.getAttribute('href').slice(1)]; el.className = 'extab st-' + status(e.pid); el.querySelector('.exl').textContent = e.label + (stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''); });
     }
-    $('#chk').addEventListener('click', () => doCheck(false));
-    $('#rst').addEventListener('click', () => { if (!confirm('¿Borrar tu trabajo en esta práctica y empezar de nuevo? Tu mejor resultado se conserva.')) return; delete store.saves[pid]; persist(); practice(pid); });
+    $('#chk').addEventListener('click', () => doCheck());
+    $('#rst').addEventListener('click', () => { if (!confirm('¿Borrar tu trabajo en este ejercicio y empezar de nuevo? Tu mejor resultado se conserva.')) return; delete store.saves[pid]; persist(); practice(pid); });
     $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
   }
-  function route() { const h = location.hash.slice(1); document.body.classList.toggle('in-prac', !!byPid[h]); if (byPid[h]) practice(h); else home(); }
+  function route() {
+    let h = location.hash.slice(1);
+    if (byTid[h]) h = byTid[h].ex[0].pid;
+    document.body.classList.toggle('in-prac', !!byPid[h]);
+    if (byPid[h]) practice(h); else home();
+  }
   shell(); window.addEventListener('hashchange', route); route();
 })();
 
