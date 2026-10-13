@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Simulador Tech Kids · 1° de secundaria</title>
+<!-- versión 2026-10-13: correcciones de avance -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -339,6 +340,8 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
 }
 @media (max-width: 520px){ body{font-size:16px} .ph-row{grid-template-columns:1fr} .trk{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+.xl-flash.okf{background:var(--ok-bg); color:var(--ok)}
+.btn.warn{background:var(--bad-bg); color:var(--bad); border-color:var(--bad)}
 </style>
 </head>
 <body>
@@ -818,8 +821,8 @@ window.GRADE = {
       cells: { A1: 'Materia', B1: 'Alumnos', A2: 'Matemáticas', B2: '4', A3: 'Artes', B3: '5', A4: 'Educación Física', B4: '6', A5: 'Ciencias', B5: '3', A6: 'Inglés', B6: '2', D1: 'Mes', E1: 'Libros leídos', D2: 'Feb', E2: '12', D3: 'Mar', E3: '15', D4: 'Abr', E4: '11', D5: 'May', E5: '19', D6: 'Jun', E6: '24', D7: 'Jul', E7: '28', A9: 'Para mostrar partes de un total uso la gráfica…', A10: 'Para comparar categorías uso la gráfica…' },
       tasks: [
         { text: 'Inserta la gráfica adecuada para ver cómo cambió la lectura del grupo de febrero a julio, con título.', check: { type: 'chart', chartType: 'lineas', labels: 'D2:D7', values: 'E2:E7', title: true }, hint: 'Es un cambio en el tiempo: líneas. Etiquetas D2:D7, valores E2:E7.' },
-        { text: 'En <code>B9</code> escribe qué tipo de gráfica muestra partes de un total.', check: { type: 'value', cell: 'B9', equals: 'circular' }, hint: 'Escribe una palabra: columnas, circular o líneas.' },
-        { text: 'En <code>B10</code> escribe qué tipo de gráfica compara cantidades entre categorías.', check: { type: 'expr', f: (c) => ['columnas', 'barras'].includes(String(c.v('B10')).trim().toLowerCase()) }, hint: 'Escribe columnas o barras.' },
+        { text: 'En <code>B9</code> escribe qué tipo de gráfica muestra partes de un total.', check: { type: 'expr', f: (c) => /circular|pastel|pay/.test(String(c.v('B9')).toLowerCase()) }, hint: 'Escribe una palabra: columnas, circular o líneas.' },
+        { text: 'En <code>B10</code> escribe qué tipo de gráfica compara cantidades entre categorías.', check: { type: 'expr', f: (c) => /column|barra/.test(String(c.v('B10')).toLowerCase()) }, hint: 'Escribe columnas o barras.' },
       ] } },
   ] },
   /* ---------------- M6 ---------------- */
@@ -1418,11 +1421,12 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     const insults = d.insults || [];
     const polite = ['por favor', 'gracias', 'podrias', 'podriamos', 'te parece', 'propongo', 'me gustaria', 'creo que', 'que opinas', 'disculpa', 'perdon', 'seria bueno', 'te pido', '¿'];
     host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` + d.msgs.map((m, i) => `<div class="rw" data-i="${i}"><div class="bubble bad-b">${esc(m.orig)}</div><label class="fld"><span>${esc(d.fieldLabel || 'Tu versión respetuosa')}</span><textarea rows="3">${esc(st.txt[i])}</textarea></label><ul class="rules small"></ul></div>`).join('');
+    const shout = (t) => { const L = (t.match(/[A-Za-zÁÉÍÓÚÑáéíóúñ]/g) || []); const U = (t.match(/[A-ZÁÉÍÓÚÑ]/g) || []); const caps = t.split(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]+/).filter((w) => w.length >= 3 && w === w.toUpperCase()); return caps.length >= 3 || (L.length >= 12 && U.length / L.length > 0.5); };
     const test = (t, m) => {
       const n = norm(t);
       return [
         ['Tiene al menos 20 caracteres', t.trim().length >= 20],
-        ['No usa palabras completas en MAYÚSCULAS (se lee como gritar)', !/\b[A-ZÁÉÍÓÚÑ]{4,}\b/.test(t)],
+        ['No escribe en MAYÚSCULAS (se lee como gritar; las siglas como INEGI sí se valen)', !shout(t)],
         ['No repite signos !! o ??', !/[!¡]{2,}|[?¿]{2,}/.test(t)],
         ['No contiene insultos ni burlas', !insults.some((w) => n.includes(w))],
         ['Conserva la intención: ' + m.intent, m.keep.some((w) => n.includes(norm(w)))],
@@ -1579,7 +1583,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     return {
       check() {
         let ok = 0;
-        d.items.forEach((it, i) => { const el = $(`.tr[data-i="${i}"]`, host); const a = String(st.ans[i] ?? '').trim(); const good = it.opts ? a === String(it.a) : norm(a).replace(/\s+/g, '') === norm(String(it.a)).replace(/\s+/g, '') || (it.alt || []).some((x) => norm(a).replace(/\s+/g, '') === norm(x).replace(/\s+/g, '')); el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (a ? 'Sigue el programa línea por línea anotando el valor de cada variable.' : 'Falta tu respuesta.'); if (good) ok++; });
+        d.items.forEach((it, i) => { const el = $(`.tr[data-i="${i}"]`, host); const a = String(st.ans[i] ?? '').trim(); const sq = (x) => norm(x).replace(/[^a-z0-9ñ\-]/g, ''); const good = it.opts ? a === String(it.a) : (a !== '' && (sq(a) === sq(String(it.a)) || (it.alt || []).some((x) => sq(a) === sq(x)))); el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (a ? 'Sigue el programa línea por línea anotando el valor de cada variable.' : 'Falta tu respuesta.'); if (good) ok++; });
         return { score: ok / d.items.length, msg: `${ok} de ${d.items.length} correctas.` };
       }
     };
@@ -1672,7 +1676,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
   E.sheet = (host, d, api) => {
     const fresh = () => ({ raw: { ...d.cells }, cf: [], chart: null, filter: null, pivot: null, val: [] });
     const st = api.load() || fresh();
-    const C = d.cols, R = d.rows; let sel = 'A1'; let sheet; let pickerOpen = null;
+    const C = d.cols, R = d.rows; let sel = 'A1'; let sheet; let pickerOpen = null; let lastIns = null, lastCommit = null, skipClick = false;
     const tools = d.tools || [];
     const TOOLN = { fill: 'Rellenar', cf: 'Formato condicional', chart: 'Insertar gráfica', sort: 'Ordenar', filter: 'Filtrar', pivot: 'Tabla dinámica', validation: 'Validación de datos' };
     host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}
@@ -1707,24 +1711,42 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       grid.innerHTML = h + '</tbody>';
       renderOutputs();
     }
-    function select(a, focusInput) {
+    function select(a, focusInput, noScroll) {
       sel = a; $('.addr', host).textContent = a; inp.value = st.raw[a] ?? '';
-      $$('td.sel', grid).forEach((x) => x.classList.remove('sel')); const td = $(`td[data-a="${a}"]`, grid); if (td) { td.classList.add('sel'); td.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+      $$('td.sel', grid).forEach((x) => x.classList.remove('sel')); const td = $(`td[data-a="${a}"]`, grid); if (td) { td.classList.add('sel'); if (!noScroll) td.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
       const vr = valRule(a); const vp = $('.valpick', host);
       if (vr) { vp.hidden = false; vp.innerHTML = `<label>Elige un valor para ${a}: <select>${['', ...vr.list].map((o) => `<option ${FX.norm(o) === FX.norm(st.raw[a] ?? '') ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`; } else { vp.hidden = true; vp.innerHTML = ''; }
+      if (pickerOpen === 'fill' && st.raw[a] !== undefined) setFillSrc(a);
       if (focusInput) inp.focus();
     }
+    function setFillSrc(a) { const f = $('.toolpanel [data-f="src"]', host); if (f) f.value = a; }
+    const fillSrc = () => (st.raw[sel] === undefined && lastCommit && st.raw[lastCommit] !== undefined ? lastCommit : sel);
+    const pending = () => inp.value !== String(st.raw[sel] ?? '');
     function commit(move) {
       let v = inp.value; const vr = valRule(sel);
-      if (vr && v.trim() && !v.startsWith('=') && !vr.list.some((o) => FX.norm(o) === FX.norm(v))) { flash(`“${v}” no está en la lista permitida de ${sel}. Elige un valor de la lista.`); return; }
-      if (v.startsWith('=')) { try { FX.parse(v.slice(1)); } catch (e) { flash('La fórmula tiene un error de escritura: revisa paréntesis, comillas y separadores.'); return; } v = v.replace(/^=\s*/, '=').replace(/([A-Za-zÁÉÍÓÚÑáéíóúñ._]+)\s*\(/g, (m, n) => n.toUpperCase() + '(').replace(/(?<![A-Za-z])([a-z]{1,2})(\$?\d+)/g, (m, c, r) => c.toUpperCase() + r); }
-      if (v === '') delete st.raw[sel]; else st.raw[sel] = v; api.save(st); renderGrid();
-      const p = FX.parseAddr(sel); if (move === 'down' && p.r < R) select(FX.addr(p.c, p.r + 1)); else if (move === 'right' && p.c < C) select(FX.addr(p.c + 1, p.r)); else select(sel);
+      if (vr && v.trim() && !v.startsWith('=') && !vr.list.some((o) => FX.norm(o) === FX.norm(v))) { flash(`“${v}” no está en la lista permitida de ${sel}. Elige un valor de la lista.`); return false; }
+      if (v.startsWith('=')) { try { FX.parse(v.slice(1)); } catch (e) { flash('La fórmula tiene un error de escritura: revisa paréntesis, comillas y separadores. Corrígela y presiona Enter.'); return false; } v = v.replace(/^=\s*/, '=').replace(/([A-Za-zÁÉÍÓÚÑáéíóúñ._]+)\s*\(/g, (m, n) => n.toUpperCase() + '(').replace(/(?<![A-Za-z])([a-z]{1,2})(\$?\d+)/g, (m, c, r) => c.toUpperCase() + r); }
+      if (v === '') delete st.raw[sel]; else st.raw[sel] = v; api.save(st); renderGrid(); lastIns = null;
+      const done = sel; if (v !== '') lastCommit = done;
+      const p = FX.parseAddr(sel); if (move === 'down' && p.r < R) select(FX.addr(p.c, p.r + 1)); else if (move === 'right' && p.c < C) select(FX.addr(p.c + 1, p.r)); else select(sel, false, true);
+      if (pickerOpen === 'fill' && v !== '') setFillSrc(done);
+      return true;
     }
-    const flash = (t) => { let f = $('.xl-flash', host); if (!f) { f = document.createElement('p'); f.className = 'xl-flash'; f.setAttribute('role', 'alert'); $('.fbar', host).after(f); } f.textContent = t; clearTimeout(f._t); f._t = setTimeout(() => f.remove(), 4500); };
+    const flash = (t, good) => { let f = $('.xl-flash', host); if (!f) { f = document.createElement('p'); f.setAttribute('role', 'alert'); $('.fbar', host).after(f); } f.className = 'xl-flash' + (good ? ' okf' : ''); f.textContent = t; clearTimeout(f._t); f._t = setTimeout(() => f.remove(), 4500); };
     const inserting = () => document.activeElement === inp && inp.value.startsWith('=') && /[=(+\-*/^,;:<>&]\s*$/.test(inp.value.slice(0, inp.selectionStart));
-    grid.addEventListener('mousedown', (e) => { const td = e.target.closest('td[data-a]'); if (!td) return; if (inserting()) { e.preventDefault(); const s = inp.selectionStart; inp.setRangeText(td.dataset.a, s, inp.selectionEnd, 'end'); } });
-    grid.addEventListener('click', (e) => { const td = e.target.closest('td[data-a]'); if (!td) return; if (document.activeElement === inp && inp.value.startsWith('=') && inp.value !== (st.raw[sel] ?? '')) return; select(td.dataset.a); grid.focus(); });
+    let touchTap = false; grid.addEventListener('pointerdown', (e) => { touchTap = e.pointerType === 'touch' || e.pointerType === 'pen'; });
+    grid.addEventListener('mousedown', (e) => {
+      skipClick = false; const td = e.target.closest('td[data-a]'); if (!td || document.activeElement !== inp) return; const a = td.dataset.a;
+      /* después de insertar una referencia con un toque, otro toque la reemplaza (como en Excel) */
+      if (lastIns && inp.selectionStart === lastIns.end && inp.selectionEnd === lastIns.end && inp.value.slice(lastIns.start, lastIns.end) === lastIns.ref) { e.preventDefault(); skipClick = true; inp.setRangeText(a, lastIns.start, lastIns.end, 'end'); lastIns = { start: lastIns.start, end: lastIns.start + a.length, ref: a }; return; }
+      if (inserting()) { e.preventDefault(); skipClick = true; const s = inp.selectionStart; inp.setRangeText(a, s, inp.selectionEnd, 'end'); lastIns = { start: s, end: s + a.length, ref: a }; return; }
+      /* tocar otra celda guarda lo que se escribió (como en Excel) */
+      if (pending()) { e.preventDefault(); skipClick = true; if (commit()) { if (touchTap) select(a, true); else { select(a, false, true); grid.focus({ preventScroll: true }); } } else inp.focus(); }
+    });
+    /* en tableta o celular, tocar una celda abre de una vez el teclado en la barra de fórmulas */
+    grid.addEventListener('click', (e) => { if (skipClick) { skipClick = false; return; } const td = e.target.closest('td[data-a]'); if (!td) return; if (touchTap) { select(td.dataset.a, true); return; } select(td.dataset.a); grid.focus({ preventScroll: true }); });
+    inp.addEventListener('input', () => { lastIns = null; });
+    inp.addEventListener('blur', () => { if (pending()) commit(); });
     grid.addEventListener('dblclick', (e) => { const td = e.target.closest('td[data-a]'); if (td) { select(td.dataset.a, true); } });
     grid.addEventListener('keydown', (e) => {
       const p = FX.parseAddr(sel); let n = null;
@@ -1734,7 +1756,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delete st.raw[sel]; api.save(st); renderGrid(); select(sel); return; }
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); inp.value = e.key; inp.focus(); }
     });
-    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit('down'); grid.focus(); } else if (e.key === 'Tab') { e.preventDefault(); commit('right'); grid.focus(); } else if (e.key === 'Escape') { inp.value = st.raw[sel] ?? ''; grid.focus(); } });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (commit('down')) grid.focus({ preventScroll: true }); } else if (e.key === 'Tab') { e.preventDefault(); if (commit('right')) grid.focus({ preventScroll: true }); } else if (e.key === 'Escape') { inp.value = st.raw[sel] ?? ''; grid.focus({ preventScroll: true }); } });
     host.addEventListener('change', (e) => { if (e.target.closest('.valpick')) { inp.value = e.target.value; commit(); } });
     host.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
@@ -1748,7 +1770,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     function headers() { const g = FX.parseRange(d.pivotSource || d.filterRange || 'A1:A1'); const out = []; for (let c = g.c1; c <= g.c2; c++) out.push(String(FX.fmt(sheet.value(FX.addr(c, d.pivotSource ? g.r1 : g.r1 - 1))))); return out; }
     function openTool(t) {
       const p = $('.toolpanel', host); if (pickerOpen === t) { p.hidden = true; pickerOpen = null; return; } pickerOpen = t; p.hidden = false; const sp = FX.parseAddr(sel);
-      if (t === 'fill') p.innerHTML = `<p>Copia el contenido de <b>${sel}</b> a las celdas siguientes. Las referencias sin $ se ajustan; las que tienen $ se quedan fijas.</p><div class="row"><label>Hacia abajo hasta la fila <input type="number" class="sm-in" data-f="row" min="${sp.r + 1}" max="${R}" value="${Math.min(R, sp.r + 4)}"></label><button type="button" class="btn sm primary" data-apply="filldown">Rellenar ↓</button></div><div class="row"><label>Hacia la derecha hasta la columna <select data-f="col">${colOpts(FX.numToCol(Math.min(C, sp.c + 1)))}</select></label><button type="button" class="btn sm" data-apply="fillright">Rellenar →</button></div><div class="row"><label>A todo un rango (por ejemplo E4:H7) <input class="sm-in w8" data-f="frange" placeholder="E4:H7"></label><button type="button" class="btn sm" data-apply="fillrange">Rellenar rango</button></div>`;
+      if (t === 'fill') { const src = fillSrc(); const fp = FX.parseAddr(src); p.innerHTML = `<div class="row wrap"><label>Celda que se copia <input class="sm-in w6" data-f="src" value="${src}"></label><span class="muted small">Toca en la hoja la celda con la fórmula y su nombre aparece aquí.</span></div><p class="muted small">Las referencias sin $ se ajustan al copiar; las que tienen $ se quedan fijas.</p><div class="row"><label>Hacia abajo hasta la fila <input type="number" class="sm-in" data-f="row" min="1" max="${R}" value="${Math.min(R, fp.r + 4)}"></label><button type="button" class="btn sm primary" data-apply="filldown">Rellenar ↓</button></div><div class="row"><label>Hacia la derecha hasta la columna <select data-f="col">${colOpts(FX.numToCol(Math.min(C, fp.c + 1)))}</select></label><button type="button" class="btn sm" data-apply="fillright">Rellenar →</button></div><div class="row"><label>A todo un rango (por ejemplo E4:H7) <input class="sm-in w8" data-f="frange" placeholder="E4:H7"></label><button type="button" class="btn sm" data-apply="fillrange">Rellenar rango</button></div>`; }
       if (t === 'cf') p.innerHTML = `<div class="row wrap"><label>Rango <input class="sm-in w8" data-f="range" value="${esc(d.cfDefault || sel)}"></label><label>Si el valor es <select data-f="op"><option value=">">mayor que</option><option value=">=">mayor o igual que</option><option value="<">menor que</option><option value="<=">menor o igual que</option><option value="=">igual a</option><option value="<>">distinto de</option><option value="contiene">contiene el texto</option></select></label><label>valor <input class="sm-in w6" data-f="value"></label><label>color <select data-f="color"><option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option></select></label><button type="button" class="btn sm primary" data-apply="cf">Agregar regla</button></div>${st.cf.length ? `<ul class="rulelist">${st.cf.map((r, i) => `<li>${esc(r.range)}: ${esc(r.op)} ${esc(r.value)} → ${r.color} <button type="button" class="mini x" data-delcf="${i}" aria-label="Quitar regla">×</button></li>`).join('')}</ul>` : ''}`;
       if (t === 'chart') p.innerHTML = `<div class="row wrap"><label>Tipo <select data-f="type"><option value="columnas">Columnas</option><option value="circular">Circular</option><option value="lineas">Líneas</option></select></label><label>Etiquetas <input class="sm-in w8" data-f="labels" placeholder="A2:A6"></label><label>Valores <input class="sm-in w8" data-f="values" placeholder="B2:B6"></label><label>Título <input class="sm-in w12" data-f="title"></label><button type="button" class="btn sm primary" data-apply="chart">Insertar</button></div><p class="muted small">Si los valores ocupan varias columnas, cada columna será una serie; su nombre se toma de la fila de encabezado de arriba.</p>`;
       if (t === 'sort') p.innerHTML = `<div class="row wrap"><label>Rango de datos (sin encabezados) <input class="sm-in w8" data-f="range" value="${esc(d.sortRange || '')}"></label><label>Ordenar por la columna <select data-f="col">${colOpts('B')}</select></label><label><select data-f="dir"><option value="asc">De menor a mayor (A→Z)</option><option value="desc">De mayor a menor (Z→A)</option></select></label><button type="button" class="btn sm primary" data-apply="sort">Ordenar</button></div>`;
@@ -1759,19 +1781,20 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     const fv = (k) => { const el = $(`.toolpanel [data-f="${k}"]`, host); return el ? el.value.trim() : ''; };
     const okRange = (s) => !!FX.parseRange(s) && /^\$?[A-Za-z]{1,2}\$?\d+(:\$?[A-Za-z]{1,2}\$?\d+)?$/.test(s.trim());
     function applyTool(a) {
-      if (a === 'filldown' || a === 'fillright') {
-        const src = st.raw[sel]; if (src === undefined) { flash(`${sel} está vacía: primero escribe algo en ella.`); return; }
-        const p = FX.parseAddr(sel);
-        if (a === 'filldown') { const to = Math.min(R, +fv('row')); for (let r = p.r + 1; r <= to; r++) st.raw[FX.addr(p.c, r)] = FX.shift(src, r - p.r, 0); }
-        else { const to = FX.colToNum(fv('col')); for (let c = p.c + 1; c <= to; c++) st.raw[FX.addr(c, p.r)] = FX.shift(src, 0, c - p.c); }
-      }
-      if (a === 'fillrange') {
-        const src = st.raw[sel]; if (src === undefined) { flash(`${sel} está vacía: primero escribe algo en ella.`); return; }
-        if (!okRange(fv('frange'))) { flash('Escribe un rango válido, por ejemplo E4:H7.'); return; }
-        const p = FX.parseAddr(sel); FX.rangeCells(fv('frange')).forEach((ad) => { const q = FX.parseAddr(ad); if (q.r > R || q.c > C) return; st.raw[ad] = FX.shift(src, q.r - p.r, q.c - p.c); });
+      if (a === 'filldown' || a === 'fillright' || a === 'fillrange') {
+        const sa = (fv('src') || sel).toUpperCase().replace(/\$/g, ''); if (!/^[A-Z]{1,2}\d+$/.test(sa)) { flash('Escribe la celda que se copia, por ejemplo D2.'); return; }
+        const src = st.raw[sa]; if (src === undefined) { flash(`${sa} está vacía: toca la celda que tiene la fórmula que quieres copiar.`); return; }
+        const p = FX.parseAddr(sa);
+        if (a === 'filldown') { const to = Math.min(R, +fv('row')); if (!(to > p.r)) { flash(`Escribe una fila mayor que ${p.r}.`); return; } for (let r = p.r + 1; r <= to; r++) st.raw[FX.addr(p.c, r)] = FX.shift(src, r - p.r, 0); }
+        else if (a === 'fillright') { const to = FX.colToNum(fv('col')); if (!(to > p.c)) { flash(`Elige una columna a la derecha de ${FX.numToCol(p.c)}.`); return; } for (let c = p.c + 1; c <= to; c++) st.raw[FX.addr(c, p.r)] = FX.shift(src, 0, c - p.c); }
+        else { if (!okRange(fv('frange'))) { flash('Escribe un rango válido, por ejemplo E4:H7.'); return; } FX.rangeCells(fv('frange').toUpperCase()).forEach((ad) => { const q = FX.parseAddr(ad); if (q.r > R || q.c > C) return; st.raw[ad] = FX.shift(src, q.r - p.r, q.c - p.c); }); }
+        api.save(st); renderGrid(); select(sel, false, true); flash(`Listo: se copió ${sa}. Revisa los resultados en la hoja.`, true); return;
       }
       if (a === 'cf') { const r = fv('range').toUpperCase(); if (!okRange(r)) { flash('Escribe un rango válido, por ejemplo E2:E6.'); return; } if (fv('value') === '') { flash('Escribe el valor de la condición.'); return; } st.cf.push({ range: r, op: fv('op'), value: fv('value'), color: fv('color') }); }
-      if (a === 'chart') { const L = fv('labels').toUpperCase(), V = fv('values').toUpperCase(); if (!okRange(L) || !okRange(V)) { flash('Escribe rangos válidos para etiquetas y valores, por ejemplo A2:A6 y B2:B6.'); return; } st.chart = { type: fv('type'), labels: L, values: V, title: fv('title') }; }
+      if (a === 'chart') { const L = fv('labels').toUpperCase(), V = fv('values').toUpperCase(); if (!okRange(L) || !okRange(V)) { flash('Escribe rangos válidos para etiquetas y valores, por ejemplo A2:A6 y B2:B6.'); return; } const gL = FX.parseRange(L), gV = FX.parseRange(V); let Lr = L, Vr = V;
+        /* si el rango incluye la fila de encabezados (texto), se usa como nombre de la serie, como en Excel */
+        if (gL.r1 === gV.r1 && gV.r2 > gV.r1) { let txt = true; for (let c = gV.c1; c <= gV.c2; c++) { const v = sheet.value(FX.addr(c, gV.r1)); if (typeof v === 'number' || v === null || v === '') txt = false; } if (txt) { Lr = FX.addr(gL.c1, gL.r1 + 1) + ':' + FX.addr(gL.c2, gL.r2); Vr = FX.addr(gV.c1, gV.r1 + 1) + ':' + FX.addr(gV.c2, gV.r2); } }
+        st.chart = { type: fv('type'), labels: Lr, values: Vr, title: fv('title') }; }
       if (a === 'sort') {
         const g = FX.parseRange(fv('range')); if (!g || !okRange(fv('range'))) { flash('Escribe el rango de datos sin encabezados, por ejemplo A2:D9.'); return; }
         const col = FX.colToNum(fv('col')); const desc = fv('dir') === 'desc';
@@ -1783,7 +1806,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       if (a === 'unfilter') st.filter = null;
       if (a === 'pivot') st.pivot = { row: fv('row'), value: fv('value'), agg: fv('agg') };
       if (a === 'validation') { const r = fv('range').toUpperCase(); const list = fv('list').split(',').map((x) => x.trim()).filter(Boolean); if (!okRange(r) || !list.length) { flash('Escribe un rango válido y al menos un valor en la lista.'); return; } st.val = st.val.filter((x) => x.range !== r); st.val.push({ range: r, list }); }
-      api.save(st); renderGrid(); select(sel); if (['cf', 'validation'].includes(a)) { pickerOpen = null; openTool(a); }
+      api.save(st); renderGrid(); select(sel, false, true); if (['cf', 'validation'].includes(a)) { pickerOpen = null; openTool(a); }
     }
     function rangeVals(s) { const g = FX.parseRange(s); const cols = []; for (let c = g.c1; c <= g.c2; c++) { const v = []; for (let r = g.r1; r <= g.r2; r++) v.push(sheet.value(FX.addr(c, r))); cols.push({ c, v }); } return { g, cols }; }
     function pivotData() { const hd = headers(); const g = FX.parseRange(d.pivotSource); const rc = g.c1 + hd.indexOf(st.pivot.row), vc = g.c1 + hd.indexOf(st.pivot.value); const m = new Map(); for (let r = g.r1 + 1; r <= g.r2; r++) { const k = FX.fmt(sheet.value(FX.addr(rc, r))); if (k === '') continue; const v = sheet.value(FX.addr(vc, r)); const e = m.get(k) || { s: 0, n: 0, c: 0 }; e.c++; if (typeof v === 'number') { e.s += v; e.n++; } m.set(k, e); } return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([k, e]) => [k, st.pivot.agg === 'SUMA' ? e.s : st.pivot.agg === 'CONTAR' ? e.c : (e.n ? e.s / e.n : 0)]); }
@@ -1798,12 +1821,17 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
 
     const eqv = (v, x, tol = 0.011) => (typeof x === 'number' ? typeof v === 'number' && Math.abs(v - x) <= tol : FX.norm(FX.fmt(v)) === FX.norm(x));
     const rawU = (a) => String(st.raw[a] ?? '').toUpperCase().replace(/\s+/g, '').replace(/;/g, ',');
+    /* una referencia absoluta $E$7 también se acepta como E$7 (fija la fila); el resultado se valida aparte */
+    const hasTok = (a, s0) => { const u = rawU(a), t = String(s0).toUpperCase().replace(/\s+/g, '').replace(/;/g, ','); if (u.includes(t)) return true; const m = t.match(/^\$([A-Z]+)\$(\d+)$/); return !!m && u.includes(m[1] + '$' + m[2]); };
+    const isRangeLit = (s0) => /^\$?[A-Z]{1,2}\$?\d+:\$?[A-Z]{1,2}\$?\d+$/i.test(String(s0).trim());
+    const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const looseEq = (v, x, tol) => { if (eqv(v, x, tol)) return true; if (typeof x === 'number' && typeof v === 'string') { const n = parseFloat(v.replace(',', '.')); return isFinite(n) && Math.abs(n - x) <= (tol ?? 0.011); } if (typeof x === 'string' && typeof v === 'string') return new RegExp('(^|[^a-z0-9])' + reEsc(FX.norm(x)) + '($|[^a-z0-9])').test(FX.norm(v)); return false; };
     const ctx = { v: (a) => sheet.value(a), raw: (a) => st.raw[a], rawU, cells: FX.rangeCells, st, isF: (a) => String(st.raw[a] ?? '').startsWith('='), eqv };
     function test(c) {
       switch (c.type) {
-        case 'value': return eqv(sheet.value(c.cell), c.equals, c.tol);
-        case 'formula': return ctx.isF(c.cell) && (c.includes || []).every((s) => rawU(c.cell).includes(s.toUpperCase().replace(/\s+/g, ''))) && (c.equals === undefined || eqv(sheet.value(c.cell), c.equals, c.tol));
-        case 'cells': return FX.rangeCells(c.range).every((a, i) => (!c.formula || ctx.isF(a)) && (c.includes || []).every((s) => rawU(a).includes(s.toUpperCase())) && (c.expect ? eqv(sheet.value(a), c.expect(ctx, a, i), c.tol) : true) && (c.notIncludes || []).every((s) => !rawU(a).includes(s.toUpperCase())));
+        case 'value': return looseEq(sheet.value(c.cell), c.equals, c.tol);
+        case 'formula': return ctx.isF(c.cell) && (c.includes || []).filter((s) => !(c.equals !== undefined && isRangeLit(s))).every((s) => hasTok(c.cell, s)) && (c.equals === undefined || eqv(sheet.value(c.cell), c.equals, c.tol));
+        case 'cells': return FX.rangeCells(c.range).every((a, i) => (!c.formula || ctx.isF(a)) && (c.includes || []).every((s) => hasTok(a, s)) && (c.expect ? eqv(sheet.value(a), c.expect(ctx, a, i), c.tol) : true) && (c.notIncludes || []).every((s) => !rawU(a).includes(s.toUpperCase())));
         case 'cf': return FX.rangeCells(c.range).every((a) => { const v = sheet.value(a); const want = c.rules.find((r) => matchRule(r, v)); const got = cfColor(a, v); return want ? got === want.color : !got; }) && st.cf.length > 0;
         case 'chart': return !!st.chart && (!c.chartType || st.chart.type === c.chartType) && (!c.values || st.chart.values.replace(/\$/g, '') === c.values) && (!c.labels || st.chart.labels.replace(/\$/g, '') === c.labels) && (!c.title || st.chart.title.length >= 3);
         case 'sorted': { const col = FX.colToNum(c.col); const vals = []; for (let r = c.from; r <= c.to; r++) vals.push(sheet.value(FX.addr(col, r))); return vals.every((v, i) => i === 0 || (c.dir === 'desc' ? (typeof v === 'number' ? v <= vals[i - 1] : String(v).localeCompare(String(vals[i - 1]), 'es') <= 0) : (typeof v === 'number' ? v >= vals[i - 1] : String(v).localeCompare(String(vals[i - 1]), 'es') >= 0))) && (!c.keep || c.keep(ctx)); }
@@ -1816,7 +1844,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     }
     return {
       check() {
-        renderGrid(); select(sel);
+        renderGrid(); select(sel, false, true);
         let ok = 0;
         d.tasks.forEach((t, i) => { const li = $(`li[data-t="${i}"]`, host); let r = false; try { r = (t.checks || [t.check]).every(test); } catch (e) { r = false; } li.classList.remove('ok', 'bad'); li.classList.add(r ? 'ok' : 'bad'); $('.tk-h', li).textContent = r ? '' : (t.hint ? ' Pista: ' + t.hint : ''); if (r) ok++; });
         return { score: ok / d.tasks.length, msg: `${ok} de ${d.tasks.length} tareas completas.` };
@@ -1831,7 +1859,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     quiz: 'Lee cada pregunta y elige una respuesta. Cuando contestes todas, presiona <b>Revisar</b>. Las opciones cambian de lugar cada vez que reinicias el ejercicio.',
     spot: 'Lee todo el texto. Toca cada parte que sea una señal de alerta o un error: se marca en amarillo. Si te equivocas, vuelve a tocarla para desmarcarla. Al final presiona <b>Revisar</b>.',
     order: 'Usa las flechas <b>↑</b> y <b>↓</b> para mover cada elemento hasta que queden en el orden correcto. Después presiona <b>Revisar</b>.',
-    sheet: '<ol><li>Toca una celda de la hoja.</li><li>Escribe en la barra de arriba (fx) y presiona <b>Enter</b>. Las fórmulas siempre empiezan con <code>=</code>.</li><li>Mientras escribes una fórmula, puedes tocar una celda para insertar su nombre.</li><li>Las herramientas (Rellenar, Gráfica, Formato condicional…) están debajo de la hoja.</li><li>Sigue la lista de <b>Tareas</b> y presiona <b>Revisar</b>: cada tarea se marca en verde o en rojo con una pista.</li></ol>',
+    sheet: '<ol><li>Toca una celda de la hoja.</li><li>Escribe en la barra de arriba (fx) y presiona <b>Enter</b> (o toca otra celda). Las fórmulas siempre empiezan con <code>=</code>.</li><li>Mientras escribes una fórmula, puedes tocar una celda para insertar su nombre.</li><li>Las herramientas (Rellenar, Gráfica, Formato condicional…) están debajo de la hoja. Para <b>Rellenar</b>, toca primero la celda que tiene la fórmula.</li><li>Sigue la lista de <b>Tareas</b> y presiona <b>Revisar</b>: cada tarea se marca en verde o en rojo con una pista.</li></ol>',
     robot: 'Agrega bloques desde la paleta de colores, presiona <b>▶ Ejecutar</b> y observa al robot. Si choca o no llega, corrige los bloques y vuelve a ejecutar. Cada nivel cuenta cuando el robot llega a la bandera.',
     trace: 'Lee el programa línea por línea como si fueras la computadora. Anota en tu cuaderno el valor de cada variable y escribe o elige la respuesta. Después presiona <b>Revisar</b>.',
     password: 'Escribe una contraseña inventada y observa cómo se palomean los criterios. Después clasifica las contraseñas de ejemplo y presiona <b>Revisar</b>.',
@@ -1843,10 +1871,11 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     html: 'Escribe tu código en el recuadro de la izquierda; la vista previa de la derecha se actualiza sola. Presiona <b>Revisar</b> para ver qué requisitos ya cumples.',
     form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
   };
+  const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
   const app = $('#app');
   function shell() {
     app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
-      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Escribe tu nombre" autocomplete="name"></label><div class="prog-pill" id="pill"></div></div></header>
+      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Escribe tu nombre" autocomplete="name"></label><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
     $('#who').addEventListener('input', (e) => { store.name = e.target.value; persist(); });
   }
@@ -1872,9 +1901,9 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
   function cert() {
     const d = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
     const avg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
-    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${temas.length} temas completados · <b>${exs.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length}</b> de ${exs.length} ejercicios completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Ejercicios completados</th><th>Promedio</th><th>Estado</th></tr>${temas.map((tm) => `<tr><td>${LET[tm.mi]}. ${esc(tm.m.name)}</td><td>${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}</td><td>${exDone(tm)} de ${tm.ex.length}</td><td>${avg(tm)}%</td><td>${stText[temaStatus(tm)]}</td></tr>`).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p></div>`;
+    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${temas.length} temas completados · <b>${exs.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length}</b> de ${exs.length} ejercicios completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Ejercicios completados</th><th>Promedio</th><th>Estado</th></tr>${temas.map((tm) => `<tr><td>${LET[tm.mi]}. ${esc(tm.m.name)}</td><td>${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}</td><td>${exDone(tm)} de ${tm.ex.length}</td><td>${avg(tm)}%</td><td>${stText[temaStatus(tm)]}</td></tr>`).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p><p class="no-print muted small" id="printnote" hidden>Si no se abrió la ventana para imprimir, es porque la página de la escuela lo bloquea: abre el simulador en una pestaña nueva con el botón «Abrir en pestaña nueva ↗» de arriba y vuelve a intentarlo.</p></div>`;
     document.body.classList.add('show-cert');
-    $('#doprint').addEventListener('click', () => window.print());
+    $('#doprint').addEventListener('click', () => { try { window.print(); } catch (e) { /* bloqueado */ } if (FRAMED) $('#printnote').hidden = false; });
     $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
   }
   function practice(pid) {
@@ -1904,16 +1933,20 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       side(tm.tid); $$('.extab').forEach((el) => { const e = byPid[el.getAttribute('href').slice(1)]; el.className = 'extab st-' + status(e.pid); el.querySelector('.exl').textContent = e.label + (stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''); });
     }
     $('#chk').addEventListener('click', () => doCheck());
-    $('#rst').addEventListener('click', () => { if (!confirm('¿Borrar tu trabajo en este ejercicio y empezar de nuevo? Tu mejor resultado se conserva.')) return; delete store.saves[pid]; persist(); practice(pid); });
+    $('#rst').addEventListener('click', (e) => { const b = e.currentTarget; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '¿Seguro? Toca otra vez para borrar'; b.classList.add('warn'); clearTimeout(b._t); b._t = setTimeout(() => { delete b.dataset.sure; b.textContent = 'Empezar de nuevo'; b.classList.remove('warn'); }, 5000); return; } delete store.saves[pid]; persist(); practice(pid); });
     $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
   }
-  function route() {
-    let h = location.hash.slice(1);
+  let curHash = location.hash.slice(1);
+  function route(force) {
+    let h = typeof force === 'string' ? force : location.hash.slice(1); curHash = h;
     if (byTid[h]) h = byTid[h].ex[0].pid;
     document.body.classList.toggle('in-prac', !!byPid[h]);
     if (byPid[h]) practice(h); else home();
   }
-  shell(); window.addEventListener('hashchange', route); route();
+  /* navegación interna: funciona aunque la página esté incrustada en Google Sites con restricciones */
+  function go(h) { try { if (location.hash.slice(1) !== h) history.pushState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) { /* sin historial: se navega igual */ } route(h); }
+  document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#"]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return; e.preventDefault(); go(a.getAttribute('href').slice(1)); });
+  shell(); window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== curHash) route(); }); window.addEventListener('popstate', () => { if (location.hash.slice(1) !== curHash) route(); }); route();
 })();
 
 </script>
