@@ -290,6 +290,15 @@ input[type=range]{width:100%; accent-color:var(--hc,var(--ink)); min-height:32px
 .pivot{border-collapse:collapse; margin-top:.4rem; font-variant-numeric:tabular-nums}
 .pivot th,.pivot td{border:1px solid var(--line); padding:.3rem .7rem} .pivot th{background:var(--sunk)} .pivot td.num{text-align:right} .pivot tr.tot td{font-weight:700}
 .xl-flash{background:var(--bad-bg); color:var(--bad); padding:.4rem .7rem; margin:0; font-weight:700}
+.hoja-info{background:var(--sunk); border-left:4px solid var(--hc); border-radius:0 var(--r-sm) var(--r-sm) 0; padding:.6rem 1rem; margin:0 0 1rem; max-width:80ch}
+.hoja-info summary{font-weight:700; cursor:pointer}
+.hoja-info p{margin:.45rem 0} .hoja-info ul{margin:.2rem 0 .4rem; padding-left:1.3rem} .hoja-info li{margin:.15rem 0}
+.hoja-info .hi-l{font-weight:700; margin-bottom:.1rem} .hoja-info .hi-n{font-size:.9em; color:var(--muted)}
+.tasks .tk-why{display:block; font-size:.88em; color:var(--muted); margin-top:.15rem}
+.tasks .tk-how{margin:.2rem 0 .1rem; font-size:.9em}
+.tasks .tk-how summary{cursor:pointer; color:var(--hc); font-weight:600; width:max-content; max-width:100%}
+.tasks .tk-how ol{margin:.3rem 0 .2rem; padding-left:1.3rem; color:var(--ink, inherit)} .tasks .tk-how li{margin:.15rem 0; padding:0}
+.tasks .tk-how li::marker{content:counter(list-item) ". "; color:var(--muted)}
 .tasks{padding-left:1.4rem}
 .tasks li{margin:.35rem 0; padding:.2rem .4rem}
 .tasks li.ok{color:var(--ok)} .tasks li.ok::marker{content:"✓ "; color:var(--ok)}
@@ -359,6 +368,13 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
 .py-code{font:14px/1.55 var(--f-mono); white-space:pre; tab-size:4; min-height:180px}
 .py-out{min-height:3.5rem; white-space:pre-wrap} .py-out.has-err{outline:2px solid var(--bad)}
 @media (max-width: 720px){ .cir-wrap,.trn{grid-template-columns:1fr} }
+.att{font-size:.9rem; color:var(--muted); align-self:center}
+.att b{color:var(--ink)}
+.engine.locked{pointer-events:none; opacity:.75}
+.caso{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--hc,var(--ink)); border-radius:var(--r-sm); padding:.7rem 1rem; margin:.6rem 0 .8rem}
+.caso p{margin:.2rem 0} .caso-h{font-size:.95rem; color:var(--hc,var(--ink))} .caso-h b{color:var(--ink)}
+.caso.is-reto{background:var(--sunk)}
+.pcell.reto .pname::before{content:"🏆 "}
 .xl-flash.okf{background:var(--ok-bg); color:var(--ok)}
 .btn.warn{background:var(--bad-bg); color:var(--bad); border-color:var(--bad)}
 </style>
@@ -1160,6 +1176,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
 /* NUEVO 2026-10 */
 (() => {
 /* ===== Ajuste curricular 2026-10: utilidades comunes ===== */
+const row = (a) => +String(a).replace(/\D/g, ""); const num = (v) => (typeof v === "number" ? v : 0);
 const Q = (q, ok, wrong, fb, hint) => ({ q, opts: [ok, ...wrong], a: 0, fb, hint });
 const QZ = (title, intro, qs) => ({ type: 'quiz', label: 'Comprueba', title, intro, qs });
 const CL = (label, title, intro, cats, items, extra = {}) => ({ type: 'classify', label, title, intro, cats, items: items.map(([t, c, why, hint]) => ({ t, c, why, hint })), ...extra });
@@ -1308,6 +1325,79 @@ clarify(M, {
   'H1.2': { intro: () => 'Es la organización del equipo de la actividad de tu cuaderno (tema H1). Decide a qué rol le toca cada tarea.' },
   'F3.1': { help: CESAR_HELP }, 'F3.2': { help: CESAR_HELP },
 });
+/* ===== Casos de lectura y retos por módulo ===== */
+{
+const CASOS = {"A1": {"t": "La foto del concurso", "x": "El club de fotografía participa en un concurso estatal. Daniel tomó una foto de un faro en sus vacaciones, pero el horizonte cruza justo por la mitad y el faro quedó en el centro: se ve plana. Antes de enviarla, recompón la imagen con la regla de los tercios."}, "A2": {"t": "Todo en una sola capa", "x": "Paulina hizo el cartel de la Feria de Ciencias en GIMP con el título, la foto y el fondo en una sola capa. Cuando quiso mover el título, se movió todo el cartel. Reorganízalo en capas para poder editar cada elemento por separado."}, "A3": {"t": "La foto del anuario", "x": "La foto del grupo en el Nevado de Toluca salió oscura, apagada y sin color porque el día estaba nublado. Es la foto del anuario y no se puede repetir. Corrígela con brillo, contraste y saturación, comparando con una referencia."}, "A4": {"t": "Nadie leía la campaña", "x": "El comité «Cuidemos el agua» lanzó su campaña en redes, pero las primeras publicaciones tenían texto amarillo sobre fondo blanco y nadie las podía leer en el celular. Diseñen una paleta que se lea bien y que la gente reconozca en cada publicación."}, "A5": {"t": "Tres segundos", "x": "Las publicaciones de la cooperativa escolar casi no reciben reacciones: tienen mucho texto, letras pequeñas y ninguna dice qué hacer. Quien desliza la pantalla decide en unos tres segundos si se detiene. Diagnostica qué falla en cada publicación."}, "B1": {"t": "Seis minutos para 30 segundos", "x": "El equipo grabó seis minutos para un video de 30 segundos sobre el reciclaje: tomas repetidas, risas, silencios y un perro que pasó corriendo. El concurso solo acepta 30 segundos. Tú eres quien edita: decide qué se queda y qué se corta."}, "B2": {"t": "Para que todos entiendan", "x": "El video del grupo se proyectará en el patio, donde hay mucho ruido. También lo verá Joaquín, un compañero con discapacidad auditiva. Sin buenos subtítulos, nadie entenderá el mensaje. Revisa que cada subtítulo sea corto y aparezca a tiempo."}, "B3": {"t": "«No se entiende nada»", "x": "En el primer episodio del pódcast escolar, la música tapaba la voz y se oía el tráfico de la avenida. Los comentarios decían: «No se entiende nada». Mezcla las pistas para que el segundo episodio suene profesional."}, "B4": {"t": "Revisar antes de publicar", "x": "La campaña de reciclaje publicó «El 90 % de los alumnos tira basura» sin ninguna fuente y un cartel que decía «Si no reciclas eres un cochino». La dirección pidió revisar todo antes de publicar más. Revisa cada pieza: ¿está verificada y respeta a todos?"}, "C1": {"t": "Playeras en dólares", "x": "La tienda escolar vende playeras de una marca que da sus precios en dólares. Cada semana cambia el tipo de cambio y la encargada recalcula todo a mano. Con una referencia absoluta solo tendrá que cambiar una celda."}, "C2": {"t": "Cuarenta boletas", "x": "La orientadora del 2° C revisa a mano 40 boletas para saber quién aprobó, quién entra al cuadro de honor y a qué familias debe citar. Le toma una tarde entera. Con SI, Y y O, la hoja lo decide en segundos y sin errores."}, "C3": {"t": "Se acabaron las tortas", "x": "En la cooperativa se acabaron las tortas de jamón a media mañana y sobraron 20 bolsas de galletas. El encargado necesita ver de un vistazo qué se está agotando, qué vale más y qué hay de cada categoría. Organiza el inventario."}, "C4": {"t": "¿Dormimos poco?", "x": "En Matemáticas el grupo registró cuántas horas duerme cada alumno y la tutora sospecha que duermen poco. Además, tu familia duda entre dos planes de celular. Los datos responden las dos preguntas: solo hay que analizarlos."}, "D1": {"t": "La calculadora de la fonda", "x": "Ana programa una calculadora de cuentas para la fonda de su familia, pero a veces da resultados raros. Antes de cambiar el código, sigue el programa paso a paso para descubrir qué valor tiene cada variable."}, "D2": {"t": "El juego de la kermés", "x": "En la kermés hay un juego que da premio si la suma de dos dados es 7. El encargado cree que todas las sumas salen igual de seguido. Simula mil lanzamientos y descubre si tiene razón."}, "D3": {"t": "Casi funcionan", "x": "Tres programas de tus compañeros «casi» funcionan: el cuadrado no cierra, los puntos no suben y el contador empieza mal. El maestro les dio una regla: no reescribir todo, sino encontrar el error exacto."}, "E1": {"t": "«La IA es un robot que piensa»", "x": "Tu abuelo dice que la inteligencia artificial «es un robot que piensa». Hoy le vas a demostrar que ya la usa sin saberlo: en su celular, en el banco y en sus videos. ¿Dónde hay IA y dónde no?"}, "E2": {"t": "La IA que inventó datos", "x": "Para su tarea sobre el ajolote de Xochimilco, Leo le preguntó a una IA. La respuesta sonaba muy segura, con fechas y citas… pero algunas no existen. Compárala con la ficha verificada antes de entregarla."}, "E3": {"t": "Domingo en la noche", "x": "Es domingo en la noche, el ensayo de Historia se entrega mañana y una IA puede escribirlo en segundos. En el grupo de amigos alguien ya lo hizo. ¿Qué harías tú? Cada decisión tiene consecuencias."}, "F1": {"t": "«Se cayó el internet»", "x": "En la escuela «se cayó el internet» justo cuando el grupo tenía que subir la tarea. El técnico explicó que una red tiene varios aparatos y que cada uno hace algo distinto. Ayúdale a identificar cuál falló."}, "F2": {"t": "¿Es del SAT o no?", "x": "A la mamá de Brenda le llegó un enlace que decía ser del SAT: http://sat-gob-mx.pagos.co/devolucion. Brenda le explicó cómo leer una dirección web para saber a qué sitio lleva en realidad. Aprende a leer las partes de una URL."}, "F3": {"t": "Mensajes secretos", "x": "Hace dos mil años, Julio César enviaba órdenes a sus generales cambiando cada letra por otra. Hoy tus mensajes de WhatsApp usan una idea parecida, pero mucho más poderosa. Ponte en el lugar de un espía y cifra y descifra mensajes."}, "G1": {"t": "El LED que duró un segundo", "x": "Para la maqueta de la Feria de Ciencias, Ricardo conectó un LED directo a una pila de 9 V… y se quemó en un segundo. Su maestra le dijo: «Te faltó una resistencia, y para elegirla necesitas la ley de Ohm»."}, "G2": {"t": "El huerto en vacaciones", "x": "En el huerto escolar las plantas se secan en vacaciones porque nadie las riega. El club de ciencias quiere un sistema que riegue solo cuando la tierra esté seca. Primero, identifiquen qué pieza mide, cuál decide y cuál actúa."}, "G3": {"t": "Un salón como horno", "x": "En mayo, el salón del 2° B parece horno. El club de robótica tiene un micro:bit, un sensor de temperatura y un ventilador. Falta lo más importante: la regla del programa, probada con valores reales."}, "H1": {"t": "El video borrado", "x": "En el proyecto del año pasado, dos integrantes trabajaron en el mismo archivo y uno borró sin querer el video del otro. Este año el equipo acordó roles claros y una forma de nombrar sus archivos."}, "H2": {"t": "Muchas vistas, pocas reacciones", "x": "La campaña del grupo ya publicó cinco piezas. Algunas tuvieron cientos de vistas, pero casi nadie reaccionó. ¿Qué funcionó de verdad? Los números lo dicen."}};
+const RETOS = {"A": {"t": "La portada del anuario", "x": "El comité del anuario te encargó la portada: una foto grupal, el título y el escudo de la escuela. Tienes que componer la imagen, ordenar las capas, corregir el color, elegir una paleta legible y revisar el diseño final.", "rep": "A1–A5"}, "B": {"t": "Cortometraje de un minuto", "x": "Tu equipo participa en un concurso de cortometrajes de un minuto sobre el cuidado del agua. Hay que editar, subtitular, mezclar el audio y revisar que el mensaje sea verificado y respetuoso.", "rep": "B1–B4"}, "C": {"t": "El torneo interescolar", "x": "La escuela organiza un torneo de futbol con otras secundarias de Metepec. En la hoja están los partidos de cada equipo. Calcula puntos con referencias absolutas, decide quién pasa a la final con SI e Y y cuenta cuántos equipos clasificaron.", "rep": "C1–C4"}, "D": {"t": "El semáforo inteligente", "x": "El club de programación simula el semáforo de la entrada de la escuela. Lee cada fragmento del programa como lo haría la computadora para encontrar qué hace y dónde está el error.", "rep": "D1–D3"}, "E": {"t": "La IA en la escuela", "x": "El consejo escolar quiere un reglamento sobre el uso de inteligencia artificial y te invitó a opinar. Antes de proponer, analiza situaciones reales: qué es IA, qué puede fallar y qué es un uso ético.", "rep": "E1–E3"}, "F": {"t": "Espía en la red", "x": "Interceptaste mensajes y enlaces sospechosos en la red de la escuela. Identifica a dónde lleva cada enlace, qué dispositivo de la red está involucrado y descifra el mensaje secreto.", "rep": "F1–F3"}, "G": {"t": "El invernadero inteligente", "x": "El club de ciencias construye un invernadero automático con un micro:bit. Programa las reglas del riego y de la ventilación, y pruébalas con valores reales antes de conectarlo.", "rep": "G1–G3"}};
+const RETO_EX = {
+A: QZ('La portada del anuario', 'Toma las decisiones de diseño de la portada. Elige la mejor opción.', [
+  Q('¿Dónde colocas al grupo y la línea del horizonte?', 'Sobre las líneas de los tercios, no justo en el centro', ['Todo en el centro exacto', 'En una esquina, cortando a la mitad del grupo'], 'Regla de los tercios.'),
+  Q('El escudo debe verse encima de la foto. En la lista de capas va…', 'arriba de la capa de la foto', ['abajo de la capa del fondo', 'en la misma capa que la foto'], 'La capa de arriba se dibuja encima.'),
+  Q('La foto salió oscura y apagada. ¿Qué ajustas primero?', 'Brillo y contraste, comparando con una referencia', ['Solo la saturación al máximo', 'Nada: así es la foto'], 'Un ajuste a la vez.'),
+  Q('El título amarillo casi no se lee sobre el cielo claro. ¿Qué haces?', 'Uso un color con contraste de al menos 4.5 : 1 con el fondo', ['Lo hago más grande y sigo con amarillo', 'Le agrego brillos'], 'El contraste mínimo para texto es 4.5 : 1.'),
+  Q('La portada tiene seis tipos de letra. ¿Qué haces?', 'Dejo una o dos tipografías', ['Agrego una más', 'Las dejo para que se vea divertida'], 'La identidad visual es coherente.'),
+]),
+B: QZ('Cortometraje de un minuto', 'Toma las decisiones de edición del cortometraje.', [
+  Q('Tienen cuatro minutos de grabación para un video de un minuto. ¿Qué cortan?', 'Silencios, tomas repetidas y lo que no aporta al mensaje', ['Solo el final', 'Nada: lo aceleran'], 'Editar es elegir.'),
+  Q('Un subtítulo ocupa tres líneas. ¿Qué haces?', 'Lo divido en dos subtítulos de máximo dos líneas', ['Lo dejo en tres líneas', 'Hago la letra más pequeña'], 'Máximo dos líneas, unos 80 caracteres.'),
+  Q('La música tapa la voz. ¿Qué niveles usas?', 'Voz entre 70 y 90; música entre 15 y 35', ['Voz 50 y música 90', 'Todo al 100'], 'La voz manda.'),
+  Q('Quieren decir «la mitad del agua se desperdicia» pero no tienen fuente. ¿Qué hacen?', 'Buscan el dato en una fuente oficial y la citan, o no lo usan', ['Lo dicen igual: suena bien', 'Lo cambian por «el 90 %»'], 'Un dato necesita fuente.'),
+  Q('¿Cómo cierran el cortometraje?', 'Con una invitación positiva: «Súmate a cuidar el agua»', ['Con un regaño a quien desperdicia', 'Con los créditos durante 30 segundos'], 'Una campaña invita, no regaña.'),
+]),
+C: { type: 'sheet', title: 'El torneo interescolar', cols: 7, rows: 13, tools: ['fill', 'sort'], sortRange: 'A5:G10', widths: { A: 150, G: 80 },
+  intro: 'Usa los resultados del torneo. Resuelve las tareas en orden; los puntos por victoria y por empate están en B1 y B2.',
+  bold: ['A1', 'A2', 'A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A12', 'A13'],
+  cells: { A1: 'Puntos por victoria', B1: 3, A2: 'Puntos por empate', B2: 1, A4: 'Equipo', B4: 'Ganados', C4: 'Empatados', D4: 'Perdidos', E4: 'Puntos', F4: 'Goles a favor', G4: '¿Final?',
+    A5: 'Halcones', B5: 4, C5: 1, D5: 0, F5: 12, A6: 'Jaguares', B6: 3, C6: 1, D6: 1, F6: 9, A7: 'Tlacuaches', B7: 2, C7: 2, D7: 1, F7: 11, A8: 'Ajolotes', B8: 3, C8: 0, D8: 2, F8: 7, A9: 'Coyotes', B9: 1, C9: 1, D9: 3, F9: 5, A10: 'Colibríes', B10: 0, C10: 1, D10: 4, F10: 3,
+    A12: 'Equipos en la final', A13: 'Promedio de goles a favor' },
+  tasks: [
+    { text: 'En <code>E5:E10</code> calcula los puntos: ganados × <code>B1</code> + empatados × <code>B2</code>. Usa referencias absolutas para B1 y B2.', check: { type: 'cells', range: 'E5:E10', formula: true, includes: ['$B$1', '$B$2'], expect: (c, a) => num(c.v('B' + row(a))) * 3 + num(c.v('C' + row(a))) }, hint: '=B5*$B$1+C5*$B$2' },
+    { text: 'En <code>G5:G10</code> escribe «Sí» si el equipo tiene 9 puntos o más <b>y</b> 8 goles a favor o más; si no, «No».', check: { type: 'cells', range: 'G5:G10', formula: true, includes: ['Y('], expect: (c, a) => (num(c.v('E' + row(a))) >= 9 && num(c.v('F' + row(a))) >= 8 ? 'Sí' : 'No') }, hint: '=SI(Y(E5>=9,F5>=8),"Sí","No")' },
+    { text: 'En <code>B12</code> cuenta con CONTAR.SI cuántos equipos van a la final.', check: { type: 'formula', cell: 'B12', includes: ['CONTAR.SI('], equals: 2 }, hint: '=CONTAR.SI(G5:G10,"Sí")' },
+    { text: 'En <code>B13</code> calcula el promedio de goles a favor.', check: { type: 'formula', cell: 'B13', includes: ['PROMEDIO('], equals: 7.83, tol: 0.01 }, hint: '=PROMEDIO(F5:F10)' },
+    { text: 'Ordena la tabla (<code>A5:G10</code>) por puntos, de mayor a menor.', check: { type: 'sorted', col: 'E', from: 5, to: 10, dir: 'desc', keep: (c) => c.v('A5') === 'Halcones' && c.v('F5') === 12 }, hint: 'Ordenar → rango A5:G10, columna E, de mayor a menor.' },
+  ] },
+D: { type: 'trace', title: 'El semáforo inteligente', intro: 'Lee cada fragmento del programa del semáforo y elige la respuesta correcta.', items: [
+  { code: 'fijar tiempo a 0\nrepetir 3 veces\n  cambiar tiempo por 20\ndecir tiempo', q: '¿Qué número dice?', opts: ['60', '20', '3'], a: 0, fb: '0 + 20 + 20 + 20 = 60.' },
+  { code: 'fijar segundos a 47\nsi segundos mod 2 = 0 entonces\n  decir "verde"\nsi no\n  decir "rojo"', q: '¿Qué dice?', opts: ['rojo', 'verde', '47'], a: 0, fb: '47 mod 2 = 1, no 0.' },
+  { code: '// Objetivo: poner rojo cuando el tiempo llegue a 30\nsi tiempo > 30 entonces\n  fijar luz a "rojo"', q: '¿Qué corrección funciona?', opts: ['Cambiar > por ≥', 'Cambiar 30 por 300', 'Quitar el «si»'], a: 0, fb: 'Con > se pone rojo hasta 31.' },
+  { code: 'fijar luz a número aleatorio entre 1 y 3', q: '¿Qué valores puede tener luz?', opts: ['1, 2 o 3', 'Solo 1 o 3', 'Cualquier número'], a: 0, fb: 'El aleatorio incluye los dos extremos.' },
+] },
+E: QZ('La IA en la escuela', 'Analiza cada situación antes de proponer el reglamento.', [
+  Q('¿Cuál de estas herramientas usa IA?', 'La cámara que reconoce rostros para enfocar', ['La calculadora del celular', 'El reloj despertador'], 'Reconoce patrones en imágenes.'),
+  Q('Una IA da una cita de un libro que no existe. ¿Cómo se llama eso y qué haces?', 'Es una alucinación: verifico en la fuente original', ['Es un dato confiable: lo uso', 'Es un virus: apago la computadora'], 'La IA puede inventar con seguridad.'),
+  Q('¿Qué regla propones para tareas?', 'Se puede usar IA para ideas y revisión, declarando cómo se usó y verificando los datos', ['Prohibir hablar de IA', 'Dejar que la IA haga todas las tareas'], 'Uso ético y transparente.'),
+  Q('Un compañero sube fotos del grupo a una app de IA sin pedir permiso. ¿Es correcto?', 'No: son datos personales de otras personas', ['Sí, si las fotos son bonitas', 'Sí, porque la app es gratis'], 'Las imágenes de las personas son datos personales.'),
+  Q('Un sistema de IA recomienda menos becas a alumnos de una colonia. ¿Qué puede estar pasando?', 'Tiene sesgo por los datos con los que aprendió', ['La IA siempre es justa', 'La colonia no existe'], 'La IA repite lo que hay en los datos.'),
+]),
+F: { type: 'trace', title: 'Espía en la red', intro: 'Analiza cada mensaje o enlace interceptado. En el mensaje cifrado escribe la respuesta en MAYÚSCULAS y sin espacios.', lead: '<p>Alfabeto: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z. Con clave 3, para descifrar retrocede tres letras: D→A.</p>', items: [
+  { code: 'https://www.gob.mx/sep/articulos', q: '¿Cuál es el dominio?', opts: ['www.gob.mx', 'https://', '/sep/articulos'], a: 0, fb: 'El dominio es el nombre del sitio.' },
+  { code: 'http://sep-gob-mx.premios.co/beca', q: '¿A qué sitio lleva en realidad?', opts: ['A premios.co, que no es de la SEP', 'A sep.gob.mx', 'A gob.mx'], a: 0, fb: 'El dominio real termina en premios.co.' },
+  { code: 'Mensaje cifrado: UHGVHJXUD\nClave: 3', q: 'Descifra el mensaje.', a: 'REDSEGURA', fb: 'RED SEGURA.' },
+  { code: 'Aparato que dirige los paquetes entre la red de la escuela e internet y crea el Wi-Fi', q: '¿Qué dispositivo es?', opts: ['Router', 'Switch', 'Servidor'], a: 0, fb: 'El router dirige los paquetes.' },
+], help: 'Lee cada mensaje o enlace. En los de opciones, elige la respuesta; en el mensaje cifrado, usa el alfabeto y escribe tu respuesta. Después presiona <b>Revisar</b>.' },
+G: { type: 'rules', title: 'El invernadero inteligente', intro: 'Programa las tres reglas del invernadero y pruébalas con el control antes de revisar.', levels: [
+  { goal: 'Riego: si la humedad es menor que 40 %, enciende la bomba; si no, apágala.', sensor: 'humedad', unit: '%', range: [0, 100], actions: ['Encender bomba', 'Apagar bomba'], tests: [[10, 'Encender bomba'], [39, 'Encender bomba'], [40, 'Apagar bomba'], [70, 'Apagar bomba']] },
+  { goal: 'Ventilación: si la temperatura es de 32 °C o más, abre la ventana; si no, ciérrala.', sensor: 'temperatura', unit: '°C', range: [10, 45], actions: ['Abrir ventana', 'Cerrar ventana'], tests: [[25, 'Cerrar ventana'], [31, 'Cerrar ventana'], [32, 'Abrir ventana'], [40, 'Abrir ventana']] },
+  { goal: 'Lámpara: si la luz es de 25 o menos, enciende la lámpara de crecimiento; si no, apágala.', sensor: 'luz', unit: '', range: [0, 100], actions: ['Encender lámpara', 'Apagar lámpara'], tests: [[10, 'Encender lámpara'], [25, 'Encender lámpara'], [26, 'Apagar lámpara'], [80, 'Apagar lámpara']] },
+] },
+};
+
+const LL = 'ABCDEFGH';
+M.forEach((m, mi) => m.temas.forEach((t, ti) => { const c = CASOS[LL[mi] + (ti + 1)]; if (c) t.caso = c; }));
+Object.keys(RETOS).forEach((L) => { const m = M[LL.indexOf(L)]; const r = RETOS[L]; const ex = Object.assign({}, RETO_EX[L], { label: 'Reto', title: r.t });
+  ex.intro = ex.intro + ' Repasa los temas ' + r.rep + ' de tu cuaderno si lo necesitas.';
+  m.temas.push({ t: 'Reto: ' + r.t, reto: true, caso: { t: r.t, x: r.x }, ps: [ex] }); });
+}
+
+/* ===== Explicación de cada hoja de cálculo ===== */
+{
+const HOJAS = {"C1.1": {"why": "Cuando un dato se usa en muchas fórmulas, como el tipo de cambio, conviene escribirlo una sola vez y fijarlo con $. Si cambia, solo cambias esa celda. La tabla de multiplicar muestra cómo fijar solo la fila o solo la columna.", "layout": ["B1: el tipo de cambio (un solo dato que usan todas las fórmulas).", "Columna A (filas 4 a 8): precios en dólares; columna B: precios en pesos.", "D4:D7 y E3:H3: los números de la tabla de multiplicar; E4:H7: los resultados."], "tasks": ["$B$1 hace que la fórmula siempre use el tipo de cambio.", "Al rellenar, sin $ la fórmula buscaría B2, B3…, que están vacías.", "$D4 fija la columna y E$3 fija la fila: así una sola fórmula sirve para toda la tabla.", "Copiar una fórmula a todo un rango ahorra escribir 16 fórmulas."]}, "C1.2": {"why": "Es la actividad de tu cuaderno: un descuento que cambia cada día está en una sola celda (B1). Las fórmulas lo usan con $ para que, al cambiar B1, todo se actualice.", "layout": ["B1: el porcentaje de descuento.", "Columna A: precios.", "Columnas B y C: descuento y precio final (tus fórmulas)."], "tasks": ["Cada descuento usa el mismo porcentaje fijo.", "El precio final es el precio menos el descuento.", "Compruebas que todo se recalcula al cambiar una sola celda."]}, "C2.1": {"why": "Una boleta automática decide por ti: SI elige un resultado según una condición. Así se revisan 40 boletas en segundos. Las columnas D, E y F están vacías para que la hoja tome las decisiones.", "layout": ["Columna A: alumno.", "Columnas B y C: promedio y asistencia.", "Columnas D, E y F: estado, reconocimiento y aviso (tus fórmulas).", "B9: cuántos aprobaron."], "tasks": ["Una sola condición: el promedio.", "Y exige que se cumplan las dos condiciones a la vez.", "O se cumple si pasa al menos una de las dos.", "CONTAR.SI cuenta los «Aprobado» sin hacerlo a mano."]}, "C2.2": {"why": "Es la actividad de tu cuaderno: decidir quién va al cuadro de honor y a quién avisar, con SI, Y y O.", "layout": ["Columnas B, C y D: edad, faltas y promedio.", "Columnas E y F: reconocimiento y aviso (tus fórmulas).", "B7: cuántos están en el cuadro de honor."], "tasks": ["Y: promedio de 8 o más y cero faltas, las dos cosas.", "O: basta con una de las dos situaciones.", "Contar los resultados con CONTAR.SI."]}, "C3.1": {"why": "Es el inventario de una cooperativa real: se ordena para ver qué falta, se filtra para revisar una categoría y se colorea para detectar problemas de un vistazo.", "layout": ["Columnas A a D: producto, categoría, existencias y precio.", "Columna E: valor de cada producto (tu fórmula).", "F2: el total del inventario.", "Las herramientas Formato condicional, Ordenar y Filtrar están debajo de la hoja."], "tasks": ["El valor dice cuánto dinero hay en cada producto.", "El semáforo marca en rojo lo que está por agotarse.", "Ordenar pone primero lo que hay que surtir.", "Filtrar muestra solo una categoría."]}, "C3.2": {"why": "Es la actividad de tu cuaderno: ordenar, resaltar y filtrar una lista de calificaciones, como lo haría un maestro para revisar a su grupo.", "layout": ["Columnas A, B y C: alumno, grupo y calificación.", "Las herramientas están debajo de la hoja."], "tasks": ["Ver primero las calificaciones más altas.", "El rojo destaca a quien necesita apoyo.", "Ver solo a los alumnos de un grupo."]}, "C4.1": {"why": "La hoja hace los cálculos de estadística que ves en Matemáticas y resuelve un problema real: qué plan de celular conviene. La parte izquierda es la de las horas de sueño y la derecha la de los planes.", "layout": ["Columnas A y B: alumno y horas de sueño.", "Columna C: distancia de cada dato a la media.", "Columnas D y E: nombre de cada medida y su resultado.", "Columnas G, H e I: GB y costo de cada plan.", "K2: tu respuesta."], "tasks": ["Media, mediana y moda describen el dato típico del grupo.", "El rango dice qué tan separados están los datos.", "La desviación media dice qué tan lejos de la media están, en promedio.", "Calcular el costo para cada cantidad de GB permite compararlos.", "En la gráfica se ve dónde se cruzan los planes.", "Ahí los dos planes cuestan lo mismo."]}, "C4.2": {"why": "Es la actividad de tu cuaderno: las medidas que calculas en Matemáticas, hechas con funciones.", "layout": ["Columna B: las calificaciones.", "Columnas D y E: nombre de cada medida y su resultado."], "tasks": ["Las tres medidas de tendencia central.", "El rango mide la diferencia entre el más alto y el más bajo."]}, "C4.3": {"why": "Comparar dos opciones que cambian con el tiempo es un sistema de ecuaciones. La hoja calcula el costo de cada mes y la gráfica muestra dónde se cruzan.", "layout": ["Columna A: meses.", "Columnas B y C: costo acumulado de cada gimnasio (tus fórmulas).", "F2 y F4: tus respuestas."], "tasks": ["Cada costo es inscripción más mensualidad por los meses.", "Las líneas se cruzan donde cuestan lo mismo.", "Comparas a los 12 meses cuál es más barato."]}, "C5.1": {"why": "En un torneo real, los puntos dependen de una regla (3 por victoria, 1 por empate) que puede cambiar. Por eso está en B1 y B2, y las fórmulas la usan con $. Después la hoja decide quién pasa a la final.", "layout": ["B1 y B2: los puntos por victoria y por empate.", "Fila 4: los encabezados.", "Filas 5 a 10: un equipo por fila; las columnas E y G son para tus fórmulas.", "B12 y B13: tus resultados."], "tasks": ["La regla de puntos se usa en todas las filas.", "Y exige las dos condiciones para ir a la final.", "Contar cuántos equipos clasificaron.", "El promedio resume los goles.", "Ordenar muestra la tabla de posiciones."]}, "D2.2": {"why": "Para saber si un dado es justo se cuenta cuántas veces salió cada cara y qué parte del total representa. La hoja ya trae las frecuencias de 30 lanzamientos.", "layout": ["Columna A: la cara del dado.", "Columna B: cuántas veces salió.", "Columna C: la frecuencia relativa (tus fórmulas).", "B8 y B9: total y tu respuesta."], "tasks": ["El total debe dar 30.", "La relativa compara cada cara con el total.", "La mayor frecuencia dice qué cara salió más."]}, "H2.1": {"why": "Así se mide una campaña en redes: el alcance dice cuántos la vieron y la tasa de interacción dice qué parte reaccionó. La hoja ya trae los datos de cinco publicaciones.", "layout": ["Columnas A a C: publicación, fecha y formato.", "Columnas D y E: alcance e interacciones.", "Columna F: tasa de interacción (tus fórmulas).", "Filas 8 y 10: totales y tu conclusión."], "tasks": ["La tasa compara reacciones con vistas.", "Los totales resumen la campaña.", "El promedio dice qué tan bien fue en general.", "El verde destaca lo que funcionó.", "Concluyes qué formato conviene repetir."]}, "H2.2": {"why": "Es la actividad de tu cuaderno: decidir con datos qué publicación funcionó mejor.", "layout": ["Columnas B y C: alcance e interacciones.", "Columna D: tasa (tus fórmulas).", "B6: tu respuesta."], "tasks": ["La tasa permite comparar publicaciones con distinto alcance.", "Gana la tasa más alta, no la que tuvo más vistas."]}};
+const LH = 'ABCDEFGH';
+M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.type !== 'sheet') return; const h = HOJAS[LH[mi] + (ti + 1) + '.' + (e + 1)]; if (!h) return;
+  p.why = h.why; p.layout = h.layout; h.tasks.forEach((w, i) => { if (p.tasks[i]) p.tasks[i].why = w; }); })));
+}
+
 })();
 
 </script>
@@ -1342,6 +1432,7 @@ clarify(M, {
   }
   /* temas y ejercicios */
   const LABELS = ['Práctica guiada', 'Aplica', 'Comprueba'];
+  const MAXT = 3;
   const temas = []; const exs = [];
   G.modules.forEach((m, mi) => m.temas.forEach((t, ti) => {
     const tid = `m${mi + 1}t${ti + 1}`; const ps = t.ps || [t.p];
@@ -1430,7 +1521,7 @@ clarify(M, {
           else { el.classList.add('bad'); $('.cls-fb', el).textContent = it.hint ? 'Revisa: ' + it.hint : 'Revisa esta opción.'; }
         });
         const n = d.items.length;
-        return { score: ok / n, msg: miss ? `Te faltan ${miss} por clasificar. Llevas ${ok} de ${n} correctas.` : `${ok} de ${n} correctas.` };
+        return { score: ok / n, incomplete: miss > 0, msg: miss ? `Te faltan ${miss} por clasificar.` : `${ok} de ${n} correctas.` };
       }
     };
   };
@@ -1451,7 +1542,7 @@ clarify(M, {
           if (a === q.a) { ok++; f.classList.add('ok'); $('.q-fb', f).textContent = '✓ ' + (q.fb || 'Correcto.'); }
           else { f.classList.add('bad'); $('.q-fb', f).textContent = q.hint ? 'Pista: ' + q.hint : 'No es la mejor opción; vuelve a leer la situación.'; }
         });
-        return { score: ok / d.qs.length, msg: miss ? `Responde todas las preguntas. Llevas ${ok} de ${d.qs.length} correctas.` : `${ok} de ${d.qs.length} correctas.` };
+        return { score: ok / d.qs.length, incomplete: miss > 0, msg: miss ? `Te faltan ${miss} pregunta(s) por responder.` : `${ok} de ${d.qs.length} correctas.` };
       }
     };
   };
@@ -1689,7 +1780,7 @@ clarify(M, {
           let sc = 0, txt;
           if (atGoal && allStars) { const n = count(st.progs[lvl]); if (L.max && n > L.max) { sc = 0.7; txt = `¡Llegó! Pero usaste ${n} bloques y el reto pide ${L.max} como máximo. Usa “Repetir” para acortar el programa.`; } else { sc = 1; txt = '¡Lo lograste! El robot llegó a la meta.'; } }
           else if (atGoal) txt = 'Llegó a la meta, pero le faltan estrellas por recoger.'; else txt = 'El programa terminó y el robot no está en la meta. Ajusta los bloques.';
-          st.solved[lvl] = Math.max(st.solved[lvl], sc); api.save(st); draw(pos); msg(txt, sc >= 1 ? 'ok' : 'bad'); api.autoCheck(); return;
+          st.solved[lvl] = Math.max(st.solved[lvl], sc); api.save(st); draw(pos); msg(txt + ' Cuando termines todos los niveles, presiona Revisar.', sc >= 1 ? 'ok' : 'bad'); return;
         }
         const k = steps[i++];
         if (k === 'izq') pos.d = (pos.d + 3) % 4; else if (k === 'der') pos.d = (pos.d + 1) % 4;
@@ -1711,7 +1802,7 @@ clarify(M, {
       check() {
         let ok = 0;
         d.items.forEach((it, i) => { const el = $(`.tr[data-i="${i}"]`, host); const a = String(st.ans[i] ?? '').trim(); const sq = (x) => norm(x).replace(/[^a-z0-9ñ\-]/g, ''); const good = it.opts ? a === String(it.a) : (a !== '' && (sq(a) === sq(String(it.a)) || (it.alt || []).some((x) => sq(a) === sq(x)))); el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (a ? 'Sigue el programa línea por línea anotando el valor de cada variable.' : 'Falta tu respuesta.'); if (good) ok++; });
-        return { score: ok / d.items.length, msg: `${ok} de ${d.items.length} correctas.` };
+        const empty = d.items.filter((it, i) => String(st.ans[i] ?? '').trim() === '').length; return { score: ok / d.items.length, incomplete: empty > 0, msg: empty ? `Te faltan ${empty} respuesta(s).` : `${ok} de ${d.items.length} correctas.` };
       }
     };
   };
@@ -1762,7 +1853,7 @@ clarify(M, {
     draw();
     return {
       check() {
-        const P = d.palette; if (st.bg < 0 || st.tx < 0 || st.ac < 0) return { score: 0, msg: 'Elige un color para cada uno de los tres papeles.' };
+        const P = d.palette; if (st.bg < 0 || st.tx < 0 || st.ac < 0) return { score: 0, incomplete: true, msg: 'Elige un color para cada uno de los tres papeles.' };
         const a = ratio(P[st.bg], P[st.tx]) >= 4.5, b = ratio(P[st.bg], P[st.ac]) >= 3, c = new Set([st.bg, st.tx, st.ac]).size === 3;
         return { score: [a, b, c].filter(Boolean).length / 3, msg: a && b && c ? 'Tu paleta es legible y coherente.' : 'Ajusta los criterios sin palomita: un texto con poco contraste no se lee en el celular.' };
       }
@@ -1892,7 +1983,7 @@ clarify(M, {
     return {
       check() {
         return exec().then((r) => {
-          if (r.noload) return { score: 0, msg: r.err };
+          if (r.noload) return { score: 0, msg: r.err, noCount: true };
           const res = d.checks.map((c) => { try { return !!c.f(st.code, r.out || '', r.err); } catch (e) { return false; } });
           $$('.py-rules li', host).forEach((li, i) => li.classList.toggle('on', res[i]));
           const n = res.filter(Boolean).length;
@@ -1903,13 +1994,102 @@ clarify(M, {
   };
 
   /* ================= HOJA DE CÁLCULO ================= */
+  /* Guía paso a paso para cada tarea de hoja de cálculo (se arma a partir del texto de la tarea). */
+  const sheetSteps = (t, d) => {
+    const tools = d.tools || [];
+    const tx = String(t.text).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    const REF = /\b([A-K][1-9]\d?)(?:(?::| a )([A-K][1-9]\d?))?\b/g;
+    const refsIn = (s) => [...s.matchAll(REF)].map((m) => ({ a: m[1], b: m[2] || m[1] }));
+    const P = (a) => FX.parseAddr(a);
+    const S = [];
+    const FNH = { SUMA: 'Dentro va el rango: toca la primera celda, escribe <code>:</code>, toca la última y cierra con <code>)</code>.',
+      'CONTAR.SI': 'Dentro van, separados por coma, el rango donde se cuenta y lo que se busca (una celda o un texto entre comillas, como <code>">50"</code>). Cierra con <code>)</code>.',
+      'SUMAR.SI': 'Dentro van, separados por coma: el rango donde está la categoría, lo que se busca y el rango con los números que se suman. Cierra con <code>)</code>.',
+      SI: `Dentro van, separados por coma: la condición${/ y la | o la /.test(tx) ? ' (con <code>Y(…)</code> si deben cumplirse las dos, con <code>O(…)</code> si basta una)' : ''}, lo que se escribe si se cumple y lo que se escribe si no. Los textos van entre comillas.`,
+      BUSCARV: 'Dentro van, separados por coma: la celda con la clave, la tabla completa (fíjala con <code>$</code>), el número de columna del dato que quieres traer y <code>FALSO</code>.' };
+    FNH['PROMEDIO.SI'] = FNH['SUMAR.SI'].replace('se suman', 'se promedian');
+    const isChart = /Inserta una gráfica|Inserta la gráfica/i.test(tx);
+    const isSort = /^Ordena/i.test(tx);
+    const isFilter = /^Filtra/i.test(tx);
+    const isCF = /semáforo|^Pinta|^Resalta|aplica formato/i.test(tx);
+    const isPivot = /^(Crea|Cambia) (una|la) tabla dinámica/i.test(tx);
+    const isValCreate = /^Crea una validación/i.test(tx);
+    const isValUse = /^Usa la lista|^Marca /i.test(tx);
+    const isChange = /^(Prueba el buscador: )?Cambia (?!la tabla)/i.test(tx);
+    const isText = /\bescribe\b/i.test(tx.replace(/escribe un título/gi, '')) && !/fórmula|» si /i.test(tx);
+    const isFormula = !isChart && !isSort && !isFilter && !isPivot && !isValCreate && !isValUse && !isChange && !isText && !isCF
+      || (isCF && /calcula/i.test(tx));
+    const FN = (tx.match(/\b(SUMAR\.SI|PROMEDIO\.SI|CONTAR\.SI|BUSCARV|PROMEDIO|MEDIANA|MODA|SUMA|MAX|MIN)\b/) || [])[1]
+      || (/» si /.test(tx) ? 'SI' : /\bcuenta\b/i.test(tx) ? 'CONTAR.SI' : /\bsuma\b/i.test(tx) ? 'SUMA' : /\bbusca\b/i.test(tx) ? 'BUSCARV' : /más alto/i.test(tx) ? 'MAX' : /más bajo/i.test(tx) ? 'MIN' : /promedio general|promedio de goles|tasa promedio/i.test(tx) ? 'PROMEDIO' : '');
+    const FN2 = /más alto/i.test(tx) && /más bajo/i.test(tx) ? 'MIN' : FN;
+    if (isFormula) {
+      const lead = tx.match(/^(?:En|Completa(?: toda la tabla)?|Rellena(?: [a-záéíóú ]+?)?) ?((?:[A-K]\d+(?::[A-K]\d+)?(?: \([^)]*\))?(?:,? y |, | )?)+)/i);
+      const copyOnly = /^Rellena|^Calcula los .* de [A-K]\d+ a |copiando esa misma/i.test(tx);
+      let tg = copyOnly ? refsIn(tx).slice(0, 1) : refsIn(lead ? lead[1] : tx); if (!tg.length) tg = refsIn(tx);
+      if (!copyOnly) [...tx.matchAll(/\by en ([A-K]\d+(?::[A-K]\d+)?)([^.,;]*)/g)].forEach((m) => { const r = refsIn(m[1])[0]; if (r && !tg.some((x) => x.a === r.a)) { r.fn = /desviación media|promedio/i.test(m[2]) ? 'PROMEDIO' : /total|suma/i.test(m[2]) ? 'SUMA' : ''; r.extra = true; tg.push(r); } });
+      const MW = { media: 'PROMEDIO', mediana: 'MEDIANA', moda: 'MODA', 'máximo': 'MAX', 'mínimo': 'MIN', rango: '' };
+      const meas = (tx.match(/\b(media|mediana|moda|máximo|mínimo|rango)\b(?=[ ,.)]|$)/g) || []).filter((w, i, a) => a.indexOf(w) === i && !(w === 'máximo' && /\(máximo/.test(tx) && a.indexOf('máximo') === i && /rango \(máximo/.test(tx) && false));
+      if (meas.length >= 2 && tg.length && (tg.length > 1 || tg[0].a !== tg[0].b)) { const g = tg[0], a = P(g.a), b = P(g.b); const cells = []; for (let r = a.r; r <= b.r; r++) cells.push(FX.addr(a.c, r)); tg.slice(1).forEach((x) => cells.push(x.a));
+        const ms = meas.slice(0, cells.length);
+        if (ms.length === cells.length) { S.push('Aquí cada celda lleva una función distinta, así que <b>no uses Rellenar</b>: escribe una fórmula en cada celda.'); ms.forEach((w, i) => S.push(MW[w] ? `En <b>${cells[i]}</b> (${w}) escribe <code>=${MW[w]}(</code>, marca el rango de los datos (toca la primera celda, escribe <code>:</code>, toca la última), cierra con <code>)</code> y presiona <b>Enter</b>.` : `En <b>${cells[i]}</b> (rango) resta el mínimo al máximo: <code>=</code>, toca la celda del máximo, escribe <code>-</code>, toca la celda del mínimo (o usa <code>MAX(…)-MIN(…)</code>) y presiona <b>Enter</b>.`)); tg = []; }
+      }
+      if (/fijo de|para [A-K]\d+ y [A-K]\d+/.test(tx) && lead) tg = refsIn(lead[1]);
+      tg.forEach((g, i) => {
+        const a = P(g.a), b = P(g.b), multi = g.a !== g.b;
+        let src = g.a;
+        if (copyOnly && !/copiando/.test(tx)) src = FX.addr(a.c, a.r - 1);
+        if (!copyOnly || i > 0) {
+          S.push(i === 0 ? `Toca la celda <b>${g.a}</b> (columna ${g.a.replace(/\d+/, '')}, fila ${a.r}).` : `Ahora toca la celda <b>${g.a}</b>.`);
+          if (i === 0) {
+            S.push(FN ? `Escribe <code>=${FN}(</code>. ${FNH[FN] || FNH.SUMA}` : 'Escribe <code>=</code> y después la operación que pide la tarea (<code>+</code> suma, <code>-</code> resta, <code>*</code> multiplica, <code>/</code> divide).');
+            S.push('Para usar un dato, <b>toca su celda</b> en lugar de escribir el número: así el resultado se corrige solo si el dato cambia.');
+            if (/mixt/i.test(tx)) S.push('Usa referencias mixtas: pon <code>$</code> solo antes de la letra cuando la columna no debe moverse (<code>$D4</code>) y solo antes del número cuando la fila no debe moverse (<code>E$3</code>).');
+            else if (/\$[A-K]|absolut|porcentaje fijo|cambio fijo/i.test(tx)) S.push('Al dato que no debe moverse ponle <code>$</code> antes de la letra y del número (por ejemplo <code>$B$1</code>).');
+            S.push('Presiona <b>Enter</b> o el botón <b>Aceptar</b>. En la celda debe aparecer un número, no la fórmula.');
+          } else if (g.extra && !g.fn) S.push('Escribe <code>=</code> y la operación que corresponde a esa celda (lee la tarea) y presiona <b>Enter</b>.');
+          else if (FN === 'BUSCARV') S.push('Escribe la misma fórmula <b>BUSCARV</b>, pero cambia el número de columna por el del dato que quieres traer, y presiona <b>Enter</b>.');
+          else if (g.fn) S.push(`Escribe <code>=${g.fn}(</code>, marca el rango, cierra con <code>)</code> y presiona <b>Enter</b>.`);
+          else S.push(FN2 && FN2 !== FN ? `Escribe <code>=${FN2}(</code> con el mismo rango y presiona <b>Enter</b>.` : 'Escribe su fórmula de la misma forma y presiona <b>Enter</b>.');
+        }
+        if (multi || copyOnly) {
+          const down = a.c === b.c, right = a.r === b.r;
+          if (tools.includes('fill')) {
+            S.push(`${copyOnly && i === 0 ? `Toca la celda <b>${src}</b>, que ya tiene la fórmula, y abre` : 'Abre'} el botón <b>Rellenar</b> (debajo de la hoja). En «Celda que se copia» debe decir <b>${src}</b>.`);
+            S.push(down ? `En «Hacia abajo hasta la fila» escribe <b>${b.r}</b> y presiona <b>Rellenar ↓</b>.` : right ? `En «Hacia la derecha hasta la columna» elige <b>${g.b.replace(/\d+/, '')}</b> y presiona <b>Rellenar →</b>.` : `En «A todo un rango» escribe <b>${g.a}:${g.b}</b> y presiona <b>Rellenar rango</b>.`);
+          } else S.push(`Haz lo mismo en cada celda hasta <b>${g.b}</b>, cambiando el número de fila.`);
+        }
+      });
+      if (!tg.length && !S.length) S.push('Escribe la fórmula en la celda que indica la tarea y presiona <b>Enter</b>.');
+    }
+    if (isChange) {
+      const r = refsIn(tx)[0];
+      S.push(r ? `Toca la celda <b>${r.a}</b>.` : 'Toca la celda del dato que vas a cambiar (búscala en la tabla).');
+      S.push('Escribe el nuevo valor y presiona <b>Enter</b>.');
+      S.push('Mira las celdas con fórmulas: deben cambiar solas. Si alguna no cambia, en esa celda hay un número escrito a mano y no una fórmula.');
+    }
+    if (isPivot) S.push('Abre el botón <b>Tabla dinámica</b> (debajo de la hoja).', `En «Filas» elige la columna por la que quieres agrupar${(tx.match(/por ([A-Za-zÁÉÍÓÚáéíóúñ]+)/) || [])[1] ? ` (<b>${tx.match(/por ([A-Za-zÁÉÍÓÚáéíóúñ]+)/)[1]}</b>)` : ''}; en «Valores», la columna con los números, y en «Operación», <b>SUMA</b>.`, 'Presiona <b>Crear tabla dinámica</b>. El resumen aparece debajo de la hoja.');
+    if (isValCreate) { const r = refsIn(tx)[0]; S.push('Abre el botón <b>Validación de datos</b> (debajo de la hoja).', `En «Rango» escribe <b>${r ? r.a + ':' + r.b : 'el rango'}</b>.`, `En «Lista de valores permitidos» escribe las opciones separadas por coma: <b>${(tx.split('lista:')[1] || '').replace(/\.$/, '').trim()}</b>.`, 'Presiona <b>Aplicar</b>.'); }
+    if (isValUse) S.push('Toca una celda de la columna de estado: arriba de la hoja aparece «Elige un valor».', 'Abre la lista y elige el estado que pide la tarea.', 'Repite con cada celda que menciona la tarea.');
+    if (isSort) { const r = refsIn(tx)[0]; S.push('Abre el botón <b>Ordenar</b> (debajo de la hoja).', `En «Rango de datos» escribe ${r ? `<b>${r.a}:${r.b}</b>` : 'todas las filas de datos'} <b>sin la fila de encabezados</b> e incluye todas las columnas, para que cada fila se mueva completa.`, 'Elige la columna por la que se ordena y el sentido (de menor a mayor o de mayor a menor).', 'Presiona <b>Ordenar</b>.'); }
+    if (isFilter) S.push('Abre el botón <b>Filtrar</b> (debajo de la hoja).', 'Elige la columna y, en «Mostrar solo», el valor que pide la tarea.', 'Presiona <b>Aplicar filtro</b>. Con «Mostrar todo» vuelves a ver toda la tabla.');
+    if (isCF) S.push('Abre el botón <b>Formato condicional</b> (debajo de la hoja).', 'En «Rango» escribe las celdas que se van a colorear.', 'Elige la condición (por ejemplo «menor que»), escribe el número y elige el color.', 'Presiona <b>Agregar regla</b>. Si la tarea pide dos colores, agrega una segunda regla.');
+    if (isChart) S.push('Abre el botón <b>Insertar gráfica</b> (debajo de la hoja).', 'En «Tipo» elige la gráfica que sirve para la pregunta: columnas para comparar, circular para partes de un total y líneas para cambios en el tiempo.', 'En «Etiquetas» escribe el rango de los nombres y en «Valores» el de los números (los rangos vienen en la tarea).', 'Escribe un título que diga qué muestra la gráfica y presiona <b>Insertar</b>.');
+    if (isText || (isPivot && /escribe/.test(tx))) {
+      const rs = refsIn(tx).filter((r) => r.a === r.b).map((r) => r.a);
+      if (!isText) S.push(`Lee el resultado y escribe tu respuesta en <b>${rs[0] || 'la celda que indica la tarea'}</b>.`);
+      else { S.push(`Toca la celda <b>${rs.join('</b> y luego <b>') || 'que indica la tarea'}</b>.`); S.push('Busca la respuesta en la tabla o en la gráfica que hiciste.'); S.push('Escribe tu respuesta <b>sin</b> el signo = (una palabra o un número) y presiona <b>Enter</b>.'); }
+    }
+    return S;
+  };
+
   E.sheet = (host, d, api) => {
     const fresh = () => ({ raw: { ...d.cells }, cf: [], chart: null, filter: null, pivot: null, val: [] });
     const st = api.load() || fresh();
     const C = d.cols, R = d.rows; let sel = 'A1'; let sheet; let pickerOpen = null; let lastIns = null, lastCommit = null, skipClick = false;
     const tools = d.tools || [];
     const TOOLN = { fill: 'Rellenar', cf: 'Formato condicional', chart: 'Insertar gráfica', sort: 'Ordenar', filter: 'Filtrar', pivot: 'Tabla dinámica', validation: 'Validación de datos' };
-    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}
+    const info = d.why ? `<details class="hoja-info" open><summary>📋 ¿Para qué sirve esta hoja y por qué está organizada así?</summary><p>${d.why}</p>${d.layout ? `<p class="hi-l">Cómo está organizada:</p><ul>${d.layout.map((x) => `<li>${x}</li>`).join('')}</ul>` : ''}<p class="hi-n">Las celdas con datos ya vienen escritas: no las borres. Las celdas vacías son las que tú llenas, casi siempre con una fórmula que empieza con <code>=</code>. Haz las tareas en orden, porque cada una usa el resultado de la anterior.</p></details>` : '';
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}${info}
       <div class="xl">
         <div class="fbar"><span class="addr" aria-live="polite">A1</span><span class="fx">fx</span><input class="finput" type="text" spellcheck="false" autocomplete="off" aria-label="Barra de fórmulas"><button type="button" class="btn sm" data-act="commit">Aceptar</button></div>
         <div class="valpick" hidden></div>
@@ -1917,7 +2097,7 @@ clarify(M, {
         ${tools.length ? `<div class="toolbar">${tools.map((t) => `<button type="button" class="btn sm" data-tool="${t}">${TOOLN[t]}</button>`).join('')}</div><div class="toolpanel" hidden></div>` : ''}
         <div class="outputs"></div>
       </div>
-      <h3 class="sub">Tareas</h3><ol class="tasks">${d.tasks.map((t, i) => `<li data-t="${i}"><span class="tk-t">${t.text}</span><span class="tk-h muted small"></span></li>`).join('')}</ol>
+      <h3 class="sub">Tareas</h3><ol class="tasks">${d.tasks.map((t, i) => `<li data-t="${i}"><span class="tk-t">${t.text}</span>${t.why ? `<span class="tk-why"><b>¿Para qué?</b> ${t.why}</span>` : ''}${(() => { const st2 = sheetSteps(t, d); return st2.length ? `<details class="tk-how"><summary>Ver cómo hacerlo, paso a paso</summary><ol>${st2.map((x) => `<li>${x}</li>`).join('')}</ol></details>` : ''; })()}<span class="tk-h muted small"></span></li>`).join('')}</ol>
       <p class="muted small">Escribe en la barra de fórmulas y presiona Enter. Mientras escribes una fórmula, toca una celda para insertar su referencia; escribe “:” y toca otra celda para formar un rango.</p>`;
     const grid = $('.grid', host), inp = $('.finput', host);
     const hidden = () => { if (!st.filter) return new Set(); const g = FX.parseRange(d.filterRange || 'A2:A' + R); const col = FX.colToNum(st.filter.col); const s = new Set(); for (let r = g.r1; r <= g.r2; r++) { const v = sheet.value(FX.addr(col, r)); if (FX.norm(FX.fmt(v)) !== FX.norm(st.filter.value)) s.add(r); } return s; };
@@ -2090,7 +2270,7 @@ clarify(M, {
     spot: 'Lee todo el texto. Toca cada parte que sea una señal de alerta o un error: se marca en amarillo. Si te equivocas, vuelve a tocarla para desmarcarla. Al final presiona <b>Revisar</b>.',
     order: 'Usa las flechas <b>↑</b> y <b>↓</b> para mover cada elemento hasta que queden en el orden correcto. Después presiona <b>Revisar</b>.',
     sheet: '<ol><li>Toca una celda de la hoja.</li><li>Escribe en la barra de arriba (fx) y presiona <b>Enter</b> (o toca otra celda). Las fórmulas siempre empiezan con <code>=</code>.</li><li>Mientras escribes una fórmula, puedes tocar una celda para insertar su nombre.</li><li>Las herramientas (Rellenar, Gráfica, Formato condicional…) están debajo de la hoja. Para <b>Rellenar</b>, toca primero la celda que tiene la fórmula.</li><li>Sigue la lista de <b>Tareas</b> y presiona <b>Revisar</b>: cada tarea se marca en verde o en rojo con una pista.</li></ol>',
-    robot: 'Agrega bloques desde la paleta de colores, presiona <b>▶ Ejecutar</b> y observa al robot. Si choca o no llega, corrige los bloques y vuelve a ejecutar. Cada nivel cuenta cuando el robot llega a la bandera.',
+    robot: 'Agrega bloques desde la paleta de colores, presiona <b>▶ Ejecutar</b> y observa al robot. Si choca o no llega, corrige los bloques y vuelve a ejecutar. Puedes ejecutar todas las veces que quieras: los intentos solo se cuentan al presionar <b>Revisar</b>. Cuando el robot llegue a la bandera en todos los niveles, presiona <b>Revisar</b>.',
     trace: 'Lee el programa línea por línea como si fueras la computadora. Anota en tu cuaderno el valor de cada variable y escribe o elige la respuesta. Después presiona <b>Revisar</b>.',
     password: 'Escribe una contraseña inventada y observa cómo se palomean los criterios. Después clasifica las contraseñas de ejemplo y presiona <b>Revisar</b>.',
     rewrite: 'Escribe tu versión debajo de cada mensaje. Los criterios se palomean mientras escribes. Cuando todos estén palomeados, presiona <b>Revisar</b>.',
@@ -2103,7 +2283,7 @@ clarify(M, {
     circuit: 'En cada circuito elige una <b>resistencia</b> y <b>cierra el interruptor</b>. El mensaje te dice cuánta corriente pasa y cómo queda el LED. Busca que brille bien sin quemarse y presiona <b>Revisar</b>.',
     rules: 'Completa la regla del microcontrolador: elige la comparación, escribe el valor límite y elige qué hacer si se cumple y si no. Mueve el control <b>Prueba el sensor</b> para comprobarla. Después presiona <b>Revisar</b>: se prueba con varios valores.',
     train: 'Cada punto de color es un ejemplo para entrenar el modelo. Marca o desmarca la casilla de cada ejemplo para usarlo o no. Los cuadros son datos de prueba: ✓ si el modelo acierta, ✗ si falla. Quita los ejemplos con etiqueta equivocada hasta que acierte todo, y presiona <b>Revisar</b>.',
-    python: 'Escribe tu programa en el recuadro y presiona <b>▶ Ejecutar</b> para ver lo que imprime. Usa 4 espacios (o la tecla Tab) para la sangría dentro de <code>if</code>, <code>for</code> y <code>def</code>. Cuando cumpla los requisitos, presiona <b>Revisar</b>: el programa se vuelve a ejecutar y se revisa solo. Necesitas conexión a internet la primera vez.',
+    python: 'Escribe tu programa en el recuadro y presiona <b>▶ Ejecutar</b> para ver lo que imprime. Usa 4 espacios (o la tecla Tab) para la sangría dentro de <code>if</code>, <code>for</code> y <code>def</code>. Puedes ejecutar todas las veces que quieras. Cuando cumpla los requisitos, presiona <b>Revisar</b> (tienes 3 intentos): el programa se vuelve a ejecutar y se revisa solo. Necesitas conexión a internet la primera vez.',
     form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
   };
   const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
@@ -2127,8 +2307,8 @@ clarify(M, {
     const maxT = Math.max(...G.modules.map((m) => m.temas.length));
     const nextT = temas.find((tm) => !['hecho', 'dominado'].includes(temaStatus(tm)));
     const nextX = nextT ? (nextT.ex.find((x) => !['hecho', 'dominado'].includes(status(x.pid))) || nextT.ex[0]) : null;
-    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
-    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}${tm.t.reto ? ' reto' : ''}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
       <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
       <p class="legend"><span><i class="dot st-hecho"></i> Ejercicio completado</span><span><i class="dot st-dominado"></i> Ejercicio dominado (100%)</span><span><i class="dot st-intentado"></i> En proceso</span><span><i class="dot st-nuevo"></i> Sin empezar</span></p>`;
     $('#cert').addEventListener('click', cert);
@@ -2136,7 +2316,7 @@ clarify(M, {
   function cert() {
     const d = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
     const avg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
-    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${temas.length} temas completados · <b>${exs.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length}</b> de ${exs.length} ejercicios completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Ejercicios completados</th><th>Promedio</th><th>Estado</th></tr>${temas.map((tm) => `<tr><td>${LET[tm.mi]}. ${esc(tm.m.name)}</td><td>${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}</td><td>${exDone(tm)} de ${tm.ex.length}</td><td>${avg(tm)}%</td><td>${stText[temaStatus(tm)]}</td></tr>`).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p><p class="no-print muted small" id="printnote" hidden>Si no se abrió la ventana para imprimir, es porque la página de la escuela lo bloquea: abre el simulador en una pestaña nueva con el botón «Abrir en pestaña nueva ↗» de arriba y vuelve a intentarlo.</p></div>`;
+    $('#print').innerHTML = `<div class="cert"><h2>Constancia de avance — ${esc(G.title)}</h2><p><b>Alumno(a):</b> ${esc(store.name || '________________')} · <b>Fecha:</b> ${d}</p><p><b>${doneCount()}</b> de ${temas.length} temas completados · <b>${exs.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length}</b> de ${exs.length} ejercicios completados.</p><table><tr><th>Módulo</th><th>Tema</th><th>Ejercicios completados</th><th>Calificación (la más alta)</th><th>Estado</th></tr>${temas.map((tm) => `<tr><td>${LET[tm.mi]}. ${esc(tm.m.name)}</td><td>${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}</td><td>${exDone(tm)} de ${tm.ex.length}</td><td>${avg(tm)}%</td><td>${stText[temaStatus(tm)]}</td></tr>`).join('')}</table><p class="no-print row"><button type="button" class="btn primary" id="doprint">Imprimir o guardar como PDF</button><button type="button" class="btn" id="closecert">Cerrar</button></p><p class="no-print muted small" id="printnote" hidden>Si no se abrió la ventana para imprimir, es porque la página de la escuela lo bloquea: abre el simulador en una pestaña nueva con el botón «Abrir en pestaña nueva ↗» de arriba y vuelve a intentarlo.</p></div>`;
     document.body.classList.add('show-cert');
     $('#doprint').addEventListener('click', () => { try { window.print(); } catch (e) { /* bloqueado */ } if (FRAMED) $('#printnote').hidden = false; });
     $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
@@ -2150,26 +2330,44 @@ clarify(M, {
       <p class="crumb"><span class="mcol">${LET[tm.mi]}${tm.ti + 1}</span> Módulo ${LET[tm.mi]}: ${esc(tm.m.name)} · Cuaderno de trabajo, tema ${LET[tm.mi]}${tm.ti + 1}</p>
       <h2>${esc(tm.t.t)}</h2>
       <div class="extabs" role="tablist">${tm.ex.map((e) => `<a role="tab" href="#${e.pid}" class="extab st-${status(e.pid)}" aria-selected="${e.pid === pid}"><span class="exn">Ejercicio ${e.ei + 1}</span><span class="exl">${esc(e.label)}${stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''}</span></a>`).join('')}</div>
+      ${tm.t.caso ? `<div class="caso${tm.t.reto ? ' is-reto' : ''}"><p class="caso-h"><span aria-hidden="true">${tm.t.reto ? '🏆' : '📖'}</span> ${tm.t.reto ? 'Reto del módulo' : 'Caso'}: <b>${esc(tm.t.caso.t)}</b></p><p>${esc(tm.t.caso.x)}</p></div>` : ''}
       <h3 class="extitle">Ejercicio ${x.ei + 1} de ${tm.ex.length}${p.title ? ': ' + esc(p.title) : ''}</h3>
       <p class="intro">${p.intro}</p>
       <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${p.help || HELP[p.type] || ''}</div></details>
       ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${/\n/.test(p.tip) && !/</.test(p.tip) ? `<pre class="code">${esc(p.tip)}</pre>` : p.tip}</div></details>` : ''}
       <div class="engine"></div>
-      <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado en este ejercicio: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
-      <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
+      <div class="result" aria-live="polite"></div>
+      <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><span class="att" aria-live="polite"></span><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
     const api = { pid, load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null), save: (s) => { store.saves[pid] = s; persist(); }, autoCheck: () => doCheck(true) };
     let eng;
     try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Este ejercicio no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
+    /* intentos: cada ejercicio permite MAXT revisiones y se conserva la calificación más alta */
+    const used = () => (store.prog[pid] && store.prog[pid].att) || 0;
+    const bestPct = () => Math.round(((store.prog[pid] && store.prog[pid].best) || 0) * 100);
+    const showAtt = () => {
+      const u = used(), left = MAXT - u; const a = $('.att');
+      if (u >= MAXT) { a.innerHTML = `<b>Intentos agotados.</b> Calificación: <b>${bestPct()}%</b>`; $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); }
+      else a.innerHTML = u ? `Te ${left === 1 ? 'queda' : 'quedan'} <b>${left}</b> de ${MAXT} intentos · Calificación más alta: <b>${bestPct()}%</b>` : `Tienes <b>${MAXT} intentos</b> para revisar este ejercicio`;
+    };
+    const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist(); };
+    let busy = false;
     async function doCheck() {
-      if (!eng) return; let r = eng.check();
-      if (r && typeof r.then === 'function') { const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.' }; } btn.disabled = false; if (!document.body.contains(btn)) { const pr0 = store.prog[pid] || { best: 0, tries: 0 }; pr0.tries++; pr0.best = Math.max(pr0.best, r.score); store.prog[pid] = pr0; persist(); return; } }
-      const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.best = Math.max(pr.best, r.score); store.prog[pid] = pr; persist();
-      const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
-      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
+      if (!eng || busy || used() >= MAXT) return; let r = eng.check();
+      if (r && typeof r.then === 'function') { busy = true; const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.', noCount: true }; } busy = false; btn.disabled = false;
+        if (r.noCount) { $('.result').innerHTML = `<div class="res res-bad"><span>${esc(r.msg)} Este intento no se contó.</span></div>`; return; }
+        if (!document.body.contains(btn)) { record(r.score); return; } }
+      if (r.incomplete) { $$('.engine .ok, .engine .bad').forEach((el) => el.classList.remove('ok', 'bad')); $$('.engine .cls-fb, .engine .q-fb').forEach((el) => { el.textContent = ''; }); $('.result').innerHTML = `<div class="res res-mid"><span>${esc(r.msg)} Complétalo antes de revisar: <span style="font-weight:700">este intento no se contó</span>.</span></div>`; return; }
+      record(r.score);
+      const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad'; const left = MAXT - used();
+      const extra = r.score >= 1 ? '' : left > 0 ? ` Corrige lo marcado en rojo y vuelve a revisar: te ${left === 1 ? 'queda 1 intento' : `quedan ${left} intentos`}.` : ' Ya usaste tus 3 intentos.';
+      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}${extra} Se guarda tu calificación más alta: <span style="font-weight:700">${bestPct()}%</span>.</span></div>${(bestPct() >= 80 || left <= 0) && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
+      showAtt();
       side(tm.tid); $$('.extab').forEach((el) => { const e = byPid[el.getAttribute('href').slice(1)]; el.className = 'extab st-' + status(e.pid); el.querySelector('.exl').textContent = e.label + (stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''); });
     }
     $('#chk').addEventListener('click', () => doCheck());
-    $('#rst').addEventListener('click', (e) => { const b = e.currentTarget; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '¿Seguro? Toca otra vez para borrar'; b.classList.add('warn'); clearTimeout(b._t); b._t = setTimeout(() => { delete b.dataset.sure; b.textContent = 'Empezar de nuevo'; b.classList.remove('warn'); }, 5000); return; } delete store.saves[pid]; persist(); practice(pid); });
+    showAtt();
+    if (best && best.att) $('.result').innerHTML = `<span class="muted">Calificación más alta en este ejercicio: <b>${Math.round(best.best * 100)}%</b> (${best.att} de ${MAXT} intentos usados).</span>`;
+    $('#rst').addEventListener('click', (e) => { const b = e.currentTarget; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '¿Seguro? Se borra tu trabajo, no tus intentos'; b.classList.add('warn'); clearTimeout(b._t); b._t = setTimeout(() => { delete b.dataset.sure; b.textContent = 'Empezar de nuevo'; b.classList.remove('warn'); }, 5000); return; } delete store.saves[pid]; persist(); practice(pid); });
     $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
   }
   let curHash = location.hash.slice(1);
