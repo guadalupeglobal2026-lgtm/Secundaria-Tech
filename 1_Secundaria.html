@@ -4,14 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Simulador Tech Kids · 1° de secundaria</title>
-<!-- versión 2026-10-13: correcciones de avance -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#EEF3F9; --surface:#FFFFFF; --sunk:#F6F9FC; --ink:#172338; --muted:#56637A; --line:#D3DDEA; --grid:#E4EBF4;
-  --datos:#12804F; --codigo:#5D3FD3; --ciudadania:#0A7584; --creacion:#B42A66; --comunicacion:#8C5E00; --integra:#3D4A63;
+  --datos:#12804F; --sistemas:#B4530A; --codigo:#5D3FD3; --ciudadania:#0A7584; --creacion:#B42A66; --comunicacion:#8C5E00; --integra:#3D4A63;
   --ok:#12804F; --ok-bg:#E3F4EA; --bad:#B82633; --bad-bg:#FBE7E9; --mid:#8C5E00; --mid-bg:#FFF3D6; --focus:#2563EB;
   --s1:#2D6FD6; --s2:#E08A00; --s3:#12804F; --s4:#B42A66; --s5:#5D3FD3; --s6:#0A7584;
   --cf-verde:#CDEFD9; --cf-amarillo:#FFF0B3; --cf-rojo:#F9CDD2;
@@ -24,7 +23,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
-    --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+    --datos:#4CC48A; --sistemas:#F2A25C; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
     --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
     --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
     --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
@@ -32,7 +31,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
-  --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+  --datos:#4CC48A; --sistemas:#F2A25C; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
   --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
   --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
   --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
@@ -340,6 +339,26 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
 }
 @media (max-width: 520px){ body{font-size:16px} .ph-row{grid-template-columns:1fr} .trk{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+.bin,.cir,.rule{border:1px solid var(--line); border-radius:var(--r); padding:.8rem; margin-bottom:1rem; background:var(--surface)}
+.bin.ok,.cir.ok,.rule.ok{border-color:var(--ok); box-shadow:inset 4px 0 0 var(--ok)}
+.bin.bad,.cir.bad,.rule.bad{border-color:var(--bad); box-shadow:inset 4px 0 0 var(--bad)}
+.bin-row{display:flex; gap:.35rem; flex-wrap:wrap}
+.bit{display:flex; flex-direction:column; align-items:center; min-width:44px; padding:.35rem .2rem; border:1px solid var(--line); border-radius:var(--r-sm); background:var(--sunk); cursor:pointer; color:var(--ink)}
+.bit[aria-pressed="true"]{background:var(--hc,var(--ink)); color:#fff; border-color:transparent}
+.bit:disabled{cursor:default; opacity:1}
+.bit-v{font:700 1.3rem/1.2 var(--f-mono)} .bit-w{font-size:.72rem; opacity:.8}
+.bin-sum{margin:.5rem 0 0}
+.cir-wrap{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:1rem; align-items:center}
+.cir-svg,.trn-svg{width:100%; display:block}
+.cir-msg{font-weight:600} .cir-msg.st-ok{color:var(--ok)} .cir-msg.st-burn{color:var(--bad)}
+.rule-code select,.rule-code input{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:.1rem .3rem}
+.rule-out{font-weight:600}
+.trn{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; align-items:start}
+.trn-list{padding-left:0; list-style:none; margin:.4rem 0} .trn-list li{margin:.15rem 0}
+.trn-acc{font-size:1.05rem}
+.py-code{font:14px/1.55 var(--f-mono); white-space:pre; tab-size:4; min-height:180px}
+.py-out{min-height:3.5rem; white-space:pre-wrap} .py-out.has-err{outline:2px solid var(--bad)}
+@media (max-width: 720px){ .cir-wrap,.trn{grid-template-columns:1fr} }
 .xl-flash.okf{background:var(--ok-bg); color:var(--ok)}
 .btn.warn{background:var(--bad-bg); color:var(--bad); border-color:var(--bad)}
 </style>
@@ -630,7 +649,7 @@ window.GRADE = {
       ] } },
     { t: 'Formato profesional', p: { type: 'spot',
       intro: 'Antes de entregar, revisa esta ficha del trabajo de un compañero. Toca los elementos que no siguen las buenas prácticas de formato.',
-      tip: 'Recuerda la checklist: máximo 2 tipografías, títulos con estilos, márgenes consistentes y archivos con nombre Materia_Tema_Nombre.',
+      tip: 'Recuerda la lista de verificación: máximo 2 tipografías, títulos con estilos, márgenes consistentes y archivos con nombre Materia_Tema_Nombre.',
       sets: [{ frame: 'doc', head: 'Ficha de revisión del documento', parts: [
         'Nombre del archivo: ', ['trabajo final FINAL2 (1).docx', true, 'Debe seguir Materia_Tema_Nombre'], '\n',
         'Tipografías usadas: ', ['Arial, Comic Sans, Times New Roman e Impact', true, 'Más de 2 tipografías'], '\n',
@@ -868,10 +887,10 @@ window.GRADE = {
         { t: 'El dato principal no proviene de una noticia falsa', c: 2, why: 'Verificación de información.', hint: '¿Dónde analizaste titulares?' },
       ] } },
     { t: 'Plan del proyecto', p: { type: 'form',
-      intro: 'Planea tu infografía o revista digital transversal. Tus respuestas se guardan aquí; cópialas a tu documento de entrega.',
+      intro: 'Planea tu infografía o revista digital sobre un tema de otra materia. Tus respuestas se guardan aquí; cópialas a tu documento de entrega.',
       lead: '<p>Un buen plan responde qué vas a comunicar, con qué fuentes y con qué datos, antes de diseñar.</p>',
       fields: [
-        { label: 'Asignatura y tema transversal', rows: 1, min: 12, ph: 'Ejemplo: Geografía, el agua en mi municipio' },
+        { label: 'Materia y tema que vas a investigar', rows: 1, min: 12, ph: 'Ejemplo: Geografía, el agua en mi municipio' },
         { label: 'Pregunta que responderá tu infografía', rows: 1, min: 20, need: ['?'], ph: '¿…?' },
         { label: 'Dos fuentes confiables que usarás (autor, año y sitio o editorial)', min: 50 },
         { label: 'Dato numérico que convertirás en tabla o gráfica y de dónde lo obtendrás', min: 30 },
@@ -1188,6 +1207,133 @@ m7t2: [
 
 GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi + 1}t${ti + 1}`; t.ps = [Object.assign({ label: 'Práctica guiada' }, t.p)].concat(X[k] || []); }));
 })();
+/* NUEVO 2026-10 */
+(() => {
+/* ===== Ajuste curricular 2026-10: utilidades comunes ===== */
+const Q = (q, ok, wrong, fb, hint) => ({ q, opts: [ok, ...wrong], a: 0, fb, hint });
+const QZ = (title, intro, qs) => ({ type: 'quiz', label: 'Comprueba', title, intro, qs });
+const CL = (label, title, intro, cats, items, extra = {}) => ({ type: 'classify', label, title, intro, cats, items: items.map(([t, c, why, hint]) => ({ t, c, why, hint })), ...extra });
+const OR = (label, title, intro, sets) => ({ type: 'order', label, title, intro, sets: sets.map(([prompt, items]) => ({ prompt, items })) });
+const PG = (o) => Object.assign({ label: 'Práctica guiada' }, o);
+const tema = (t, ps) => ({ t, ps });
+/* renombra claves de tema en los textos (A1, B2…) cuando un módulo cambia de letra */
+const relabel = (obj, map) => {
+  const fix = (s) => s.replace(/\b(tema|temas|celda|Módulo|módulo) ([A-H])(\d)\b/g, (m, w, L, n) => `${w} ${map[L + n] || (map[L] ? map[L] + n : L + n)}`).replace(/\(([A-H])(\d)\)/g, (m, L, n) => `(${map[L + n] || (map[L] ? map[L] + n : L + n)})`);
+  const walk = (o) => { if (Array.isArray(o)) return o.map(walk); if (o && typeof o === 'object') { for (const k of Object.keys(o)) { if (typeof o[k] === 'string') o[k] = fix(o[k]); else if (typeof o[k] === 'object') o[k] = walk(o[k]); } return o; } return o; };
+  return walk(obj);
+};
+/* claridad de instrucciones: cada ejercicio dice qué hacer y cómo terminar */
+const clarify = (M, edits) => {
+  const L = 'ABCDEFGH';
+  M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => {
+    const key = `${L[mi]}${ti + 1}.${ei + 1}`;
+    if (typeof p.intro === 'string') {
+      p.intro = p.intro.replace(/^Responde con lo que leíste en (?:«Lo que debes saber» del )?(?:el )?tema ([A-H]\d)\.\s*/, 'Lee cada pregunta y elige la respuesta correcta. Si tienes dudas, repasa el tema $1 de tu cuaderno. ');
+      p.intro = p.intro.trim();
+    }
+    const e = edits[key]; if (e) { if (e.intro) p.intro = e.intro(p.intro); if (e.help) p.help = e.help; if (e.f) e.f(p); }
+  })));
+};
+const add = (txt) => (s) => (s.trim() + ' ' + txt).trim();
+const CESAR_HELP = 'Lee el mensaje y la clave. Usa el alfabeto del recuadro para cambiar cada letra y escribe tu respuesta en el espacio, en MAYÚSCULAS y sin espacios. Después presiona <b>Revisar</b>.';
+
+const M = GRADE.modules;
+/* letras que cambian: el Integrador pasa de G a H */
+M.forEach((m) => m.temas.forEach((t) => relabel(t.ps, { G: 'H' })));
+const integ = M.pop();
+const f = integ.temas[0].ps.find((p) => p.type === 'form'); if (f) f.fields.push({ label: 'G · Cómo funciona una computadora', min: 25, rows: 2 });
+
+/* ===== G · Cómo funciona una computadora ===== */
+const G1 = tema('Hardware y software', [
+  PG(CL('Práctica guiada', '', 'Una computadora es un sistema: recibe datos, los procesa, los guarda y entrega resultados. Clasifica cada parte según lo que hace en el sistema.', ['Entrada', 'Proceso', 'Salida', 'Almacenamiento'], [
+    ['Teclado', 0, 'Con él introduces datos.', '¿Mete información o la muestra?'], ['Micrófono', 0, 'Capta tu voz y la convierte en datos.', '¿Mete información o la muestra?'],
+    ['Cámara web', 0, 'Captura imágenes.', '¿Mete información o la muestra?'], ['Procesador (CPU)', 1, 'Hace los cálculos y sigue las instrucciones de los programas.', 'Es el «cerebro» que hace los cálculos.'],
+    ['Monitor', 2, 'Muestra los resultados.', '¿Mete información o la muestra?'], ['Bocinas', 2, 'Reproducen sonido.', '¿Mete información o la entrega?'],
+    ['Impresora', 2, 'Entrega los resultados en papel.', '¿Mete información o la entrega?'], ['Disco duro o SSD', 3, 'Guarda archivos aunque apagues la computadora.', '¿Qué parte guarda tus archivos?'],
+    ['Memoria USB', 3, 'Guarda y transporta archivos.', '¿Qué parte guarda tus archivos?'], ['Almacenamiento en la nube', 3, 'Guarda archivos en servidores por internet.', '¿Dónde quedan guardadas tus fotos al respaldarlas?'],
+  ], { label: 'Práctica guiada' })),
+  CL('Aplica', '¿Hardware o software?', 'Es la actividad de tu cuaderno (tema G1). Hardware son las partes físicas que puedes tocar; software son los programas.', ['Hardware', 'Software'], [
+    ['Windows', 1, 'Es un sistema operativo: un programa.', '¿Lo puedes tocar?'], ['Ratón (mouse)', 0, 'Es una parte física.', '¿Lo puedes tocar?'],
+    ['Google Chrome', 1, 'Es un navegador: un programa.', '¿Lo puedes tocar?'], ['Tarjeta de video', 0, 'Es una pieza física dentro de la computadora.', '¿Lo puedes tocar?'],
+    ['Minecraft', 1, 'Es un videojuego: un programa.', '¿Lo puedes tocar?'], ['Memoria RAM', 0, 'Es un componente físico.', '¿Lo puedes tocar?'],
+    ['Android', 1, 'Es el sistema operativo de muchos celulares.', '¿Lo puedes tocar?'], ['Pantalla táctil', 0, 'Es una parte física (de entrada y de salida).', '¿Lo puedes tocar?'],
+  ]),
+  QZ('Partes de la computadora', 'Responde con lo que leíste en el tema G1.', [
+    Q('¿Qué diferencia hay entre la memoria RAM y el disco duro?', 'La RAM guarda lo que estás usando y se borra al apagar; el disco guarda tus archivos de forma permanente.', ['Son lo mismo con distinto nombre.', 'El disco se borra al apagar y la RAM no.'], 'La RAM es memoria de trabajo temporal.'),
+    Q('¿Para qué sirve el sistema operativo?', 'Administra el hardware y permite que funcionen los demás programas.', ['Solo sirve para navegar en internet.', 'Es una pieza física de la computadora.'], 'Windows, macOS, Android o Linux son sistemas operativos.'),
+    Q('Una pantalla táctil es un dispositivo de…', 'Entrada y salida', ['Solo entrada', 'Solo almacenamiento'], 'Muestra imágenes y recibe tus toques.'),
+    Q('Al tomar una foto con el celular, ¿qué parte la guarda?', 'El almacenamiento interno', ['La cámara', 'La pantalla'], 'La cámara es entrada; la pantalla, salida.'),
+  ]),
+]);
+const G2 = tema('Sistema binario', [
+  PG({ type: 'binary', intro: 'Las computadoras guardan todo con ceros y unos (bits). Enciende las casillas necesarias para formar cada número.', lead: '<p>Cada casilla vale el doble que la de su derecha: 128, 64, 32, 16, 8, 4, 2 y 1. El número es la suma de las casillas encendidas (con 1).</p>', tip: 'Empieza por el valor más grande que quepa en el número. Para 13: 8 cabe (te faltan 5), luego 4 (te falta 1) y luego 1.',
+    items: [{ q: 'Forma el número 13.', target: 13, fb: '8 + 4 + 1 = 13 → 00001101.' }, { q: 'Forma el número 6.', target: 6, fb: '4 + 2 = 6 → 00000110.' }, { q: 'Forma el número 255, el más grande que cabe en un byte.', target: 255, fb: 'Todas encendidas: 128+64+32+16+8+4+2+1 = 255.' }] }),
+  { type: 'binary', label: 'Aplica', title: 'Números y letras en binario', intro: 'Es la actividad de tu cuaderno (tema G2). Forma los números y después lee el byte de la última pregunta.', lead: '<p>Las letras también se guardan como números: en el código ASCII, la A es 65, la B es 66 y la a minúscula es 97.</p>',
+    items: [{ q: 'Forma el número 5.', target: 5, fb: '4 + 1 = 5.' }, { q: 'Forma el número 20.', target: 20, fb: '16 + 4 = 20.' }, { q: 'Forma el número 100.', target: 100, fb: '64 + 32 + 4 = 100.' }, { q: '¿Qué número es 01000001? Escríbelo en decimal (en ASCII es la letra A).', mode: 'read', bits: '01000001', fb: '64 + 1 = 65, la letra A.' }] },
+  QZ('Bits y bytes', 'Responde con lo que leíste en el tema G2.', [
+    Q('¿Cuántos bits tiene un byte?', '8', ['2', '10'], 'Un byte son 8 bits.'),
+    Q('¿Por qué las computadoras usan el sistema binario?', 'Porque sus circuitos solo distinguen dos estados: apagado (0) y encendido (1).', ['Porque es más fácil de leer para las personas.', 'Porque así ocupan menos electricidad las pantallas.'], 'Un bit es un interruptor con dos estados.'),
+    Q('¿Qué número es 00001010?', '10', ['1010', '5'], '8 + 2 = 10.'),
+    Q('Si la A es 65 en ASCII, ¿qué número es la C?', '67', ['66', '3'], 'Las letras van en orden: A 65, B 66, C 67.'),
+  ]),
+]);
+const G3 = tema('Almacenamiento y solución de fallas', [
+  PG(OR('Práctica guiada', '', 'Ordena las unidades de almacenamiento y los pasos para resolver una falla.', [
+    ['Unidades, de la más pequeña a la más grande', ['Bit', 'Byte', 'Kilobyte (KB)', 'Megabyte (MB)', 'Gigabyte (GB)', 'Terabyte (TB)']],
+    ['La impresora no imprime: ¿qué haces primero?', ['Describe exactamente qué pasa (¿sale un mensaje? ¿se enciende?)', 'Revisa lo simple: que esté encendida, conectada y con papel', 'Prueba una sola solución a la vez y observa el resultado', 'Reinicia la computadora y la impresora', 'Si sigue fallando, pide ayuda y cuenta lo que ya intentaste']],
+  ])),
+  OR('Aplica', 'Ordena y resuelve', 'Es la actividad de tu cuaderno (tema G3).', [
+    ['De menor a mayor', ['500 KB', '3 MB', '1 GB', '2 TB']],
+    ['El internet no carga en tu computadora', ['Identifica el problema: ¿falla una página o todas?', 'Revisa lo simple: que el Wi-Fi esté encendido y conectado a la red correcta', 'Prueba en otro dispositivo para saber si falla la red o tu equipo', 'Reinicia la computadora y, si se puede, el módem', 'Avisa al responsable de la red y explica lo que ya probaste']],
+  ]),
+  QZ('Almacenamiento', 'Responde con lo que leíste en el tema G3. Usa 1 GB ≈ 1 000 MB.', [
+    Q('En una memoria USB de 16 GB, ¿cuántas fotos de 4 MB caben aproximadamente?', 'Unas 4 000', ['Unas 4', 'Unas 64'], '16 GB ≈ 16 000 MB; 16 000 ÷ 4 = 4 000.'),
+    Q('¿Qué archivo ocupa normalmente más espacio?', 'Un video de 10 minutos', ['Una página de texto', 'Una canción de 3 minutos'], 'El video guarda muchas imágenes por segundo.'),
+    Q('¿Cuál es el primer paso para resolver una falla?', 'Describir exactamente qué pasa', ['Reiniciar todo de inmediato', 'Comprar otra computadora'], 'Sin saber qué pasa, no sabes qué probar.'),
+    Q('¿Por qué conviene probar una solución a la vez?', 'Para saber cuál fue la que funcionó', ['Para terminar más rápido', 'Porque la computadora no acepta dos cambios'], 'Si cambias varias cosas, no sabrás cuál resolvió el problema.'),
+  ]),
+]);
+M.push({ name: 'Cómo funciona una computadora', hilo: 'sistemas', temas: [G1, G2, G3] });
+
+/* ===== H · Integrador: nuevo tema H3 ===== */
+integ.temas.push(tema('Proceso de diseño y bocetos', [
+  PG(OR('Práctica guiada', '', 'El proceso de diseño ayuda a resolver un problema real con un producto. Ordena sus fases.', [
+    ['Fases del proceso de diseño', ['Identificar el problema o la necesidad', 'Investigar: quién lo tiene y qué soluciones existen', 'Generar ideas con bocetos', 'Elegir una idea y planearla con diagramas y materiales', 'Construir un prototipo', 'Probar y evaluar el prototipo', 'Mejorar y comunicar la solución']],
+  ])),
+  CL('Aplica', '¿Qué representación técnica es?', 'Es la actividad de tu cuaderno (tema H3). Cada producto se comunica con distintas representaciones. Clasifica cada descripción.', ['Boceto', 'Diagrama', 'Plano técnico', 'Prototipo'], [
+    ['Dibujo rápido a mano para explorar una idea', 0, 'El boceto es rápido y sin medidas exactas.', '¿Tiene medidas exactas o es una idea rápida?'],
+    ['Tres dibujos distintos del organizador de botellas, hechos en 5 minutos', 0, 'Varias ideas rápidas: bocetos.', '¿Es una idea rápida?'],
+    ['Cajas y flechas que muestran los pasos para armar el producto', 1, 'Muestra pasos o relaciones: diagrama.', '¿Muestra pasos con flechas?'],
+    ['Esquema de un circuito con símbolos de pila, interruptor y LED', 1, 'Un esquema con símbolos es un diagrama.', '¿Usa símbolos y conexiones?'],
+    ['Dibujo con medidas en centímetros y escala 1:10', 2, 'Las medidas y la escala son del plano técnico.', '¿Tiene medidas y escala?'],
+    ['Vista de frente y de lado con cotas para fabricar la pieza', 2, 'Las vistas con medidas son de un plano técnico.', '¿Sirve para fabricar con exactitud?'],
+    ['Modelo de cartón del organizador para probarlo con tus compañeros', 3, 'Se puede usar y probar: prototipo.', '¿Se puede probar?'],
+    ['Modelo 3D hecho en Tinkercad que se puede imprimir', 3, 'Un modelo digital para probar e imprimir también es prototipo.', '¿Es un modelo para probar?'],
+  ]),
+  CL('Comprueba', 'Evalúa tu prototipo', 'Para evaluar un producto se usan cuatro criterios. ¿Cuál revisa cada pregunta?', ['Eficacia', 'Eficiencia', 'Factibilidad', 'Impacto'], [
+    ['¿El organizador realmente evita que olviden la botella?', 0, 'Eficacia: ¿cumple su función?', '¿Pregunta si cumple su función?'],
+    ['¿Resuelve el problema para el que se diseñó?', 0, 'Eficacia.', '¿Pregunta si funciona?'],
+    ['¿Usa poco material y poco tiempo de construcción?', 1, 'Eficiencia: aprovechar recursos.', '¿Habla de recursos?'],
+    ['¿Gasta la menor energía posible?', 1, 'Eficiencia: energía es un recurso.', '¿Habla de recursos?'],
+    ['¿Podemos hacerlo con el dinero y las herramientas que tenemos?', 2, 'Factibilidad: ¿se puede hacer?', '¿Pregunta si es posible hacerlo?'],
+    ['¿Lo terminamos en las dos semanas que tenemos?', 2, 'Factibilidad: el tiempo disponible.', '¿Pregunta si es posible hacerlo?'],
+    ['¿Qué pasa con el producto cuando ya no sirve: se recicla o es basura?', 3, 'Impacto ambiental.', '¿Habla de efectos en el ambiente o las personas?'],
+    ['¿Lo pueden usar todas las personas, incluidas quienes tienen alguna discapacidad?', 3, 'Impacto social: inclusión.', '¿Habla de efectos en las personas?'],
+  ]),
+]));
+M.push(integ);
+
+GRADE.migrate = { ver: 'sec1-2026-10', map: { m7t1: 'm8t1', m7t2: 'm8t2' } };
+clarify(M, {
+  'B3.2': { intro: add('Decide qué harías con cada publicación.') },
+  'C1.1': { intro: add('Después decide si cada fuente es confiable o dudosa.') },
+  'H1.1': { intro: add('Toca el módulo correcto para cada requisito.') },
+  'D3.2': { intro: add('Lee cómo se encontró cada imagen y decide si la usas, la usas dando crédito o no la usas.') },
+  'E4.1': { f: (p) => { p.tasks[0].text = 'Inserta la gráfica adecuada para ver cómo cambió la lectura del grupo de febrero a julio. Usa como etiquetas los meses (<code>D2:D7</code>), como valores los libros leídos (<code>E2:E7</code>) y escribe un título.'; } },
+  'E4.3': { intro: add('Lee cada pregunta de investigación y elige la gráfica que mejor la responde.') },
+  'G3.2': { intro: add('Usa las flechas ↑ y ↓ para ordenar las unidades de menor a mayor y los pasos para resolver la falla.') },
+});
+})();
 
 </script>
 <script>
@@ -1213,6 +1359,12 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
   /* migración: avance guardado antes de que hubiera varios ejercicios por tema */
   for (const k of Object.keys(store.prog)) if (/^m\d+t\d+$/.test(k)) { if (!store.prog[k + 'e1']) store.prog[k + 'e1'] = store.prog[k]; delete store.prog[k]; }
   for (const k of Object.keys(store.saves)) if (/^m\d+t\d+$/.test(k)) { if (!store.saves[k + 'e1']) store.saves[k + 'e1'] = store.saves[k]; delete store.saves[k]; }
+  /* migración: cuando se reorganizan módulos, el avance guardado sigue a su tema */
+  if (G.migrate && store.mig !== G.migrate.ver) {
+    const mp = G.migrate.map || {};
+    const remap = (o) => { const out = {}; for (const [k, v] of Object.entries(o)) { const m = k.match(/^(m\d+t\d+)(e\d+)$/); out[m && mp[m[1]] ? mp[m[1]] + m[2] : k] = v; } return out; };
+    store.prog = remap(store.prog); store.saves = remap(store.saves); store.mig = G.migrate.ver; persist();
+  }
   /* temas y ejercicios */
   const LABELS = ['Práctica guiada', 'Aplica', 'Comprueba'];
   const temas = []; const exs = [];
@@ -1672,6 +1824,109 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     return { check() { const n = d.fields.filter((_, i) => ok(i)).length; return { score: n / d.fields.length, msg: n === d.fields.length ? 'Todas tus respuestas cumplen con lo que se pide.' : `${n} de ${d.fields.length} respuestas completas. Revisa la extensión mínima y las palabras que deben aparecer.` }; } };
   };
 
+  /* --- sistema binario --- */
+  E.binary = (host, d, api) => {
+    const n = d.bits || 8; const W = Array.from({ length: n }, (_, i) => 2 ** (n - 1 - i));
+    const st = api.load() || { b: d.items.map((it) => (it.bits ? it.bits.split('').map(Number) : Array(n).fill(0))), a: d.items.map(() => '') };
+    const val = (bits) => bits.reduce((s, b, i) => s + b * W[i], 0);
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.items.map((it, i) => {
+        const fixed = it.mode === 'read'; const v = val(st.b[i]);
+        return `<div class="bin" data-i="${i}"><p class="bin-q"><b>${i + 1}.</b> ${esc(it.q)}</p><div class="bin-row" role="group" aria-label="Bits">${st.b[i].map((b, k) => `<button type="button" class="bit" data-i="${i}" data-k="${k}" aria-pressed="${!!b}" ${fixed ? 'disabled' : ''}><span class="bit-v">${b}</span><span class="bit-w">${W[k]}</span></button>`).join('')}</div>
+          ${fixed ? `<label class="fld"><span>Valor en decimal</span><input type="text" inputmode="numeric" class="bin-in" data-i="${i}" value="${esc(st.a[i])}" autocomplete="off"></label>` : `<p class="bin-sum">Suma de los valores encendidos: <b>${v}</b>${it.char ? ` · carácter: <b>${v >= 32 && v < 127 ? esc(String.fromCharCode(v)) : '—'}</b>` : ''}</p>`}<p class="q-fb" aria-live="polite"></p></div>`;
+      }).join('');
+    };
+    host.addEventListener('click', (e) => { const b = e.target.closest('.bit'); if (!b || b.disabled) return; const i = +b.dataset.i, k = +b.dataset.k; st.b[i][k] = st.b[i][k] ? 0 : 1; api.save(st); draw(); const nb = $(`.bit[data-i="${i}"][data-k="${k}"]`, host); if (nb) nb.focus(); });
+    host.addEventListener('input', (e) => { const el = e.target.closest('.bin-in'); if (!el) return; st.a[+el.dataset.i] = el.value; api.save(st); });
+    draw();
+    return {
+      check() {
+        let ok = 0;
+        d.items.forEach((it, i) => { const el = $(`.bin[data-i="${i}"]`, host); const good = it.mode === 'read' ? String(st.a[i]).trim() !== '' && +String(st.a[i]).trim() === val(st.b[i]) : val(st.b[i]) === it.target; el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (it.mode === 'read' ? 'Suma solo los valores de las casillas que tienen 1.' : `Llevas ${val(st.b[i])}. Enciende los valores que sumen ${it.target}: empieza por el más grande que quepa.`); if (good) ok++; });
+        return { score: ok / d.items.length, msg: `${ok} de ${d.items.length} correctas.` };
+      }
+    };
+  };
+
+  /* --- circuito con LED: ley de Ohm --- */
+  E.circuit = (host, d, api) => {
+    const VF = 2; const RES = d.res || [0, 100, 220, 330, 1000, 10000];
+    const st = api.load() || { lv: d.levels.map(() => ({ r: -1, on: false })) };
+    const fmtR = (r) => (r === 0 ? 'Sin resistencia' : r >= 1000 ? r / 1000 + ' kΩ' : r + ' Ω');
+    const calc = (L, s) => { if (!s.on) return { st: 'off', i: 0, t: 'El interruptor está abierto: no circula corriente.' }; if (s.r < 0) return { st: 'off', i: 0, t: 'Elige una resistencia.' }; if (s.r === 0) return { st: 'burn', i: Infinity, t: '¡El LED se quemó! Sin resistencia la corriente es demasiado alta.' }; const i = ((L.v - VF) / s.r) * 1000; if (i > 25) return { st: 'burn', i, t: `Corriente de ${i.toFixed(1)} mA: demasiado alta, el LED se daña.` }; if (i < 10) return { st: 'dim', i, t: `Corriente de ${i.toFixed(1)} mA: el LED casi no brilla.` }; return { st: 'ok', i, t: `Corriente de ${i.toFixed(1)} mA: el LED brilla bien y está seguro.` }; };
+    const svg = (L, c) => { const glow = c.st === 'ok' ? '#FFD54A' : c.st === 'dim' ? '#8A7A3A' : c.st === 'burn' ? '#3A3A3A' : '#5A6478'; return `<svg viewBox="0 0 320 150" class="cir-svg" role="img" aria-label="Circuito"><rect x="20" y="20" width="280" height="110" rx="10" fill="none" stroke="var(--ink)" stroke-width="3"/><rect x="8" y="55" width="26" height="42" rx="4" fill="var(--sunk)" stroke="var(--ink)" stroke-width="2"/><text x="21" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${L.v}V</text><rect x="92" y="10" width="106" height="20" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="145" y="25" text-anchor="middle" font-size="11" fill="var(--ink)">${esc(fmtR(Math.max(0, st.lv[d.levels.indexOf(L)].r)))}</text><circle cx="250" cy="20" r="14" fill="${glow}" stroke="var(--ink)" stroke-width="2"/>${c.st === 'ok' ? '<circle cx="250" cy="20" r="24" fill="#FFD54A" opacity=".25"/>' : ''}${c.st === 'burn' ? '<text x="250" y="25" text-anchor="middle" font-size="14">✕</text>' : ''}<text x="250" y="52" text-anchor="middle" font-size="11" fill="var(--muted)">LED</text><line x1="110" y1="130" x2="150" y2="${st.lv[d.levels.indexOf(L)].on ? 130 : 112}" stroke="var(--ink)" stroke-width="4"/><text x="160" y="148" font-size="11" fill="var(--muted)">interruptor</text></svg>`; };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.levels.map((L, li) => { const s = st.lv[li]; const c = calc(L, s); return `<div class="cir" data-l="${li}"><p class="lv-goal"><b>Circuito ${li + 1}.</b> ${esc(L.goal || `Pila de ${L.v} V. Haz que el LED brille sin dañarse.`)}</p><div class="cir-wrap">${svg(L, c)}<div class="cir-ctl"><label class="fld"><span>Resistencia</span><select data-l="${li}" class="cir-r"><option value="-1">Elige…</option>${RES.map((r) => `<option value="${r}" ${s.r === r ? 'selected' : ''}>${fmtR(r)}</option>`).join('')}</select></label><label class="chk"><input type="checkbox" class="cir-on" data-l="${li}" ${s.on ? 'checked' : ''}> Cerrar el interruptor</label><p class="cir-msg st-${c.st}" aria-live="polite">${esc(c.t)}</p></div></div></div>`; }).join('') + `<p class="muted small">Fórmula: corriente (mA) = (voltaje de la pila − 2 V del LED) ÷ resistencia (Ω) × 1000. Un LED trabaja bien entre 10 y 25 mA.</p>`;
+    };
+    host.addEventListener('change', (e) => { const el = e.target; if (!el.dataset.l) return; const s = st.lv[+el.dataset.l]; if (el.classList.contains('cir-r')) s.r = +el.value; if (el.classList.contains('cir-on')) s.on = el.checked; api.save(st); draw(); });
+    draw();
+    return { check() { const r = d.levels.map((L, i) => calc(L, st.lv[i]).st === 'ok'); const n = r.filter(Boolean).length; $$('.cir', host).forEach((el, i) => { el.classList.remove('ok', 'bad'); el.classList.add(r[i] ? 'ok' : 'bad'); }); return { score: n / r.length, msg: n === r.length ? 'Todos los LED brillan de forma segura.' : `${n} de ${r.length} circuitos correctos. Cierra el interruptor y elige la resistencia que deje pasar entre 10 y 25 mA.` }; } };
+  };
+
+  /* --- reglas de un microcontrolador (sensor → actuador) --- */
+  E.rules = (host, d, api) => {
+    const st = api.load() || { r: d.levels.map(() => ({ op: '', th: '', a: '', b: '' })), probe: d.levels.map((L) => L.range[0]) };
+    const evalR = (L, r, v) => { const th = parseFloat(String(r.th).replace(',', '.')); if (!r.op || !isFinite(th) || !r.a || !r.b) return null; const c = r.op === '<' ? v < th : r.op === '>' ? v > th : r.op === '<=' ? v <= th : v >= th; return c ? r.a : r.b; };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.levels.map((L, li) => { const r = st.r[li]; const out = evalR(L, r, st.probe[li]); const opts = (sel) => ['<option value="">Elige…</option>', ...L.actions.map((a) => `<option ${sel === a ? 'selected' : ''}>${esc(a)}</option>`)].join(''); return `<div class="rule" data-l="${li}"><p class="lv-goal"><b>Reto ${li + 1}.</b> ${esc(L.goal)}</p>
+        <div class="code rule-code">al iniciar → repetir por siempre:<br>&nbsp;&nbsp;si <b>${esc(L.sensor)}</b> <select data-k="op" data-l="${li}" aria-label="Comparación">${['', '<', '>', '<=', '>='].map((o) => `<option value="${o}" ${r.op === o ? 'selected' : ''}>${o ? esc(o === '<=' ? '≤' : o === '>=' ? '≥' : o) : '?'}</option>`).join('')}</select> <input data-k="th" data-l="${li}" class="sm-in w6" inputmode="decimal" value="${esc(r.th)}" aria-label="Valor límite"> ${esc(L.unit || '')} entonces<br>&nbsp;&nbsp;&nbsp;&nbsp;<select data-k="a" data-l="${li}" aria-label="Acción si se cumple">${opts(r.a)}</select><br>&nbsp;&nbsp;si no<br>&nbsp;&nbsp;&nbsp;&nbsp;<select data-k="b" data-l="${li}" aria-label="Acción si no se cumple">${opts(r.b)}</select></div>
+        <label class="fld"><span>Prueba el sensor: ${esc(L.sensor)} = <b>${st.probe[li]}</b> ${esc(L.unit || '')}</span><input type="range" min="${L.range[0]}" max="${L.range[1]}" step="${L.step || 1}" value="${st.probe[li]}" data-k="probe" data-l="${li}"></label>
+        <p class="rule-out" aria-live="polite">${out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'}</p><p class="q-fb"></p></div>`; }).join('');
+    };
+    host.addEventListener('input', (e) => { const el = e.target; const k = el.dataset.k; if (!k) return; const li = +el.dataset.l; if (k === 'probe') { st.probe[li] = +el.value; api.save(st); const L = d.levels[li]; const out = evalR(L, st.r[li], st.probe[li]); const box = $(`.rule[data-l="${li}"]`, host); box.querySelector('.fld span b').textContent = st.probe[li]; box.querySelector('.rule-out').innerHTML = out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'; return; } if (k === 'th') { st.r[li].th = el.value; api.save(st); const out = evalR(d.levels[li], st.r[li], st.probe[li]); $(`.rule[data-l="${li}"] .rule-out`, host).innerHTML = out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'; } });
+    host.addEventListener('change', (e) => { const el = e.target; const k = el.dataset.k; if (!k || k === 'probe' || k === 'th') return; st.r[+el.dataset.l][k] = el.value; api.save(st); draw(); });
+    draw();
+    return { check() { let ok = 0; d.levels.forEach((L, li) => { const bad = L.tests.filter((t) => evalR(L, st.r[li], t[0]) !== t[1]); const el = $(`.rule[data-l="${li}"]`, host); el.classList.remove('ok', 'bad'); el.classList.add(bad.length ? 'bad' : 'ok'); $('.q-fb', el).textContent = bad.length ? `Falla con ${L.sensor} = ${bad[0][0]} ${L.unit || ''}: debería «${bad[0][1]}».` : '✓ La regla funciona en todas las pruebas.'; if (!bad.length) ok++; }); return { score: ok / d.levels.length, msg: `${ok} de ${d.levels.length} retos funcionan en todas las pruebas.` }; } };
+  };
+
+  /* --- entrenar un modelo (vecino más cercano) --- */
+  E.train = (host, d, api) => {
+    const st = api.load() || { use: d.pool.map(() => true) };
+    const model = () => d.pool.filter((p, i) => st.use[i]);
+    const predict = (t) => { const m = model(); if (!m.length) return null; let best = null, bd = Infinity; m.forEach((p) => { const dd = Math.hypot(p.x - t.x, p.y - t.y); if (dd < bd) { bd = dd; best = p; } }); return best.label; };
+    const acc = () => { const r = d.test.map((t) => predict(t) === t.label); return r.filter(Boolean).length / d.test.length; };
+    const COL = ['var(--s1)', 'var(--s3)', 'var(--s2)'];
+    const draw = () => {
+      const S = 30, P = 34; const px = (x) => P + x * S, py = (y) => 10 + (10 - y) * S;
+      const pts = d.pool.map((p, i) => `<g opacity="${st.use[i] ? 1 : 0.18}"><circle cx="${px(p.x)}" cy="${py(p.y)}" r="9" fill="${COL[d.classes.indexOf(p.label)]}"/><text x="${px(p.x)}" y="${py(p.y) + 4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${i + 1}</text></g>`).join('');
+      const tst = d.test.map((t) => { const pr = predict(t); const ok = pr === t.label; return `<g><rect x="${px(t.x) - 8}" y="${py(t.y) - 8}" width="16" height="16" rx="3" fill="var(--surface)" fill-opacity=".7" stroke="${ok ? 'var(--ok)' : 'var(--bad)'}" stroke-width="3"/><text x="${px(t.x)}" y="${py(t.y) + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="${ok ? 'var(--ok)' : 'var(--bad)'}">${ok ? '✓' : '✗'}</text></g>`; }).join('');
+      const a = acc(); const cnt = d.classes.map((c) => model().filter((p) => p.label === c).length);
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + `<div class="trn"><svg viewBox="0 0 ${P + 10 * S + 14} ${10 * S + 40}" class="trn-svg" role="img" aria-label="Datos de entrenamiento"><line x1="${P}" y1="${py(0)}" x2="${px(10)}" y2="${py(0)}" stroke="var(--line)"/><line x1="${P}" y1="${py(0)}" x2="${P}" y2="${py(10)}" stroke="var(--line)"/><text x="${px(5)}" y="${py(0) + 26}" text-anchor="middle" font-size="12" fill="var(--muted)">${esc(d.xLabel)} →</text><text x="12" y="${py(5)}" font-size="12" fill="var(--muted)" transform="rotate(-90 12 ${py(5)})" text-anchor="middle">${esc(d.yLabel)} →</text>${pts}${tst}</svg>
+        <div><p class="trn-acc">Precisión del modelo con los datos de prueba: <b>${Math.round(a * 100)}%</b></p><p class="muted small">Ejemplos usados: ${d.classes.map((c, k) => `<span style="color:${COL[k]};font-weight:700">● ${esc(c)}: ${cnt[k]}</span>`).join(' · ')} · Los cuadros son los datos de prueba (✓ acierta, ✗ falla).</p>
+        <ol class="trn-list">${d.pool.map((p, i) => `<li><label class="chk"><input type="checkbox" data-i="${i}" ${st.use[i] ? 'checked' : ''}> <b>${i + 1}.</b> ${esc(p.n)} — etiqueta: <span style="color:${COL[d.classes.indexOf(p.label)]};font-weight:700">${esc(p.label)}</span></label></li>`).join('')}</ol></div></div>`;
+    };
+    host.addEventListener('change', (e) => { const el = e.target.closest('input[data-i]'); if (!el) return; st.use[+el.dataset.i] = el.checked; api.save(st); draw(); });
+    draw();
+    return { check() { const a = acc(); const cnt = d.classes.map((c) => model().filter((p) => p.label === c).length); const enough = cnt.every((c) => c >= (d.minPer || 2)); const sc = enough ? a : Math.min(a, 0.5); return { score: sc, msg: !enough ? `El modelo necesita al menos ${d.minPer || 2} ejemplos de cada clase.` : a >= 1 ? 'El modelo acierta todos los datos de prueba: quitaste los ejemplos con etiqueta equivocada.' : `Precisión ${Math.round(a * 100)}%. Revisa qué ejemplos tienen la etiqueta equivocada y quítalos del entrenamiento.` }; } };
+  };
+
+  /* --- Python (se ejecuta en el navegador con Skulpt) --- */
+  let skP = null;
+  const loadSk = () => { if (window.Sk && window.Sk.importMainWithBody) return Promise.resolve(); if (skP) return skP; const base = window.SKULPT_BASE || 'https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/'; const add = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('sin conexión')); document.head.appendChild(s); }); skP = add(base + 'skulpt.min.js').then(() => add(base + 'skulpt-stdlib.js')).catch((e) => { skP = null; throw e; }); return skP; };
+  const runPy = (code, inputs) => loadSk().then(() => { let out = ''; const q = [...(inputs || [])]; window.Sk.configure({ output: (t) => { out += t; }, read: (x) => { if (!window.Sk.builtinFiles || window.Sk.builtinFiles.files[x] === undefined) throw new Error('No se encontró ' + x); return window.Sk.builtinFiles.files[x]; }, inputfun: () => (q.length ? String(q.shift()) : ''), inputfunTakesPrompt: true, execLimit: 4000, __future__: window.Sk.python3 }); return window.Sk.misceval.asyncToPromise(() => window.Sk.importMainWithBody('<stdin>', false, code, true)).then(() => ({ out, err: null }), (e) => ({ out, err: pyErr(e) })); });
+  const pyErr = (e) => { let s = String(e && e.toString ? e.toString() : e); const m = s.match(/on line (\d+)/); const line = m ? ` (línea ${m[1]})` : ''; if (/TimeLimitError/.test(s)) return 'El programa tardó demasiado: revisa que tus ciclos terminen.'; if (/SyntaxError|ParseError/.test(s)) return 'Error de escritura' + line + ': revisa los dos puntos (:), los paréntesis, las comillas y la sangría.'; if (/IndentationError/.test(s)) return 'Error de sangría' + line + ': las líneas dentro de if, for o def llevan 4 espacios.'; if (/NameError/.test(s)) return 'Usas un nombre que no existe' + line + ': revisa cómo escribiste la variable o la función.'; if (/TypeError/.test(s)) return 'Error de tipo' + line + ': quizá sumas texto con números. Usa int() o str().'; return 'Error' + line + ': ' + s.replace(/\s*on line \d+/, ''); };
+  E.python = (host, d, api) => {
+    const st = api.load() || { code: d.starter || '' };
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ''}<div class="py"><label class="fld"><span>Tu programa en Python</span><textarea class="py-code" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.max(8, (st.code.match(/\n/g) || []).length + 3)}">${esc(st.code)}</textarea></label><div class="row"><button type="button" class="btn primary" data-act="run">▶ Ejecutar</button>${d.inputs ? `<span class="muted small">Si tu programa usa input(), recibirá: ${d.inputs.map((x) => `<code>${esc(x)}</code>`).join(', ')}</span>` : ''}</div><div class="py-out-wrap"><span class="muted small">Salida</span><pre class="py-out code" aria-live="polite">Presiona ▶ Ejecutar para ver lo que imprime tu programa.</pre></div></div><ul class="rules small py-rules">${d.checks.map((c) => `<li>${esc(c.t)}</li>`).join('')}</ul>`;
+    const ta = $('.py-code', host), out = $('.py-out', host);
+    ta.addEventListener('input', () => { st.code = ta.value; api.save(st); });
+    ta.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText('    ', s, ta.selectionEnd, 'end'); st.code = ta.value; api.save(st); } });
+    const show = (r) => { out.textContent = (r.out || '') + (r.err ? (r.out ? '\n' : '') + '⚠ ' + r.err : '') || '(el programa no imprimió nada)'; out.classList.toggle('has-err', !!r.err); };
+    const exec = () => { out.textContent = 'Ejecutando…'; return runPy(st.code, d.inputs).then((r) => { show(r); return r; }, () => { const r = { out: '', err: 'No se pudo cargar Python. Revisa tu conexión a internet y vuelve a intentar.', noload: true }; show(r); return r; }); };
+    host.addEventListener('click', (e) => { if (e.target.closest('[data-act="run"]')) exec(); });
+    return {
+      check() {
+        return exec().then((r) => {
+          if (r.noload) return { score: 0, msg: r.err };
+          const res = d.checks.map((c) => { try { return !!c.f(st.code, r.out || '', r.err); } catch (e) { return false; } });
+          $$('.py-rules li', host).forEach((li, i) => li.classList.toggle('on', res[i]));
+          const n = res.filter(Boolean).length;
+          return { score: n / res.length, msg: (r.err ? 'Tu programa tiene un error: corrígelo y vuelve a revisar. ' : '') + `${n} de ${res.length} requisitos cumplidos.` };
+        });
+      }
+    };
+  };
+
   /* ================= HOJA DE CÁLCULO ================= */
   E.sheet = (host, d, api) => {
     const fresh = () => ({ raw: { ...d.cells }, cf: [], chart: null, filter: null, pivot: null, val: [] });
@@ -1869,6 +2124,11 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     simulate: 'Elige el modo, presiona los botones de lanzar hasta llegar a 1 000 lanzamientos en cada modo, observa la tabla y la gráfica, y responde las preguntas.',
     contrast: 'Elige un color para cada papel (fondo, texto y acento) tocando los cuadros de color. La publicación de la derecha cambia en vivo. Cuida que se palomeen los tres criterios.',
     html: 'Escribe tu código en el recuadro de la izquierda; la vista previa de la derecha se actualiza sola. Presiona <b>Revisar</b> para ver qué requisitos ya cumples.',
+    binary: 'Toca cada casilla para cambiarla entre <b>0</b> y <b>1</b>. Debajo de cada casilla está su valor (128, 64, 32…). El número es la suma de los valores de las casillas que tienen 1. Al terminar presiona <b>Revisar</b>.',
+    circuit: 'En cada circuito elige una <b>resistencia</b> y <b>cierra el interruptor</b>. El mensaje te dice cuánta corriente pasa y cómo queda el LED. Busca que brille bien sin quemarse y presiona <b>Revisar</b>.',
+    rules: 'Completa la regla del microcontrolador: elige la comparación, escribe el valor límite y elige qué hacer si se cumple y si no. Mueve el control <b>Prueba el sensor</b> para comprobarla. Después presiona <b>Revisar</b>: se prueba con varios valores.',
+    train: 'Cada punto de color es un ejemplo para entrenar el modelo. Marca o desmarca la casilla de cada ejemplo para usarlo o no. Los cuadros son datos de prueba: ✓ si el modelo acierta, ✗ si falla. Quita los ejemplos con etiqueta equivocada hasta que acierte todo, y presiona <b>Revisar</b>.',
+    python: 'Escribe tu programa en el recuadro y presiona <b>▶ Ejecutar</b> para ver lo que imprime. Usa 4 espacios (o la tecla Tab) para la sangría dentro de <code>if</code>, <code>for</code> y <code>def</code>. Cuando cumpla los requisitos, presiona <b>Revisar</b>: el programa se vuelve a ejecutar y se revisa solo. Necesitas conexión a internet la primera vez.',
     form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
   };
   const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
@@ -1879,7 +2139,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
     $('#who').addEventListener('input', (e) => { store.name = e.target.value; persist(); });
   }
-  const hiloName = { datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
+  const hiloName = { sistemas: 'Sistemas y redes', datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
   const stText = { nuevo: 'Sin empezar', intentado: 'En proceso', hecho: 'Completado', dominado: 'Dominado' };
   const dots = (tm) => tm.ex.map((x) => `<i class="dot st-${status(x.pid)}" title="Ejercicio ${x.ei + 1}: ${stText[status(x.pid)]}"></i>`).join('');
@@ -1917,16 +2177,17 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       <div class="extabs" role="tablist">${tm.ex.map((e) => `<a role="tab" href="#${e.pid}" class="extab st-${status(e.pid)}" aria-selected="${e.pid === pid}"><span class="exn">Ejercicio ${e.ei + 1}</span><span class="exl">${esc(e.label)}${stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''}</span></a>`).join('')}</div>
       <h3 class="extitle">Ejercicio ${x.ei + 1} de ${tm.ex.length}${p.title ? ': ' + esc(p.title) : ''}</h3>
       <p class="intro">${p.intro}</p>
-      <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${HELP[p.type] || ''}</div></details>
-      ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${p.tip}</div></details>` : ''}
+      <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${p.help || HELP[p.type] || ''}</div></details>
+      ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${/\n/.test(p.tip) && !/</.test(p.tip) ? `<pre class="code">${esc(p.tip)}</pre>` : p.tip}</div></details>` : ''}
       <div class="engine"></div>
       <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado en este ejercicio: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
       <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
     const api = { pid, load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null), save: (s) => { store.saves[pid] = s; persist(); }, autoCheck: () => doCheck(true) };
     let eng;
     try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Este ejercicio no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
-    function doCheck() {
-      if (!eng) return; const r = eng.check();
+    async function doCheck() {
+      if (!eng) return; let r = eng.check();
+      if (r && typeof r.then === 'function') { const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.' }; } btn.disabled = false; if (!document.body.contains(btn)) { const pr0 = store.prog[pid] || { best: 0, tries: 0 }; pr0.tries++; pr0.best = Math.max(pr0.best, r.score); store.prog[pid] = pr0; persist(); return; } }
       const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.best = Math.max(pr.best, r.score); store.prog[pid] = pr; persist();
       const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
       $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;

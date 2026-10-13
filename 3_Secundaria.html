@@ -4,14 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Simulador Tech Kids · 3° de secundaria</title>
-<!-- versión 2026-10-13 (correcciones de avance) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#EEF3F9; --surface:#FFFFFF; --sunk:#F6F9FC; --ink:#172338; --muted:#56637A; --line:#D3DDEA; --grid:#E4EBF4;
-  --datos:#12804F; --codigo:#5D3FD3; --ciudadania:#0A7584; --creacion:#B42A66; --comunicacion:#8C5E00; --integra:#3D4A63;
+  --datos:#12804F; --sistemas:#B4530A; --codigo:#5D3FD3; --ciudadania:#0A7584; --creacion:#B42A66; --comunicacion:#8C5E00; --integra:#3D4A63;
   --ok:#12804F; --ok-bg:#E3F4EA; --bad:#B82633; --bad-bg:#FBE7E9; --mid:#8C5E00; --mid-bg:#FFF3D6; --focus:#2563EB;
   --s1:#2D6FD6; --s2:#E08A00; --s3:#12804F; --s4:#B42A66; --s5:#5D3FD3; --s6:#0A7584;
   --cf-verde:#CDEFD9; --cf-amarillo:#FFF0B3; --cf-rojo:#F9CDD2;
@@ -24,7 +23,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
-    --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+    --datos:#4CC48A; --sistemas:#F2A25C; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
     --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
     --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
     --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
@@ -32,7 +31,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#0F1522; --surface:#182133; --sunk:#131B2A; --ink:#E6ECF5; --muted:#9AA8BE; --line:#2C3A52; --grid:#243048;
-  --datos:#4CC48A; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
+  --datos:#4CC48A; --sistemas:#F2A25C; --codigo:#A493FF; --ciudadania:#4BC2D1; --creacion:#F07AAE; --comunicacion:#E2B54A; --integra:#A7B4CC;
   --ok:#4CC48A; --ok-bg:#163A2A; --bad:#FF7A85; --bad-bg:#3D1A21; --mid:#E2B54A; --mid-bg:#3A2E12; --focus:#7AA7FF;
   --s1:#6EA2FF; --s2:#FFB547; --s3:#4CC48A; --s4:#F07AAE; --s5:#A493FF; --s6:#4BC2D1;
   --cf-verde:#1F5A3B; --cf-amarillo:#5A4A12; --cf-rojo:#5E2129; color-scheme: dark;
@@ -340,6 +339,26 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
 }
 @media (max-width: 520px){ body{font-size:16px} .ph-row{grid-template-columns:1fr} .trk{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+.bin,.cir,.rule{border:1px solid var(--line); border-radius:var(--r); padding:.8rem; margin-bottom:1rem; background:var(--surface)}
+.bin.ok,.cir.ok,.rule.ok{border-color:var(--ok); box-shadow:inset 4px 0 0 var(--ok)}
+.bin.bad,.cir.bad,.rule.bad{border-color:var(--bad); box-shadow:inset 4px 0 0 var(--bad)}
+.bin-row{display:flex; gap:.35rem; flex-wrap:wrap}
+.bit{display:flex; flex-direction:column; align-items:center; min-width:44px; padding:.35rem .2rem; border:1px solid var(--line); border-radius:var(--r-sm); background:var(--sunk); cursor:pointer; color:var(--ink)}
+.bit[aria-pressed="true"]{background:var(--hc,var(--ink)); color:#fff; border-color:transparent}
+.bit:disabled{cursor:default; opacity:1}
+.bit-v{font:700 1.3rem/1.2 var(--f-mono)} .bit-w{font-size:.72rem; opacity:.8}
+.bin-sum{margin:.5rem 0 0}
+.cir-wrap{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:1rem; align-items:center}
+.cir-svg,.trn-svg{width:100%; display:block}
+.cir-msg{font-weight:600} .cir-msg.st-ok{color:var(--ok)} .cir-msg.st-burn{color:var(--bad)}
+.rule-code select,.rule-code input{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:.1rem .3rem}
+.rule-out{font-weight:600}
+.trn{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; align-items:start}
+.trn-list{padding-left:0; list-style:none; margin:.4rem 0} .trn-list li{margin:.15rem 0}
+.trn-acc{font-size:1.05rem}
+.py-code{font:14px/1.55 var(--f-mono); white-space:pre; tab-size:4; min-height:180px}
+.py-out{min-height:3.5rem; white-space:pre-wrap} .py-out.has-err{outline:2px solid var(--bad)}
+@media (max-width: 720px){ .cir-wrap,.trn{grid-template-columns:1fr} }
 .xl-flash.okf{background:var(--ok-bg); color:var(--ok)}
 .btn.warn{background:var(--bad-bg); color:var(--bad); border-color:var(--bad)}
 </style>
@@ -1227,6 +1246,133 @@ m7t2: [
 
 GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi + 1}t${ti + 1}`; t.ps = [Object.assign({ label: 'Práctica guiada' }, t.p)].concat(X[k] || []); }));
 })();
+/* NUEVO 2026-10 */
+(() => {
+/* ===== Ajuste curricular 2026-10: utilidades comunes ===== */
+const Q = (q, ok, wrong, fb, hint) => ({ q, opts: [ok, ...wrong], a: 0, fb, hint });
+const QZ = (title, intro, qs) => ({ type: 'quiz', label: 'Comprueba', title, intro, qs });
+const CL = (label, title, intro, cats, items, extra = {}) => ({ type: 'classify', label, title, intro, cats, items: items.map(([t, c, why, hint]) => ({ t, c, why, hint })), ...extra });
+const OR = (label, title, intro, sets) => ({ type: 'order', label, title, intro, sets: sets.map(([prompt, items]) => ({ prompt, items })) });
+const PG = (o) => Object.assign({ label: 'Práctica guiada' }, o);
+const tema = (t, ps) => ({ t, ps });
+/* renombra claves de tema en los textos (A1, B2…) cuando un módulo cambia de letra */
+const relabel = (obj, map) => {
+  const fix = (s) => s.replace(/\b(tema|temas|celda|Módulo|módulo) ([A-H])(\d)\b/g, (m, w, L, n) => `${w} ${map[L + n] || (map[L] ? map[L] + n : L + n)}`).replace(/\(([A-H])(\d)\)/g, (m, L, n) => `(${map[L + n] || (map[L] ? map[L] + n : L + n)})`);
+  const walk = (o) => { if (Array.isArray(o)) return o.map(walk); if (o && typeof o === 'object') { for (const k of Object.keys(o)) { if (typeof o[k] === 'string') o[k] = fix(o[k]); else if (typeof o[k] === 'object') o[k] = walk(o[k]); } return o; } return o; };
+  return walk(obj);
+};
+/* claridad de instrucciones: cada ejercicio dice qué hacer y cómo terminar */
+const clarify = (M, edits) => {
+  const L = 'ABCDEFGH';
+  M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => {
+    const key = `${L[mi]}${ti + 1}.${ei + 1}`;
+    if (typeof p.intro === 'string') {
+      p.intro = p.intro.replace(/^Responde con lo que leíste en (?:«Lo que debes saber» del )?(?:el )?tema ([A-H]\d)\.\s*/, 'Lee cada pregunta y elige la respuesta correcta. Si tienes dudas, repasa el tema $1 de tu cuaderno. ');
+      p.intro = p.intro.trim();
+    }
+    const e = edits[key]; if (e) { if (e.intro) p.intro = e.intro(p.intro); if (e.help) p.help = e.help; if (e.f) e.f(p); }
+  })));
+};
+const add = (txt) => (s) => (s.trim() + ' ' + txt).trim();
+const CESAR_HELP = 'Lee el mensaje y la clave. Usa el alfabeto del recuadro para cambiar cada letra y escribe tu respuesta en el espacio, en MAYÚSCULAS y sin espacios. Después presiona <b>Revisar</b>.';
+
+const M = GRADE.modules;
+M.forEach((m) => m.temas.forEach((t) => relabel(t.ps, { E: 'F', F: 'G', G: 'H' })));
+const ok = (o) => (c, out, err) => !err && o(c, out);
+const lines = (out) => out.split('\n').map((x) => x.trim()).filter(Boolean);
+
+/* ===== B4 · Entrena un modelo de IA ===== */
+M[1].temas.push(tema('Entrena un modelo de IA', [
+  PG({ type: 'train', intro: 'Un modelo aprende de ejemplos con etiqueta. Este modelo distingue limones de naranjas por su color y su tamaño, y responde la etiqueta del ejemplo más parecido. Algunos ejemplos tienen la etiqueta equivocada: encuéntralos y quítalos del entrenamiento.', lead: '<p>Los <b>datos de entrenamiento</b> enseñan al modelo; los <b>datos de prueba</b> sirven para medir si aprendió. Precisión = aciertos ÷ total de pruebas.</p>', tip: 'Busca un punto que esté rodeado de puntos del otro color: probablemente tiene la etiqueta equivocada.',
+    classes: ['Limón', 'Naranja'], xLabel: 'Color (verde a naranja)', yLabel: 'Tamaño',
+    pool: [{ n: 'Fruta verde y pequeña', x: 1, y: 3, label: 'Limón' }, { n: 'Fruta verde amarillenta', x: 3, y: 2, label: 'Limón' }, { n: 'Fruta verde mediana', x: 2, y: 5, label: 'Limón' }, { n: 'Fruta amarilla mediana', x: 4, y: 4, label: 'Limón' }, { n: 'Fruta verde y pequeña', x: 2, y: 3, label: 'Naranja' }, { n: 'Fruta naranja grande', x: 7, y: 6, label: 'Naranja' }, { n: 'Fruta naranja muy grande', x: 9, y: 8, label: 'Naranja' }, { n: 'Fruta anaranjada grande', x: 6, y: 8, label: 'Naranja' }, { n: 'Fruta naranja mediana', x: 8, y: 5, label: 'Naranja' }, { n: 'Fruta naranja grande', x: 8, y: 7, label: 'Limón' }],
+    test: [{ x: 2.5, y: 3.5, label: 'Limón' }, { x: 1.5, y: 4, label: 'Limón' }, { x: 3.5, y: 3, label: 'Limón' }, { x: 7.5, y: 7, label: 'Naranja' }, { x: 8.5, y: 6.5, label: 'Naranja' }, { x: 6.5, y: 6.5, label: 'Naranja' }] }),
+  { type: 'train', label: 'Aplica', title: 'Filtro de correo basura', intro: 'Es la actividad de tu cuaderno (tema B4). El modelo decide si un correo es spam según cuántos signos «!» tiene y cuántas palabras como «gratis» o «premio» usa. Quita los ejemplos mal etiquetados.',
+    classes: ['Spam', 'No spam'], xLabel: 'Signos «!»', yLabel: 'Palabras «gratis», «premio»',
+    pool: [{ n: '«¡¡Ganaste un premio gratis!!»', x: 8, y: 7, label: 'Spam' }, { n: '«Premio gratis, reclámalo ya!!!»', x: 9, y: 9, label: 'Spam' }, { n: '«¡Oferta gratis! ¡Premio seguro!»', x: 7, y: 8, label: 'Spam' }, { n: '«Gratis gratis gratis, ¡entra!»', x: 6, y: 9, label: 'Spam' }, { n: '«Mañana entregamos la maqueta»', x: 1, y: 1, label: 'No spam' }, { n: '«Te mando la lista de la tarea»', x: 0, y: 2, label: 'No spam' }, { n: '«Junta de padres el viernes»', x: 2, y: 0, label: 'No spam' }, { n: '«¿Vamos a la biblioteca?»', x: 1, y: 3, label: 'No spam' }, { n: '«¡¡Premio gratis!! Da clic aquí!!»', x: 8, y: 8, label: 'No spam' }, { n: '«¡Feliz cumpleaños, Ana!»', x: 2, y: 1, label: 'Spam' }],
+    test: [{ x: 7.5, y: 8.5, label: 'Spam' }, { x: 8.3, y: 8.4, label: 'Spam' }, { x: 1.5, y: 0.5, label: 'No spam' }, { x: 2.3, y: 1.3, label: 'No spam' }, { x: 9, y: 9.5, label: 'Spam' }, { x: 0.5, y: 1.5, label: 'No spam' }] },
+  QZ('Datos y sesgo', 'Responde con lo que leíste en el tema B4.', [
+    Q('Un modelo se probó con 12 fotos y acertó 9. ¿Cuál es su precisión?', '75 %', ['9 %', '90 %'], '9 ÷ 12 = 0.75.'),
+    Q('Un modelo para reconocer rostros se entrenó casi solo con fotos de personas de piel clara. ¿Qué problema tendrá?', 'Fallará más con personas de piel oscura: tiene sesgo por los datos.', ['Ninguno: la IA es neutral.', 'Será más rápido.'], 'El modelo aprende lo que hay en los datos.'),
+    Q('¿Para qué sirven los datos de prueba?', 'Para medir si el modelo funciona con ejemplos que no vio al entrenar', ['Para entrenar más rápido', 'Para borrar los errores'], 'Si pruebas con los mismos datos, no sabrás si aprendió.'),
+    Q('En Teachable Machine entrenas un modelo con tu cámara. ¿Qué es lo más responsable?', 'Usar objetos o tu propia imagen, sin fotografiar a otras personas sin su permiso', ['Usar fotos de compañeros sin avisarles', 'Subir fotos de documentos personales'], 'Las imágenes de las personas son datos personales.'),
+  ]),
+]));
+
+/* ===== D4 · Sustentabilidad y evaluación del producto ===== */
+M[3].temas.push(tema('Sustentabilidad y evaluación del producto', [
+  PG(CL('Práctica guiada', '', 'Evalúa el servicio de reparación de bicicletas. Clasifica cada pregunta según el criterio de evaluación que revisa.', ['Eficacia', 'Eficiencia', 'Factibilidad', 'Fiabilidad', 'Impacto'], [
+    ['¿Las bicicletas quedan bien reparadas?', 0, 'Eficacia: ¿cumple su función?', '¿Pregunta si funciona?'],
+    ['¿Usamos solo las refacciones necesarias y en poco tiempo?', 1, 'Eficiencia: aprovechar recursos.', '¿Habla de recursos?'],
+    ['¿Tenemos las herramientas y el permiso de la escuela?', 2, 'Factibilidad: ¿se puede hacer?', '¿Pregunta si es posible?'],
+    ['¿La reparación sigue funcionando después de un mes?', 3, 'Fiabilidad: funciona bien con el tiempo.', '¿Pregunta si dura?'],
+    ['¿Qué hacemos con las llantas y piezas usadas?', 4, 'Impacto ambiental.', '¿Habla del ambiente o la comunidad?'],
+    ['¿Más compañeros llegan en bicicleta y se usa menos el auto?', 4, 'Impacto social y ambiental positivo.', '¿Habla del ambiente o la comunidad?'],
+  ])),
+  CL('Aplica', 'Aguas frescas sustentables', 'Es la actividad de tu cuaderno (tema D4). ¿Cada decisión del puesto de aguas frescas reduce o aumenta el impacto ambiental?', ['Reduce el impacto', 'Aumenta el impacto'], [
+    ['Pedir a los compradores que traigan su propio vaso', 0, 'Reduce residuos.', '¿Genera menos basura?'], ['Usar vasos de unicel', 1, 'El unicel casi no se recicla.', '¿Genera más basura?'],
+    ['Compostar las cáscaras de fruta', 0, 'Los residuos orgánicos se aprovechan.', '¿Qué pasa con las cáscaras?'], ['Dar un popote de plástico a cada persona', 1, 'Más plástico de un solo uso.', '¿Genera más basura?'],
+    ['Comprar fruta de temporada a productores locales', 0, 'Menos transporte y apoyo a la comunidad.', '¿Viaja menos la fruta?'], ['Dejar la hielera abierta todo el día', 1, 'Se desperdicia hielo y energía.', '¿Se desperdicia algo?'],
+  ]),
+  QZ('Ciclo de vida y basura electrónica', 'Responde con lo que leíste en el tema D4.', [
+    Q('¿Cuál es el orden del ciclo de vida de un producto?', 'Materias primas → fabricación → transporte → uso → desecho o reciclaje', ['Uso → fabricación → materias primas → desecho', 'Desecho → uso → transporte → fabricación'], 'Evaluar el ciclo completo muestra dónde se genera más impacto.'),
+    Q('¿Qué hacer con un celular que ya no sirve?', 'Llevarlo a un centro de acopio de residuos electrónicos', ['Tirarlo a la basura común', 'Quemarlo'], 'Tiene metales que contaminan, pero también materiales que se recuperan.'),
+    Q('La evaluación externa de un producto revisa…', 'sus efectos en la sociedad, la cultura y la naturaleza', ['solo su precio', 'solo si funciona'], 'La interna revisa eficacia, eficiencia, factibilidad y fiabilidad.'),
+    Q('¿Qué opción alarga la vida útil de una computadora?', 'Repararla y actualizar sus piezas en lugar de cambiarla', ['Comprar una nueva cada año', 'Desarmarla y tirar las piezas'], 'Reparar es más sustentable que reemplazar.'),
+  ]),
+]));
+
+/* ===== E · Programación con Python ===== */
+const E1 = tema('Variables, entrada y salida', [
+  PG({ type: 'python', intro: 'Escribe un programa que guarde el precio y la cantidad en variables, calcule el total y lo imprima.', lead: '<p><code>print()</code> muestra un resultado. Una <b>variable</b> guarda un valor: <code>precio = 35</code>. Los textos van entre comillas.</p>', tip: 'precio = 35\ncantidad = 4\ntotal = precio * cantidad\nprint("Total:", total)',
+    starter: '# Compra en la papelería\nprecio = 35\ncantidad = 4\n# Calcula el total y muéstralo\n',
+    checks: [{ t: 'Calcula el total con una variable (total = …)', f: ok((c) => /total\s*=\s*.*(precio|cantidad)/.test(c)) }, { t: 'Usa print() para mostrar el resultado', f: ok((c) => /print\s*\(/.test(c)) }, { t: 'El programa imprime 140', f: ok((c, o) => /\b140\b/.test(o)) }] }),
+  { type: 'python', label: 'Aplica', title: 'Convierte la temperatura', intro: 'Es la actividad de tu cuaderno (tema E1). Pide la temperatura en grados Celsius con input(), conviértela a Fahrenheit (F = C × 9 / 5 + 32) e imprime el resultado.', inputs: ['25'],
+    lead: '<p><code>input()</code> siempre devuelve texto. Para hacer cuentas, conviértelo a número: <code>int(input(...))</code> o <code>float(input(...))</code>.</p>',
+    starter: 'c = float(input("Grados Celsius: "))\n# Calcula f y muéstralo\n',
+    checks: [{ t: 'Usa input() para pedir el dato', f: ok((c) => /input\s*\(/.test(c)) }, { t: 'Convierte el texto a número con int() o float()', f: ok((c) => /(int|float)\s*\(\s*input/.test(c)) }, { t: 'Con 25 °C imprime 77', f: ok((c, o) => /\b77(\.0)?\b/.test(o)) }] },
+  { type: 'trace', label: 'Comprueba', title: '¿Qué imprime?', intro: 'Lee cada programa como lo haría la computadora y elige qué imprime.', items: [
+    { code: 'x = 7\ny = 3\nprint(x + y)', q: '¿Qué imprime?', opts: ['10', 'x + y', '73'], a: 0, fb: 'Suma los valores de las variables.' },
+    { code: 'a = "7"\nb = "3"\nprint(a + b)', q: '¿Qué imprime?', opts: ['73', '10', 'Error'], a: 0, fb: 'Con texto, + pega: "7" + "3" = "73".' },
+    { code: 'nombre = "Ana"\nprint("Hola,", nombre)', q: '¿Qué imprime?', opts: ['Hola, Ana', 'Hola, nombre', 'HolaAna'], a: 0, fb: 'print separa con un espacio lo que va entre comas.' },
+    { code: 'n = 10\nn = n * 2\nprint(n)', q: '¿Qué imprime?', opts: ['20', '10', 'n * 2'], a: 0, fb: 'n vale 10 y después 20.' },
+  ] },
+]);
+const E2 = tema('Condicionales y ciclos', [
+  PG({ type: 'python', intro: 'Escribe un programa que diga si una calificación aprueba y que imprima la tabla del 7 del 1 al 10.', lead: '<p>Después de <code>if</code>, <code>else</code> y <code>for</code> van dos puntos <code>:</code> y las líneas de dentro llevan 4 espacios. <code>range(1, 11)</code> da los números del 1 al 10.</p>', tip: 'if calif >= 6:\n    print("Aprobado")\nelse:\n    print("Reprobado")\nfor i in range(1, 11):\n    print(7 * i)',
+    starter: 'calif = 7.5\n# 1) Si calif es 6 o más imprime "Aprobado"; si no, "Reprobado"\n\n# 2) Imprime la tabla del 7 (7, 14, 21 … 70)\n',
+    checks: [{ t: 'Usa if y else', f: ok((c) => /\bif\b[\s\S]*\belse\s*:/.test(c)) }, { t: 'Imprime «Aprobado»', f: ok((c, o) => /Aprobado/.test(o) && !/Reprobado/.test(o)) }, { t: 'Usa un ciclo for', f: ok((c) => /\bfor\b[^\n]*:/.test(c)) }, { t: 'Imprime la tabla del 7 completa (7 a 70)', f: ok((c, o) => [7, 14, 21, 28, 35, 42, 49, 56, 63, 70].every((n) => lines(o).includes(String(n)))) }] }),
+  { type: 'python', label: 'Aplica', title: 'Suma del 1 al 10', intro: 'Es la actividad de tu cuaderno (tema E2). Con un ciclo, suma los números del 1 al 10 en una variable acumuladora e imprime el total.', starter: 'suma = 0\n# Usa un ciclo for para sumar del 1 al 10\n\nprint(suma)\n',
+    checks: [{ t: 'Usa un ciclo for con range', f: ok((c) => /for\s+\w+\s+in\s+range\s*\(/.test(c)) }, { t: 'Acumula en la variable suma (suma = suma + … o suma += …)', f: ok((c) => /suma\s*(\+=|=\s*suma\s*\+)/.test(c)) }, { t: 'Imprime 55', f: ok((c, o) => lines(o).includes('55')) }] },
+  { type: 'trace', label: 'Comprueba', title: 'Sigue el ciclo', intro: 'Lee cada programa y elige qué imprime.', items: [
+    { code: 'edad = 14\nif edad >= 15:\n    print("Bachillerato")\nelse:\n    print("Secundaria")', q: '¿Qué imprime?', opts: ['Secundaria', 'Bachillerato', 'Nada'], a: 0, fb: '14 no es mayor o igual que 15.' },
+    { code: 'for i in range(3):\n    print(i)', q: '¿Qué imprime?', opts: ['0 1 2 (uno por línea)', '1 2 3 (uno por línea)', '3'], a: 0, fb: 'range(3) va de 0 a 2.' },
+    { code: 'x = 1\nwhile x < 20:\n    x = x * 2\nprint(x)', q: '¿Qué imprime?', opts: ['32', '16', '20'], a: 0, fb: '1 → 2 → 4 → 8 → 16 → 32; 32 ya no es menor que 20.' },
+  ] },
+]);
+const E3 = tema('Listas y funciones', [
+  PG({ type: 'python', intro: 'Escribe una función que reciba una lista de calificaciones y regrese su promedio. Después úsala con la lista dada.', lead: '<p>Una <b>lista</b> guarda varios valores: <code>[8, 9, 7]</code>. <code>sum()</code> los suma y <code>len()</code> los cuenta. Una <b>función</b> se crea con <code>def</code> y entrega su resultado con <code>return</code>.</p>', tip: 'def promedio(lista):\n    return sum(lista) / len(lista)\n\nprint(promedio(calificaciones))',
+    starter: 'calificaciones = [8, 9, 7, 10, 6]\n# Crea la función promedio y muestra el resultado\n',
+    checks: [{ t: 'Crea una función con def', f: ok((c) => /def\s+\w+\s*\(\s*\w+\s*\)\s*:/.test(c)) }, { t: 'La función usa return', f: ok((c) => /\breturn\b/.test(c)) }, { t: 'Imprime el promedio: 8', f: ok((c, o) => /\b8(\.0)?\b/.test(o)) }] }),
+  { type: 'python', label: 'Aplica', title: 'Lista del súper', intro: 'Es la actividad de tu cuaderno (tema E3). Agrega "huevo" a la lista con append(), imprime cuántos productos hay con len() y después cada producto con un ciclo.', starter: 'compras = ["pan", "leche"]\n# 1) Agrega "huevo"\n\n# 2) Imprime cuántos productos hay\n\n# 3) Imprime cada producto, uno por línea\n',
+    checks: [{ t: 'Usa append()', f: ok((c) => /\.append\s*\(/.test(c)) }, { t: 'Imprime 3 con len()', f: ok((c, o) => /len\s*\(/.test(c) && lines(o).some((l) => /\b3\b/.test(l))) }, { t: 'Imprime pan, leche y huevo con un ciclo for', f: ok((c, o) => /for\s+\w+\s+in\s+compras/.test(c) && ['pan', 'leche', 'huevo'].every((w) => lines(o).includes(w))) }] },
+  { type: 'trace', label: 'Comprueba', title: 'Listas y funciones', intro: 'Lee cada programa y elige qué imprime.', items: [
+    { code: 'colores = ["rojo", "verde", "azul"]\nprint(colores[0])', q: '¿Qué imprime?', opts: ['rojo', 'verde', 'azul'], a: 0, fb: 'Las posiciones empiezan en 0.' },
+    { code: 'def doble(n):\n    return n * 2\n\nprint(doble(5) + 1)', q: '¿Qué imprime?', opts: ['11', '10', '12'], a: 0, fb: 'doble(5) regresa 10, más 1 = 11.' },
+    { code: 'nums = [4, 6]\nnums.append(10)\nprint(len(nums))', q: '¿Qué imprime?', opts: ['3', '2', '10'], a: 0, fb: 'Después de append la lista tiene 3 elementos.' },
+  ] },
+]);
+M.splice(4, 0, { name: 'Programación con Python', hilo: 'codigo', temas: [E1, E2, E3] });
+
+GRADE.migrate = { ver: 'sec3-2026-10', map: { m5t1: 'm6t1', m5t2: 'm6t2', m5t3: 'm6t3', m6t1: 'm7t1', m6t2: 'm7t2', m6t3: 'm7t3', m7t1: 'm8t1', m7t2: 'm8t2' } };
+clarify(M, {
+  'D4.2': { intro: add('Toca la opción correcta en cada tarjeta.') },
+  'A3.3': { intro: () => 'Decide si cada situación es una señal de alerta o algo normal (tema A3).' },
+  'B3.2': { intro: add('Decide si cada frase es clara o vaga.') },
+  'G2.2': { intro: () => 'Lee cada situación y elige el tipo de bachillerato que conviene, con la comparación del tema G2.' },
+  'E1.2': { intro: add('Cuando tu programa pida el dato con input(), el simulador escribirá 25 por ti.') },
+});
+})();
 
 </script>
 <script>
@@ -1252,6 +1398,12 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
   /* migración: avance guardado antes de que hubiera varios ejercicios por tema */
   for (const k of Object.keys(store.prog)) if (/^m\d+t\d+$/.test(k)) { if (!store.prog[k + 'e1']) store.prog[k + 'e1'] = store.prog[k]; delete store.prog[k]; }
   for (const k of Object.keys(store.saves)) if (/^m\d+t\d+$/.test(k)) { if (!store.saves[k + 'e1']) store.saves[k + 'e1'] = store.saves[k]; delete store.saves[k]; }
+  /* migración: cuando se reorganizan módulos, el avance guardado sigue a su tema */
+  if (G.migrate && store.mig !== G.migrate.ver) {
+    const mp = G.migrate.map || {};
+    const remap = (o) => { const out = {}; for (const [k, v] of Object.entries(o)) { const m = k.match(/^(m\d+t\d+)(e\d+)$/); out[m && mp[m[1]] ? mp[m[1]] + m[2] : k] = v; } return out; };
+    store.prog = remap(store.prog); store.saves = remap(store.saves); store.mig = G.migrate.ver; persist();
+  }
   /* temas y ejercicios */
   const LABELS = ['Práctica guiada', 'Aplica', 'Comprueba'];
   const temas = []; const exs = [];
@@ -1711,6 +1863,109 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     return { check() { const n = d.fields.filter((_, i) => ok(i)).length; return { score: n / d.fields.length, msg: n === d.fields.length ? 'Todas tus respuestas cumplen con lo que se pide.' : `${n} de ${d.fields.length} respuestas completas. Revisa la extensión mínima y las palabras que deben aparecer.` }; } };
   };
 
+  /* --- sistema binario --- */
+  E.binary = (host, d, api) => {
+    const n = d.bits || 8; const W = Array.from({ length: n }, (_, i) => 2 ** (n - 1 - i));
+    const st = api.load() || { b: d.items.map((it) => (it.bits ? it.bits.split('').map(Number) : Array(n).fill(0))), a: d.items.map(() => '') };
+    const val = (bits) => bits.reduce((s, b, i) => s + b * W[i], 0);
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.items.map((it, i) => {
+        const fixed = it.mode === 'read'; const v = val(st.b[i]);
+        return `<div class="bin" data-i="${i}"><p class="bin-q"><b>${i + 1}.</b> ${esc(it.q)}</p><div class="bin-row" role="group" aria-label="Bits">${st.b[i].map((b, k) => `<button type="button" class="bit" data-i="${i}" data-k="${k}" aria-pressed="${!!b}" ${fixed ? 'disabled' : ''}><span class="bit-v">${b}</span><span class="bit-w">${W[k]}</span></button>`).join('')}</div>
+          ${fixed ? `<label class="fld"><span>Valor en decimal</span><input type="text" inputmode="numeric" class="bin-in" data-i="${i}" value="${esc(st.a[i])}" autocomplete="off"></label>` : `<p class="bin-sum">Suma de los valores encendidos: <b>${v}</b>${it.char ? ` · carácter: <b>${v >= 32 && v < 127 ? esc(String.fromCharCode(v)) : '—'}</b>` : ''}</p>`}<p class="q-fb" aria-live="polite"></p></div>`;
+      }).join('');
+    };
+    host.addEventListener('click', (e) => { const b = e.target.closest('.bit'); if (!b || b.disabled) return; const i = +b.dataset.i, k = +b.dataset.k; st.b[i][k] = st.b[i][k] ? 0 : 1; api.save(st); draw(); const nb = $(`.bit[data-i="${i}"][data-k="${k}"]`, host); if (nb) nb.focus(); });
+    host.addEventListener('input', (e) => { const el = e.target.closest('.bin-in'); if (!el) return; st.a[+el.dataset.i] = el.value; api.save(st); });
+    draw();
+    return {
+      check() {
+        let ok = 0;
+        d.items.forEach((it, i) => { const el = $(`.bin[data-i="${i}"]`, host); const good = it.mode === 'read' ? String(st.a[i]).trim() !== '' && +String(st.a[i]).trim() === val(st.b[i]) : val(st.b[i]) === it.target; el.classList.remove('ok', 'bad'); el.classList.add(good ? 'ok' : 'bad'); $('.q-fb', el).textContent = good ? '✓ ' + (it.fb || 'Correcto.') : (it.mode === 'read' ? 'Suma solo los valores de las casillas que tienen 1.' : `Llevas ${val(st.b[i])}. Enciende los valores que sumen ${it.target}: empieza por el más grande que quepa.`); if (good) ok++; });
+        return { score: ok / d.items.length, msg: `${ok} de ${d.items.length} correctas.` };
+      }
+    };
+  };
+
+  /* --- circuito con LED: ley de Ohm --- */
+  E.circuit = (host, d, api) => {
+    const VF = 2; const RES = d.res || [0, 100, 220, 330, 1000, 10000];
+    const st = api.load() || { lv: d.levels.map(() => ({ r: -1, on: false })) };
+    const fmtR = (r) => (r === 0 ? 'Sin resistencia' : r >= 1000 ? r / 1000 + ' kΩ' : r + ' Ω');
+    const calc = (L, s) => { if (!s.on) return { st: 'off', i: 0, t: 'El interruptor está abierto: no circula corriente.' }; if (s.r < 0) return { st: 'off', i: 0, t: 'Elige una resistencia.' }; if (s.r === 0) return { st: 'burn', i: Infinity, t: '¡El LED se quemó! Sin resistencia la corriente es demasiado alta.' }; const i = ((L.v - VF) / s.r) * 1000; if (i > 25) return { st: 'burn', i, t: `Corriente de ${i.toFixed(1)} mA: demasiado alta, el LED se daña.` }; if (i < 10) return { st: 'dim', i, t: `Corriente de ${i.toFixed(1)} mA: el LED casi no brilla.` }; return { st: 'ok', i, t: `Corriente de ${i.toFixed(1)} mA: el LED brilla bien y está seguro.` }; };
+    const svg = (L, c) => { const glow = c.st === 'ok' ? '#FFD54A' : c.st === 'dim' ? '#8A7A3A' : c.st === 'burn' ? '#3A3A3A' : '#5A6478'; return `<svg viewBox="0 0 320 150" class="cir-svg" role="img" aria-label="Circuito"><rect x="20" y="20" width="280" height="110" rx="10" fill="none" stroke="var(--ink)" stroke-width="3"/><rect x="8" y="55" width="26" height="42" rx="4" fill="var(--sunk)" stroke="var(--ink)" stroke-width="2"/><text x="21" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${L.v}V</text><rect x="92" y="10" width="106" height="20" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="145" y="25" text-anchor="middle" font-size="11" fill="var(--ink)">${esc(fmtR(Math.max(0, st.lv[d.levels.indexOf(L)].r)))}</text><circle cx="250" cy="20" r="14" fill="${glow}" stroke="var(--ink)" stroke-width="2"/>${c.st === 'ok' ? '<circle cx="250" cy="20" r="24" fill="#FFD54A" opacity=".25"/>' : ''}${c.st === 'burn' ? '<text x="250" y="25" text-anchor="middle" font-size="14">✕</text>' : ''}<text x="250" y="52" text-anchor="middle" font-size="11" fill="var(--muted)">LED</text><line x1="110" y1="130" x2="150" y2="${st.lv[d.levels.indexOf(L)].on ? 130 : 112}" stroke="var(--ink)" stroke-width="4"/><text x="160" y="148" font-size="11" fill="var(--muted)">interruptor</text></svg>`; };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.levels.map((L, li) => { const s = st.lv[li]; const c = calc(L, s); return `<div class="cir" data-l="${li}"><p class="lv-goal"><b>Circuito ${li + 1}.</b> ${esc(L.goal || `Pila de ${L.v} V. Haz que el LED brille sin dañarse.`)}</p><div class="cir-wrap">${svg(L, c)}<div class="cir-ctl"><label class="fld"><span>Resistencia</span><select data-l="${li}" class="cir-r"><option value="-1">Elige…</option>${RES.map((r) => `<option value="${r}" ${s.r === r ? 'selected' : ''}>${fmtR(r)}</option>`).join('')}</select></label><label class="chk"><input type="checkbox" class="cir-on" data-l="${li}" ${s.on ? 'checked' : ''}> Cerrar el interruptor</label><p class="cir-msg st-${c.st}" aria-live="polite">${esc(c.t)}</p></div></div></div>`; }).join('') + `<p class="muted small">Fórmula: corriente (mA) = (voltaje de la pila − 2 V del LED) ÷ resistencia (Ω) × 1000. Un LED trabaja bien entre 10 y 25 mA.</p>`;
+    };
+    host.addEventListener('change', (e) => { const el = e.target; if (!el.dataset.l) return; const s = st.lv[+el.dataset.l]; if (el.classList.contains('cir-r')) s.r = +el.value; if (el.classList.contains('cir-on')) s.on = el.checked; api.save(st); draw(); });
+    draw();
+    return { check() { const r = d.levels.map((L, i) => calc(L, st.lv[i]).st === 'ok'); const n = r.filter(Boolean).length; $$('.cir', host).forEach((el, i) => { el.classList.remove('ok', 'bad'); el.classList.add(r[i] ? 'ok' : 'bad'); }); return { score: n / r.length, msg: n === r.length ? 'Todos los LED brillan de forma segura.' : `${n} de ${r.length} circuitos correctos. Cierra el interruptor y elige la resistencia que deje pasar entre 10 y 25 mA.` }; } };
+  };
+
+  /* --- reglas de un microcontrolador (sensor → actuador) --- */
+  E.rules = (host, d, api) => {
+    const st = api.load() || { r: d.levels.map(() => ({ op: '', th: '', a: '', b: '' })), probe: d.levels.map((L) => L.range[0]) };
+    const evalR = (L, r, v) => { const th = parseFloat(String(r.th).replace(',', '.')); if (!r.op || !isFinite(th) || !r.a || !r.b) return null; const c = r.op === '<' ? v < th : r.op === '>' ? v > th : r.op === '<=' ? v <= th : v >= th; return c ? r.a : r.b; };
+    const draw = () => {
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + d.levels.map((L, li) => { const r = st.r[li]; const out = evalR(L, r, st.probe[li]); const opts = (sel) => ['<option value="">Elige…</option>', ...L.actions.map((a) => `<option ${sel === a ? 'selected' : ''}>${esc(a)}</option>`)].join(''); return `<div class="rule" data-l="${li}"><p class="lv-goal"><b>Reto ${li + 1}.</b> ${esc(L.goal)}</p>
+        <div class="code rule-code">al iniciar → repetir por siempre:<br>&nbsp;&nbsp;si <b>${esc(L.sensor)}</b> <select data-k="op" data-l="${li}" aria-label="Comparación">${['', '<', '>', '<=', '>='].map((o) => `<option value="${o}" ${r.op === o ? 'selected' : ''}>${o ? esc(o === '<=' ? '≤' : o === '>=' ? '≥' : o) : '?'}</option>`).join('')}</select> <input data-k="th" data-l="${li}" class="sm-in w6" inputmode="decimal" value="${esc(r.th)}" aria-label="Valor límite"> ${esc(L.unit || '')} entonces<br>&nbsp;&nbsp;&nbsp;&nbsp;<select data-k="a" data-l="${li}" aria-label="Acción si se cumple">${opts(r.a)}</select><br>&nbsp;&nbsp;si no<br>&nbsp;&nbsp;&nbsp;&nbsp;<select data-k="b" data-l="${li}" aria-label="Acción si no se cumple">${opts(r.b)}</select></div>
+        <label class="fld"><span>Prueba el sensor: ${esc(L.sensor)} = <b>${st.probe[li]}</b> ${esc(L.unit || '')}</span><input type="range" min="${L.range[0]}" max="${L.range[1]}" step="${L.step || 1}" value="${st.probe[li]}" data-k="probe" data-l="${li}"></label>
+        <p class="rule-out" aria-live="polite">${out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'}</p><p class="q-fb"></p></div>`; }).join('');
+    };
+    host.addEventListener('input', (e) => { const el = e.target; const k = el.dataset.k; if (!k) return; const li = +el.dataset.l; if (k === 'probe') { st.probe[li] = +el.value; api.save(st); const L = d.levels[li]; const out = evalR(L, st.r[li], st.probe[li]); const box = $(`.rule[data-l="${li}"]`, host); box.querySelector('.fld span b').textContent = st.probe[li]; box.querySelector('.rule-out').innerHTML = out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'; return; } if (k === 'th') { st.r[li].th = el.value; api.save(st); const out = evalR(d.levels[li], st.r[li], st.probe[li]); $(`.rule[data-l="${li}"] .rule-out`, host).innerHTML = out ? `El microcontrolador hace: <b>${esc(out)}</b>` : 'Completa la regla para probarla.'; } });
+    host.addEventListener('change', (e) => { const el = e.target; const k = el.dataset.k; if (!k || k === 'probe' || k === 'th') return; st.r[+el.dataset.l][k] = el.value; api.save(st); draw(); });
+    draw();
+    return { check() { let ok = 0; d.levels.forEach((L, li) => { const bad = L.tests.filter((t) => evalR(L, st.r[li], t[0]) !== t[1]); const el = $(`.rule[data-l="${li}"]`, host); el.classList.remove('ok', 'bad'); el.classList.add(bad.length ? 'bad' : 'ok'); $('.q-fb', el).textContent = bad.length ? `Falla con ${L.sensor} = ${bad[0][0]} ${L.unit || ''}: debería «${bad[0][1]}».` : '✓ La regla funciona en todas las pruebas.'; if (!bad.length) ok++; }); return { score: ok / d.levels.length, msg: `${ok} de ${d.levels.length} retos funcionan en todas las pruebas.` }; } };
+  };
+
+  /* --- entrenar un modelo (vecino más cercano) --- */
+  E.train = (host, d, api) => {
+    const st = api.load() || { use: d.pool.map(() => true) };
+    const model = () => d.pool.filter((p, i) => st.use[i]);
+    const predict = (t) => { const m = model(); if (!m.length) return null; let best = null, bd = Infinity; m.forEach((p) => { const dd = Math.hypot(p.x - t.x, p.y - t.y); if (dd < bd) { bd = dd; best = p; } }); return best.label; };
+    const acc = () => { const r = d.test.map((t) => predict(t) === t.label); return r.filter(Boolean).length / d.test.length; };
+    const COL = ['var(--s1)', 'var(--s3)', 'var(--s2)'];
+    const draw = () => {
+      const S = 30, P = 34; const px = (x) => P + x * S, py = (y) => 10 + (10 - y) * S;
+      const pts = d.pool.map((p, i) => `<g opacity="${st.use[i] ? 1 : 0.18}"><circle cx="${px(p.x)}" cy="${py(p.y)}" r="9" fill="${COL[d.classes.indexOf(p.label)]}"/><text x="${px(p.x)}" y="${py(p.y) + 4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${i + 1}</text></g>`).join('');
+      const tst = d.test.map((t) => { const pr = predict(t); const ok = pr === t.label; return `<g><rect x="${px(t.x) - 8}" y="${py(t.y) - 8}" width="16" height="16" rx="3" fill="var(--surface)" fill-opacity=".7" stroke="${ok ? 'var(--ok)' : 'var(--bad)'}" stroke-width="3"/><text x="${px(t.x)}" y="${py(t.y) + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="${ok ? 'var(--ok)' : 'var(--bad)'}">${ok ? '✓' : '✗'}</text></g>`; }).join('');
+      const a = acc(); const cnt = d.classes.map((c) => model().filter((p) => p.label === c).length);
+      host.innerHTML = (d.lead ? `<div class="lead-card">${d.lead}</div>` : '') + `<div class="trn"><svg viewBox="0 0 ${P + 10 * S + 14} ${10 * S + 40}" class="trn-svg" role="img" aria-label="Datos de entrenamiento"><line x1="${P}" y1="${py(0)}" x2="${px(10)}" y2="${py(0)}" stroke="var(--line)"/><line x1="${P}" y1="${py(0)}" x2="${P}" y2="${py(10)}" stroke="var(--line)"/><text x="${px(5)}" y="${py(0) + 26}" text-anchor="middle" font-size="12" fill="var(--muted)">${esc(d.xLabel)} →</text><text x="12" y="${py(5)}" font-size="12" fill="var(--muted)" transform="rotate(-90 12 ${py(5)})" text-anchor="middle">${esc(d.yLabel)} →</text>${pts}${tst}</svg>
+        <div><p class="trn-acc">Precisión del modelo con los datos de prueba: <b>${Math.round(a * 100)}%</b></p><p class="muted small">Ejemplos usados: ${d.classes.map((c, k) => `<span style="color:${COL[k]};font-weight:700">● ${esc(c)}: ${cnt[k]}</span>`).join(' · ')} · Los cuadros son los datos de prueba (✓ acierta, ✗ falla).</p>
+        <ol class="trn-list">${d.pool.map((p, i) => `<li><label class="chk"><input type="checkbox" data-i="${i}" ${st.use[i] ? 'checked' : ''}> <b>${i + 1}.</b> ${esc(p.n)} — etiqueta: <span style="color:${COL[d.classes.indexOf(p.label)]};font-weight:700">${esc(p.label)}</span></label></li>`).join('')}</ol></div></div>`;
+    };
+    host.addEventListener('change', (e) => { const el = e.target.closest('input[data-i]'); if (!el) return; st.use[+el.dataset.i] = el.checked; api.save(st); draw(); });
+    draw();
+    return { check() { const a = acc(); const cnt = d.classes.map((c) => model().filter((p) => p.label === c).length); const enough = cnt.every((c) => c >= (d.minPer || 2)); const sc = enough ? a : Math.min(a, 0.5); return { score: sc, msg: !enough ? `El modelo necesita al menos ${d.minPer || 2} ejemplos de cada clase.` : a >= 1 ? 'El modelo acierta todos los datos de prueba: quitaste los ejemplos con etiqueta equivocada.' : `Precisión ${Math.round(a * 100)}%. Revisa qué ejemplos tienen la etiqueta equivocada y quítalos del entrenamiento.` }; } };
+  };
+
+  /* --- Python (se ejecuta en el navegador con Skulpt) --- */
+  let skP = null;
+  const loadSk = () => { if (window.Sk && window.Sk.importMainWithBody) return Promise.resolve(); if (skP) return skP; const base = window.SKULPT_BASE || 'https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/'; const add = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('sin conexión')); document.head.appendChild(s); }); skP = add(base + 'skulpt.min.js').then(() => add(base + 'skulpt-stdlib.js')).catch((e) => { skP = null; throw e; }); return skP; };
+  const runPy = (code, inputs) => loadSk().then(() => { let out = ''; const q = [...(inputs || [])]; window.Sk.configure({ output: (t) => { out += t; }, read: (x) => { if (!window.Sk.builtinFiles || window.Sk.builtinFiles.files[x] === undefined) throw new Error('No se encontró ' + x); return window.Sk.builtinFiles.files[x]; }, inputfun: () => (q.length ? String(q.shift()) : ''), inputfunTakesPrompt: true, execLimit: 4000, __future__: window.Sk.python3 }); return window.Sk.misceval.asyncToPromise(() => window.Sk.importMainWithBody('<stdin>', false, code, true)).then(() => ({ out, err: null }), (e) => ({ out, err: pyErr(e) })); });
+  const pyErr = (e) => { let s = String(e && e.toString ? e.toString() : e); const m = s.match(/on line (\d+)/); const line = m ? ` (línea ${m[1]})` : ''; if (/TimeLimitError/.test(s)) return 'El programa tardó demasiado: revisa que tus ciclos terminen.'; if (/SyntaxError|ParseError/.test(s)) return 'Error de escritura' + line + ': revisa los dos puntos (:), los paréntesis, las comillas y la sangría.'; if (/IndentationError/.test(s)) return 'Error de sangría' + line + ': las líneas dentro de if, for o def llevan 4 espacios.'; if (/NameError/.test(s)) return 'Usas un nombre que no existe' + line + ': revisa cómo escribiste la variable o la función.'; if (/TypeError/.test(s)) return 'Error de tipo' + line + ': quizá sumas texto con números. Usa int() o str().'; return 'Error' + line + ': ' + s.replace(/\s*on line \d+/, ''); };
+  E.python = (host, d, api) => {
+    const st = api.load() || { code: d.starter || '' };
+    host.innerHTML = `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ''}<div class="py"><label class="fld"><span>Tu programa en Python</span><textarea class="py-code" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.max(8, (st.code.match(/\n/g) || []).length + 3)}">${esc(st.code)}</textarea></label><div class="row"><button type="button" class="btn primary" data-act="run">▶ Ejecutar</button>${d.inputs ? `<span class="muted small">Si tu programa usa input(), recibirá: ${d.inputs.map((x) => `<code>${esc(x)}</code>`).join(', ')}</span>` : ''}</div><div class="py-out-wrap"><span class="muted small">Salida</span><pre class="py-out code" aria-live="polite">Presiona ▶ Ejecutar para ver lo que imprime tu programa.</pre></div></div><ul class="rules small py-rules">${d.checks.map((c) => `<li>${esc(c.t)}</li>`).join('')}</ul>`;
+    const ta = $('.py-code', host), out = $('.py-out', host);
+    ta.addEventListener('input', () => { st.code = ta.value; api.save(st); });
+    ta.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText('    ', s, ta.selectionEnd, 'end'); st.code = ta.value; api.save(st); } });
+    const show = (r) => { out.textContent = (r.out || '') + (r.err ? (r.out ? '\n' : '') + '⚠ ' + r.err : '') || '(el programa no imprimió nada)'; out.classList.toggle('has-err', !!r.err); };
+    const exec = () => { out.textContent = 'Ejecutando…'; return runPy(st.code, d.inputs).then((r) => { show(r); return r; }, () => { const r = { out: '', err: 'No se pudo cargar Python. Revisa tu conexión a internet y vuelve a intentar.', noload: true }; show(r); return r; }); };
+    host.addEventListener('click', (e) => { if (e.target.closest('[data-act="run"]')) exec(); });
+    return {
+      check() {
+        return exec().then((r) => {
+          if (r.noload) return { score: 0, msg: r.err };
+          const res = d.checks.map((c) => { try { return !!c.f(st.code, r.out || '', r.err); } catch (e) { return false; } });
+          $$('.py-rules li', host).forEach((li, i) => li.classList.toggle('on', res[i]));
+          const n = res.filter(Boolean).length;
+          return { score: n / res.length, msg: (r.err ? 'Tu programa tiene un error: corrígelo y vuelve a revisar. ' : '') + `${n} de ${res.length} requisitos cumplidos.` };
+        });
+      }
+    };
+  };
+
   /* ================= HOJA DE CÁLCULO ================= */
   E.sheet = (host, d, api) => {
     const fresh = () => ({ raw: { ...d.cells }, cf: [], chart: null, filter: null, pivot: null, val: [] });
@@ -1908,6 +2163,11 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
     simulate: 'Elige el modo, presiona los botones de lanzar hasta llegar a 1 000 lanzamientos en cada modo, observa la tabla y la gráfica, y responde las preguntas.',
     contrast: 'Elige un color para cada papel (fondo, texto y acento) tocando los cuadros de color. La publicación de la derecha cambia en vivo. Cuida que se palomeen los tres criterios.',
     html: 'Escribe tu código en el recuadro de la izquierda; la vista previa de la derecha se actualiza sola. Presiona <b>Revisar</b> para ver qué requisitos ya cumples.',
+    binary: 'Toca cada casilla para cambiarla entre <b>0</b> y <b>1</b>. Debajo de cada casilla está su valor (128, 64, 32…). El número es la suma de los valores de las casillas que tienen 1. Al terminar presiona <b>Revisar</b>.',
+    circuit: 'En cada circuito elige una <b>resistencia</b> y <b>cierra el interruptor</b>. El mensaje te dice cuánta corriente pasa y cómo queda el LED. Busca que brille bien sin quemarse y presiona <b>Revisar</b>.',
+    rules: 'Completa la regla del microcontrolador: elige la comparación, escribe el valor límite y elige qué hacer si se cumple y si no. Mueve el control <b>Prueba el sensor</b> para comprobarla. Después presiona <b>Revisar</b>: se prueba con varios valores.',
+    train: 'Cada punto de color es un ejemplo para entrenar el modelo. Marca o desmarca la casilla de cada ejemplo para usarlo o no. Los cuadros son datos de prueba: ✓ si el modelo acierta, ✗ si falla. Quita los ejemplos con etiqueta equivocada hasta que acierte todo, y presiona <b>Revisar</b>.',
+    python: 'Escribe tu programa en el recuadro y presiona <b>▶ Ejecutar</b> para ver lo que imprime. Usa 4 espacios (o la tecla Tab) para la sangría dentro de <code>if</code>, <code>for</code> y <code>def</code>. Cuando cumpla los requisitos, presiona <b>Revisar</b>: el programa se vuelve a ejecutar y se revisa solo. Necesitas conexión a internet la primera vez.',
     form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
   };
   const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
@@ -1918,7 +2178,7 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
     $('#who').addEventListener('input', (e) => { store.name = e.target.value; persist(); });
   }
-  const hiloName = { datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
+  const hiloName = { sistemas: 'Sistemas y redes', datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
   const stText = { nuevo: 'Sin empezar', intentado: 'En proceso', hecho: 'Completado', dominado: 'Dominado' };
   const dots = (tm) => tm.ex.map((x) => `<i class="dot st-${status(x.pid)}" title="Ejercicio ${x.ei + 1}: ${stText[status(x.pid)]}"></i>`).join('');
@@ -1956,16 +2216,17 @@ GRADE.modules.forEach((m, mi) => m.temas.forEach((t, ti) => { const k = `m${mi +
       <div class="extabs" role="tablist">${tm.ex.map((e) => `<a role="tab" href="#${e.pid}" class="extab st-${status(e.pid)}" aria-selected="${e.pid === pid}"><span class="exn">Ejercicio ${e.ei + 1}</span><span class="exl">${esc(e.label)}${stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''}</span></a>`).join('')}</div>
       <h3 class="extitle">Ejercicio ${x.ei + 1} de ${tm.ex.length}${p.title ? ': ' + esc(p.title) : ''}</h3>
       <p class="intro">${p.intro}</p>
-      <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${HELP[p.type] || ''}</div></details>
-      ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${p.tip}</div></details>` : ''}
+      <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${p.help || HELP[p.type] || ''}</div></details>
+      ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${/\n/.test(p.tip) && !/</.test(p.tip) ? `<pre class="code">${esc(p.tip)}</pre>` : p.tip}</div></details>` : ''}
       <div class="engine"></div>
       <div class="result" aria-live="polite">${best ? `<span class="muted">Tu mejor resultado en este ejercicio: ${Math.round(best.best * 100)}% en ${best.tries} intento(s).</span>` : ''}</div>
       <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
     const api = { pid, load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null), save: (s) => { store.saves[pid] = s; persist(); }, autoCheck: () => doCheck(true) };
     let eng;
     try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Este ejercicio no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
-    function doCheck() {
-      if (!eng) return; const r = eng.check();
+    async function doCheck() {
+      if (!eng) return; let r = eng.check();
+      if (r && typeof r.then === 'function') { const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.' }; } btn.disabled = false; if (!document.body.contains(btn)) { const pr0 = store.prog[pid] || { best: 0, tries: 0 }; pr0.tries++; pr0.best = Math.max(pr0.best, r.score); store.prog[pid] = pr0; persist(); return; } }
       const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.best = Math.max(pr.best, r.score); store.prog[pid] = pr; persist();
       const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad';
       $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}</span></div>${r.score >= 0.8 && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
