@@ -58,6 +58,9 @@ button,input,select,textarea{font:inherit; color:inherit}
 .brand p{margin:0; color:var(--muted); font-size:.9rem}
 .top-r{display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
 .who{display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--muted)}
+.who input.need{outline:3px solid var(--bad); outline-offset:1px}
+.who.grp input{width:4.5rem}
+.result .sent{margin:.4rem 0 0}
 .who input{border:1px solid var(--line); background:var(--sunk); border-radius:var(--r-sm); padding:.35rem .6rem; width:13rem; max-width:50vw}
 .prog-pill{display:flex; flex-direction:column; gap:.25rem; font-size:.85rem; min-width:9rem}
 .pbar{display:block; height:8px; border-radius:99px; background:var(--grid); overflow:hidden}
@@ -344,7 +347,7 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
   .top{position:static}
   .thirds,.rb-wrap,.ct-grid,.ed,.ord-wrap.with-prev{grid-template-columns:1fr}
   .ph-row{grid-template-columns:1fr 1fr}
-  .who input{width:10rem}
+  .who input{width:10rem} .who.grp input{width:4rem}
 }
 @media (max-width: 520px){ body{font-size:16px} .ph-row{grid-template-columns:1fr} .trk{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
@@ -1492,7 +1495,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   let store;
   try { store = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { store = null; }
   if (!store || typeof store !== 'object') store = {};
-  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || '';
+  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || [];
+  if (!store.dev) store.dev = Math.random().toString(36).slice(2, 8).toUpperCase();
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
   /* migración: avance guardado antes de que hubiera varios ejercicios por tema */
@@ -1521,6 +1525,30 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   const exDone = (tm) => tm.ex.filter((x) => ['hecho', 'dominado'].includes(status(x.pid))).length;
   const all = temas;
   const doneCount = () => temas.filter((tm) => ['hecho', 'dominado'].includes(temaStatus(tm))).length;
+
+  /* ---------- envío de calificaciones a la hoja de la maestra (Google Apps Script) ---------- */
+  const REPORT_URL = 'https://script.google.com/macros/s/AKfycbyKT03IQL3BMPzIwkXtFPYXTPbhbJvrXe0FAujnKgnklZHdki1ScIQf2bEVEigREqlW/exec'.indexOf('http') === 0 ? 'https://script.google.com/macros/s/AKfycbyKT03IQL3BMPzIwkXtFPYXTPbhbJvrXe0FAujnKgnklZHdki1ScIQf2bEVEigREqlW/exec' : '';
+  const normGrupo = (v) => String(v || '').toUpperCase().replace(/\s+/g, '').slice(0, 8);
+  const registered = () => store.name.trim().length >= 3 && store.grupo.length >= 1;
+  const temaAvg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
+  const rowFor = (x, calif, tipo) => { const tm = x.tema; const pr = store.prog[x.pid] || {}; const d = new Date(); const pad = (n) => String(n).padStart(2, '0');
+    return { fecha: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`, grado: G.short, grupo: store.grupo, alumno: store.name.trim().replace(/\s+/g, ' '),
+      tema: `${LET[tm.mi]}${tm.ti + 1}`, temaNombre: tm.t.t, ejercicio: `${LET[tm.mi]}${tm.ti + 1}.${x.ei + 1}`, titulo: x.p.title || x.label, calif: calif == null ? '' : Math.round(calif * 100), intento: pr.att || 0,
+      mejor: Math.round((pr.best || 0) * 100), promTema: temaAvg(tm), temasComp: doneCount(), totalTemas: temas.length, tipo, dev: store.dev }; };
+  let sending = false;
+  const flush = () => new Promise((res) => {
+    if (!REPORT_URL || sending || !store.outbox.length) { res(!store.outbox.length); return; }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) { res(false); return; }
+    sending = true; const batch = store.outbox.slice(0, 120);
+    fetch(REPORT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ rows: batch }) })
+      .then(() => { store.outbox = store.outbox.slice(batch.length); persist(); sending = false; if (store.outbox.length) flush().then(res); else res(true); })
+      .catch(() => { sending = false; res(false); });
+  });
+  const report = (rows) => { if (!REPORT_URL || !rows.length) return Promise.resolve(true); store.outbox.push(...rows); if (store.outbox.length > 2000) store.outbox = store.outbox.slice(-2000); persist(); return flush(); };
+  /* al registrarse (o cambiar nombre o grupo) se envía el avance que ya había en este navegador */
+  const syncAll = () => { if (!REPORT_URL || !registered()) return; const who = store.name.trim() + '|' + store.grupo; if (store.synced === who) return;
+    store.synced = who; persist(); report(exs.filter((x) => store.prog[x.pid] && store.prog[x.pid].att).map((x) => rowFor(x, null, 'Avance guardado'))); };
+  if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { syncAll(); flush(); }, 1500); }
 
   /* ---------- gráficas SVG compartidas ---------- */
   const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
@@ -2364,9 +2392,12 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   const app = $('#app');
   function shell() {
     app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
-      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Escribe tu nombre" autocomplete="name"></label><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
+      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Nombre y apellidos" autocomplete="name" maxlength="60"></label><label class="who grp"><span>Grupo</span><input type="text" id="grp" value="${esc(store.grupo)}" placeholder="1A" maxlength="8" autocomplete="off"></label><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
-    $('#who').addEventListener('input', (e) => { store.name = e.target.value; persist(); });
+    $('#who').addEventListener('input', (e) => { store.name = e.target.value.slice(0, 60); persist(); });
+    $('#grp').addEventListener('input', (e) => { store.grupo = normGrupo(e.target.value); persist(); });
+    $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; syncAll(); });
+    $('#who').addEventListener('change', () => syncAll());
   }
   const hiloName = { sistemas: 'Sistemas y redes', datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
@@ -2382,7 +2413,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
     const nextT = temas.find((tm) => !['hecho', 'dominado'].includes(temaStatus(tm)));
     const nextX = nextT ? (nextT.ex.find((x) => !['hecho', 'dominado'].includes(status(x.pid))) || nextT.ex[0]) : null;
     const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}${tm.t.reto ? ' reto' : ''}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
-    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.${REPORT_URL ? ' <b>Antes de empezar escribe arriba tu nombre y apellidos y tu grupo</b>: cada vez que revisas un ejercicio, tu calificación le llega a tu maestra o maestro.' : ''}</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
       <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
       <p class="legend"><span><i class="dot st-hecho"></i> Ejercicio completado</span><span><i class="dot st-dominado"></i> Ejercicio dominado (100%)</span><span><i class="dot st-intentado"></i> En proceso</span><span><i class="dot st-nuevo"></i> Sin empezar</span></p>`;
     $('#cert').addEventListener('click', cert);
@@ -2423,10 +2454,14 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
       if (u >= MAXT) { a.innerHTML = `<b>Intentos agotados.</b> Calificación: <b>${bestPct()}%</b>`; $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); }
       else a.innerHTML = u ? `Te ${left === 1 ? 'queda' : 'quedan'} <b>${left}</b> de ${MAXT} intentos · Calificación más alta: <b>${bestPct()}%</b>` : `Tienes <b>${MAXT} intentos</b> para revisar este ejercicio`;
     };
-    const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist(); };
+    const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist();
+      if (!REPORT_URL) return; syncAll(); const res = $('.result');
+      report([rowFor(x, score, 'Revisión')]).then((ok) => { if (!document.body.contains(res) || !res.firstChild) return; const n = document.createElement('p'); n.className = 'sent muted small'; n.textContent = ok ? '✓ Tu calificación se envió a tu maestra o maestro.' : 'Sin conexión: tu calificación se enviará sola cuando vuelvas a tener internet.'; res.appendChild(n); }); };
     let busy = false;
     async function doCheck() {
-      if (!eng || busy || used() >= MAXT) return; let r = eng.check();
+      if (!eng || busy || used() >= MAXT) return;
+      if (REPORT_URL && !registered()) { $('.result').innerHTML = '<div class="res res-mid"><span>Antes de revisar, escribe arriba tu <b>nombre y apellidos</b> y tu <b>grupo</b> (por ejemplo 1A). Así tu calificación le llega a tu maestra o maestro. Este intento no se contó.</span></div>'; const f = !store.name.trim() || store.name.trim().length < 3 ? $('#who') : $('#grp'); if (f) { f.classList.add('need'); f.focus(); setTimeout(() => f.classList.remove('need'), 2500); } return; }
+      let r = eng.check();
       if (r && typeof r.then === 'function') { busy = true; const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.', noCount: true }; } busy = false; btn.disabled = false;
         if (r.noCount) { $('.result').innerHTML = `<div class="res res-bad"><span>${esc(r.msg)} Este intento no se contó.</span></div>`; return; }
         if (!document.body.contains(btn)) { record(r.score); return; } }
