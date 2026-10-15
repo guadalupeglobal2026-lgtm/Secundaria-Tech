@@ -58,6 +58,7 @@ button,input,select,textarea{font:inherit; color:inherit}
 .brand p{margin:0; color:var(--muted); font-size:.9rem}
 .top-r{display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
 .who{display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--muted)}
+.exp-box{display:block; margin:1rem 0; max-width:80ch} .exp-box textarea{width:100%} .exp-box textarea.need{outline:3px solid var(--bad)}
 .who input.need{outline:3px solid var(--bad); outline-offset:1px}
 .who.grp input{width:4.5rem}
 .result .sent{margin:.4rem 0 0}
@@ -302,6 +303,14 @@ input[type=range]{width:100%; accent-color:var(--hc,var(--ink)); min-height:32px
 .tasks .tk-how summary{cursor:pointer; color:var(--hc); font-weight:600; width:max-content; max-width:100%}
 .tasks .tk-how ol{margin:.3rem 0 .2rem; padding-left:1.3rem; color:var(--ink, inherit)} .tasks .tk-how li{margin:.15rem 0; padding:0}
 .tasks .tk-how li::marker{content:counter(list-item) ". "; color:var(--muted)}
+.sol-box{margin:1rem 0; border:2px solid var(--ok); border-radius:var(--r-sm); background:var(--surface); padding:.7rem 1rem; max-width:80ch}
+.sol-box summary{font-weight:700; cursor:pointer; color:var(--ok)}
+.sol-note{color:var(--muted); font-size:.9em; margin:.4rem 0}
+.sol-l{padding-left:1.4rem; margin:.4rem 0} .sol-l li{margin:.35rem 0}
+.sol-why{color:var(--muted); font-size:.9em}
+.sol-rb{margin:.2rem 0 .5rem; padding-left:1.3rem} .sol-rb li{margin:.15rem 0}
+.sol-sw{display:inline-block; width:1em; height:1em; border:1px solid var(--line); border-radius:3px; vertical-align:-.15em; margin-right:.3rem}
+.sol-box pre.code{white-space:pre-wrap; overflow-x:auto}
 .tasks{padding-left:1.4rem}
 .tasks li{margin:.35rem 0; padding:.2rem .4rem}
 .tasks li.ok{color:var(--ok)} .tasks li.ok::marker{content:"✓ "; color:var(--ok)}
@@ -1475,6 +1484,14 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   p.why = h.why; p.layout = h.layout; h.tasks.forEach((w, i) => { if (p.tasks[i]) p.tasks[i].why = w; }); })));
 }
 
+/* ===== Respuestas correctas (se muestran al agotar los intentos) ===== */
+{
+const SOLS = {"m3t1e1": {"sheet": ["En <b>F2</b> escribe <code>=SUMAR.SI($B$2:$B$13,E2,$C$2:$C$13)</code>", "Con <b>F2</b> seleccionada, <b>Rellenar ↓</b> hasta la fila <b>5</b>", "En <b>G2</b> escribe <code>=PROMEDIO.SI($B$2:$B$13,E2,$C$2:$C$13)</code>", "Con <b>G2</b> seleccionada, <b>Rellenar ↓</b> hasta la fila <b>5</b>", "En <b>F7</b> escribe <code>=CONTAR.SI(C2:C13,\"&gt;50\")</code>"]}, "m3t1e2": {"sheet": ["En <b>F2</b> escribe <code>=SUMAR.SI(B2:B6,\"Transporte\",C2:C6)</code>", "En <b>F3</b> escribe <code>=PROMEDIO.SI(B2:B6,\"Comida\",C2:C6)</code>", "En <b>F4</b> escribe <code>=CONTAR.SI(C2:C6,\"&gt;50\")</code>"]}, "m3t2e1": {"sheet": ["En <b>G2</b> escribe <code>=BUSCARV(G1,A2:D8,2,FALSO)</code>", "En <b>G3</b> escribe <code>=BUSCARV(G1,A2:D8,3,FALSO)</code>", "En <b>G4</b> escribe <code>=BUSCARV(G1,A2:D8,4,FALSO)</code>", "En <b>G7</b> escribe <code>=G3*G6</code>", "En <b>G1</b> escribe <b>P06</b>"]}, "m3t2e2": {"sheet": ["En <b>G2</b> escribe <code>=BUSCARV(G1,A2:D5,2,FALSO)</code>", "En <b>G3</b> escribe <code>=BUSCARV(G1,A2:D5,4,FALSO)</code>", "En <b>G1</b> escribe <b>M102</b>"]}, "m3t3e1": {"sheet": ["<b>Validación de datos</b> en <b>C2:C7</b> con la lista: Pendiente, Pagado, Entregado", "En <b>C2</b> elige <b>Pagado</b> de la lista", "En <b>C3</b> elige <b>Entregado</b> de la lista", "En <b>C4</b> elige <b>Pendiente</b> de la lista", "En <b>C5</b> elige <b>Pendiente</b> de la lista", "En <b>C6</b> escribe <b>pendiente</b>", "En <b>C7</b> elige <b>Pendiente</b> de la lista", "En <b>F2</b> escribe <code>=CONTAR.SI(C2:C7,\"Pendiente\")</code>"]}, "m3t3e2": {"sheet": ["<b>Validación de datos</b> en <b>C2:C6</b> con la lista: Prestado, Devuelto, Atrasado", "En <b>C2</b> elige <b>Prestado</b> de la lista", "En <b>C3</b> elige <b>Devuelto</b> de la lista", "En <b>C4</b> elige <b>Atrasado</b> de la lista", "En <b>C5</b> elige <b>Devuelto</b> de la lista", "En <b>C6</b> elige <b>Atrasado</b> de la lista", "En <b>F2</b> escribe <code>=CONTAR.SI(C2:C6,\"Atrasado\")</code>"]}, "m3t4e1": {"sheet": ["<b>Tabla dinámica</b>: Filas = <b>Categoría</b>, Valores = <b>Importe</b>, Operación = <b>SUMA</b>", "En <b>G2</b> escribe <b>Comida</b>", "<b>Tabla dinámica</b>: Filas = <b>Grupo</b>, Valores = <b>Importe</b>, Operación = <b>SUMA</b>", "En <b>G3</b> escribe <b>2B</b>", "En <b>G4</b> escribe <code>=SUMA(D2:D21)</code>"]}, "m3t4e2": {"sheet": ["<b>Tabla dinámica</b>: Filas = <b>Grupo</b>, Valores = <b>Kilos</b>, Operación = <b>SUMA</b>", "En <b>E2</b> escribe <b>3A</b>", "<b>Tabla dinámica</b>: Filas = <b>Material</b>, Valores = <b>Kilos</b>, Operación = <b>SUMA</b>", "En <b>E3</b> escribe <b>PET</b>"]}, "m4t2e1": {"sheet": ["En <b>B4</b> escribe <code>=SUMA(B2:B3)</code>", "En <b>B9</b> escribe <code>=B7-B6</code>", "En <b>B10</b> escribe <code>=B4/B9</code>", "En <b>E2</b> escribe <code>=D2*$B$7</code>", "Con <b>E2</b> seleccionada, <b>Rellenar ↓</b> hasta la fila <b>8</b>", "En <b>F2</b> escribe <code>=$B$4+D2*$B$6</code>", "Con <b>F2</b> seleccionada, <b>Rellenar ↓</b> hasta la fila <b>8</b>", "En <b>G2</b> escribe <code>=E2-F2</code>", "Con <b>G2</b> seleccionada, <b>Rellenar ↓</b> hasta la fila <b>8</b>", "<b>Formato condicional</b> en <b>G2:G8</b>: si es mayor que <b>0</b> → verde", "<b>Formato condicional</b> en <b>G2:G8</b>: si es menor que <b>0</b> → rojo", "<b>Insertar gráfica</b> de <b>líneas</b>: etiquetas <b>D2:D8</b>, valores <b>E2:F8</b>, título «Ingresos y costos»"]}, "m3t5e1": {"sheet": ["En <b>H3</b> escribe <code>=SUMAR.SI(C2:C9,\"Bebidas\",D2:D9)</code>", "En <b>H4</b> escribe <code>=BUSCARV(H1,A2:E9,2,FALSO)</code>", "En <b>H5</b> escribe <code>=BUSCARV(H1,A2:E9,4,FALSO)</code>", "En <b>H6</b> escribe <code>=CONTAR.SI(E2:E9,\"Pendiente\")</code>", "En <b>H7</b> escribe <code>=PROMEDIO.SI(C2:C9,\"Snacks\",D2:D9)</code>"]}, "m4t2e2": {"sheet": ["En <b>B5</b> escribe <code>=B4-B3</code>", "En <b>B6</b> escribe <code>=B2/B5</code>", "En <b>B7</b> escribe <code>=50*B5-B2</code>"]}, "m5t4e1": {"code": "calificaciones = [9, 7, 8, 6, 10]\nfor c in calificaciones:\n    print(c)\ndef promedio(lista):\n    return sum(lista) / len(lista)\np = promedio(calificaciones)\nprint(\"Promedio:\", p)\nif p >= 6:\n    print(\"Aprobado\")\nelse:\n    print(\"Reprobado\")\n"}, "m5t1e1": {"code": "precio = 35\ncantidad = 4\ntotal = precio * cantidad\nprint(\"Total:\", total)\n"}, "m5t1e2": {"code": "c = float(input(\"Grados Celsius: \"))\nf = c * 9 / 5 + 32\nprint(f)\n"}, "m5t2e1": {"code": "calif = 7.5\nif calif >= 6:\n    print(\"Aprobado\")\nelse:\n    print(\"Reprobado\")\nfor i in range(1, 11):\n    print(7 * i)\n"}, "m5t2e2": {"code": "suma = 0\nfor n in range(1, 11):\n    suma = suma + n\nprint(suma)\n"}, "m5t3e1": {"code": "calificaciones = [8, 9, 7, 10, 6]\ndef promedio(lista):\n    return sum(lista) / len(lista)\nprint(promedio(calificaciones))\n"}, "m5t3e2": {"code": "compras = [\"pan\", \"leche\"]\ncompras.append(\"huevo\")\nprint(len(compras))\nfor p in compras:\n    print(p)\n"}, "m6t4e1": {"code": "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"utf-8\"><style>h1 { color: #0E7C66; }</style></head><body><h1>Club de robótica</h1><p>Construimos robots con micro:bit cada martes en el laboratorio.</p><ul><li>Ana</li><li>Luis</li><li>Sofía</li></ul><button id=\"ver\">Ver horario</button><p id=\"horario\"></p><script>document.getElementById(\"ver\").addEventListener(\"click\", () => { document.getElementById(\"horario\").textContent = \"Martes 3 pm\"; });<\/script></body></html>"}, "m6t1e1": {"code": "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"utf-8\"><title>Mi portafolio</title></head><body>\n<h1>Valeria Gómez</h1>\n<p>Soy estudiante de tercero de secundaria y me gusta el diseño.</p>\n<h2>Proyectos</h2>\n<ul><li>Encuesta</li><li>Campaña</li><li>Video</li></ul>\n<img src=\"foto.jpg\" alt=\"Foto de Valeria\">\n<a href=\"https://www.ejemplo.mx\">Mi blog</a>\n</body></html>"}, "m6t1e2": {"code": "<html><body><h1>Filtro de agua</h1><h2>Objetivo</h2><p>Construir un filtro casero con materiales reciclados.</p><ol><li>Cortar</li><li>Llenar</li><li>Probar</li></ol><a href=\"fuente.html\">Fuente</a></body></html>"}, "m6t2e1": {"add": [["/* Escribe aquí tus estilos */", "body { font-family: Arial, sans-serif; background-color: #F6EFD9; max-width: 700px; margin: auto; }\n h1 { color: #0E7C66; }\n .proyecto { border: 2px solid #0E7C66; padding: 12px; }"]]}, "m6t2e2": {"add": [["/* Escribe aquí tus estilos */", ".tarjeta { background-color: #E8F5E9; padding: 16px; border-radius: 12px; }\n h2 { font-size: 24px; }\n p { color: #333333; }"]]}, "m6t3e1": {"add": [["// Escribe aquí tu código", "const btn = document.getElementById(\"saludo\");\n btn.addEventListener(\"click\", () => { document.getElementById(\"mensaje\").textContent = \"Gracias\"; });\n document.getElementById(\"modo\").addEventListener(\"click\", () => document.body.classList.toggle(\"oscuro\"));"], ["<button id=\"saludo\">Saludar</button>", "<button id=\"saludo\">Saludar</button>\n  <button id=\"modo\">Modo oscuro</button>"]]}, "m6t3e2": {"add": [["// Escribe aquí tu código", "let visitas = 0;\n const cuenta = document.getElementById(\"cuenta\");\n const boton = document.getElementById(\"mas\");\n boton.onclick = () => { visitas++; cuenta.textContent = visitas; };"]]}};
+M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const s = SOLS[`m${mi + 1}t${ti + 1}e${ei + 1}`]; if (!s) return;
+  if (s.add && p.starter) { let c = p.starter; s.add.forEach(([a, b]) => { c = c.replace(a, b); }); s.code = c; }
+  p.sol = s; })));
+}
+
 })();
 
 </script>
@@ -1495,7 +1512,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   let store;
   try { store = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { store = null; }
   if (!store || typeof store !== 'object') store = {};
-  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || [];
+  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {};
   if (!store.dev) store.dev = Math.random().toString(36).slice(2, 8).toUpperCase();
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
@@ -1531,10 +1548,11 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   const normGrupo = (v) => String(v || '').toUpperCase().replace(/\s+/g, '').slice(0, 8);
   const registered = () => store.name.trim().length >= 3 && store.grupo.length >= 1;
   const temaAvg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
+  const textoFor = (x) => { if (x.tema.t.reto) return (store.exp[x.pid] || '').trim(); if (x.p.type === 'form') { const v = (store.saves[x.pid] && store.saves[x.pid].v) || []; return x.p.fields.map((f, i) => `${f.label}: ${(v[i] || '').trim()}`).join(' | '); } return ''; };
   const rowFor = (x, calif, tipo) => { const tm = x.tema; const pr = store.prog[x.pid] || {}; const d = new Date(); const pad = (n) => String(n).padStart(2, '0');
     return { fecha: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`, grado: G.short, grupo: store.grupo, alumno: store.name.trim().replace(/\s+/g, ' '),
       tema: `${LET[tm.mi]}${tm.ti + 1}`, temaNombre: tm.t.t, ejercicio: `${LET[tm.mi]}${tm.ti + 1}.${x.ei + 1}`, titulo: x.p.title || x.label, calif: calif == null ? '' : Math.round(calif * 100), intento: pr.att || 0,
-      mejor: Math.round((pr.best || 0) * 100), promTema: temaAvg(tm), temasComp: doneCount(), totalTemas: temas.length, tipo, dev: store.dev }; };
+      mejor: Math.round((pr.best || 0) * 100), promTema: temaAvg(tm), temasComp: doneCount(), totalTemas: temas.length, tipo, dev: store.dev, texto: textoFor(x).slice(0, 1500) }; };
   let sending = false;
   const flush = () => new Promise((res) => {
     if (!REPORT_URL || sending || !store.outbox.length) { res(!store.outbox.length); return; }
@@ -1548,7 +1566,17 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
   /* al registrarse (o cambiar nombre o grupo) se envía el avance que ya había en este navegador */
   const syncAll = () => { if (!REPORT_URL || !registered()) return; const who = store.name.trim() + '|' + store.grupo; if (store.synced === who) return;
     store.synced = who; persist(); report(exs.filter((x) => store.prog[x.pid] && store.prog[x.pid].att).map((x) => rowFor(x, null, 'Avance guardado'))); };
-  if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { syncAll(); flush(); }, 1500); }
+  /* el avance guardado en la hoja de la maestra se combina con el de este navegador:
+     así el alumno conserva su avance en otro dispositivo y borrar el navegador no devuelve intentos */
+  const byLabel = {}; exs.forEach((x) => { byLabel[`${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`] = x.pid; });
+  let pulling = false;
+  const pullProgress = () => { if (!REPORT_URL || !registered() || pulling) return Promise.resolve(false); pulling = true;
+    const q = `alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}`;
+    return fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => { pulling = false; if (!d || !d.prog) return false; let ch = false;
+      Object.entries(d.prog).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const pr = store.prog[pid] || { best: 0, tries: 0 }; const att = Math.min(MAXT, Math.max(pr.att || 0, +v.att || 0)); const best = Math.max(pr.best || 0, (+v.best || 0) / 100);
+        if (att !== (pr.att || 0) || best !== pr.best) { pr.att = att; pr.best = best; pr.tries = Math.max(pr.tries || 0, att); store.prog[pid] = pr; ch = true; } });
+      store.pulled = store.name.trim() + '|' + store.grupo; persist(); if (ch && typeof route === 'function') route(curHash); return ch; }).catch(() => { pulling = false; return false; }); };
+  if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { pullProgress().then(() => { syncAll(); flush(); }); }, 1200); }
 
   /* ---------- gráficas SVG compartidas ---------- */
   const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
@@ -2388,6 +2416,67 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
     python: 'Escribe tu programa en el recuadro y presiona <b>▶ Ejecutar</b> para ver lo que imprime. Usa 4 espacios (o la tecla Tab) para la sangría dentro de <code>if</code>, <code>for</code> y <code>def</code>. Puedes ejecutar todas las veces que quieras. Cuando cumpla los requisitos, presiona <b>Revisar</b> (tienes 3 intentos): el programa se vuelve a ejecutar y se revisa solo. Necesitas conexión a internet la primera vez.',
     form: 'Responde cada pregunta con tus propias palabras. Cada respuesta tiene una extensión mínima. Con <b>Copiar mis respuestas</b> puedes pegarlas en tu documento.',
   };
+  /* ---------- respuestas correctas: se muestran cuando se agotan los intentos ---------- */
+  const solutionHTML = (p) => {
+    const li = (a) => `<ol class="sol-l">${a.map((x) => `<li>${x}</li>`).join('')}</ol>`;
+    const why = (t) => (t ? ` <span class="sol-why">${esc(t)}</span>` : '');
+    const strip = (h) => { const e = document.createElement('div'); e.innerHTML = h; return e.textContent; };
+    const lum = (hex) => { const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+    const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const quizSol = (qs) => li(qs.map((q) => `${esc(q.q)}<br>✓ <b>${esc(q.opts[q.a])}</b>${why(q.fb)}`));
+    const s = p.sol || {};
+    switch (p.type) {
+      case 'classify': return li(p.items.map((it) => `${it.html ? strip(it.html) : esc(it.t)} → <b>${esc(p.cats[it.c])}</b>${why(it.why)}`));
+      case 'quiz': return quizSol(p.qs);
+      case 'spot': { const out = []; (p.sets || [p]).forEach((st) => st.parts.forEach((x) => { if (Array.isArray(x) && x[1]) out.push(`<b>${esc(x[0])}</b>${why(x[2])}`); })); return '<p>Estas eran las partes con problema (todo lo demás estaba bien):</p>' + li(out); }
+      case 'order': return p.sets.map((st) => `<p><b>${esc(st.prompt)}</b></p>${li(st.items.map((x) => (st.html ? x : esc(typeof x === 'string' ? x : x.t || ''))))}`).join('');
+      case 'password': return '<p><b>Una contraseña segura</b> cumple los seis criterios, por ejemplo: <code>Rio-Tambor-Nube#48x</code> (frase con mayúsculas, minúsculas, números y símbolo, sin datos personales).</p><p><b>Clasificación de los ejemplos:</b></p>' + li(p.samples.map((x) => `<code>${esc(x.p)}</code> → <b>${esc(p.cats[x.c])}</b>${why(x.why)}`));
+      case 'rewrite': return '<p>Hay muchas formas correctas. Un ejemplo de cada mensaje:</p>' + li(p.msgs.map((m, i) => `<span class="sol-why">Original: ${esc(m.orig)}</span><br>✓ ${s.examples && s.examples[i] ? `«${esc(s.examples[i])}»` : `Debe ${esc(m.intent)}, sin mayúsculas sostenidas, sin insultos y con una fórmula amable.`}`));
+      case 'thirds': return li(['<b>Horizonte:</b> sobre una de las dos líneas horizontales de la cuadrícula (a un tercio de arriba o de abajo), nunca en el centro.', '<b>Faro:</b> con su centro en uno de los cuatro puntos donde se cruzan las líneas.', 'Activa «Mostrar cuadrícula 3×3» para verlo.']);
+      case 'sliders': return li(p.sliders.map((x) => { const f = x.fmt || ((v) => v); return `<b>${esc(x.label)}</b>: entre <b>${f(x.target[0])}</b> y <b>${f(x.target[1])}</b>`; }));
+      case 'robot': {
+        const NM = { A: 'Avanzar 1 casilla', I: 'Girar a la izquierda', D: 'Girar a la derecha' };
+        const parse = (str) => { const root = []; const stack = [root]; let last = null; for (const ch of str) { const cur = stack[stack.length - 1]; if (NM[ch]) cur.push({ k: ch }); else if (ch === 'R') { last = { k: 'R', n: 2, body: [] }; cur.push(last); stack.push(last.body); } else if (ch === ']') stack.pop(); else if (ch === '+' && last) last.n++; } return root; };
+        const group = (l) => { const o = []; l.forEach((b) => { const pv = o[o.length - 1]; if (b.k !== 'R' && pv && pv.k === b.k) pv.c++; else o.push(b.k === 'R' ? b : { k: b.k, c: 1 }); }); return o; };
+        const show = (l) => `<ul class="sol-rb">${group(l).map((b) => (b.k === 'R' ? `<li><b>Repetir ${b.n} veces</b>:${show(b.body)}</li>` : `<li>${NM[b.k]}${b.c > 1 ? ` <b>(${b.c} bloques seguidos)</b>` : ''}</li>`)).join('')}</ul>`;
+        return (s.robot || []).map((pr, i) => `<p><b>Nivel ${i + 1}</b></p>${show(parse(pr))}`).join('') || '<p>Arma el camino paso a paso y prueba cada nivel con ▶ Ejecutar.</p>';
+      }
+      case 'trace': return li(p.items.map((it) => `<span class="sol-why">${esc(it.q)}</span><br>✓ <b>${esc(it.opts ? it.opts[it.a] : it.a)}</b>${why(it.fb)}`));
+      case 'simulate': return '<p>Lanza <b>1000 o más</b> veces con 1 dado y 1000 o más con la suma de 2 dados.</p>' + quizSol(p.qs);
+      case 'contrast': {
+        const P = p.palette; let best = null;
+        P.forEach((bg, i) => P.forEach((tx, j) => P.forEach((ac, k) => { if (i === j || j === k || i === k) return; const r1 = ratio(bg, tx), r2 = ratio(bg, ac); const rgb = [1, 3, 5].map((q) => parseInt(ac.slice(q, q + 2), 16)); const sat = (Math.max(...rgb) - Math.min(...rgb)) / 255; const sc = Math.min(r1, 12) + sat * 10; if (r1 >= 4.5 && r2 >= 3 && (!best || sc > best.s)) best = { i, j, k, r1, r2, s: sc }; })));
+        if (!best) return '';
+        const sw = (c) => `<span class="sol-sw" style="background:${c}"></span><code>${c}</code>`;
+        return `<p>Una combinación correcta (hay varias):</p>${li([`Fondo: ${sw(P[best.i])}`, `Texto: ${sw(P[best.j])} · contraste ${best.r1.toFixed(1)} : 1 (mínimo 4.5)`, `Acento: ${sw(P[best.k])} · contraste ${best.r2.toFixed(1)} : 1 (mínimo 3)`])}<p class="sol-why">Regla: texto oscuro sobre fondo claro (o al revés) y tres colores distintos.</p>`;
+      }
+      case 'circuit': { const RES = p.res || [0, 100, 220, 330, 1000, 10000]; return li(p.levels.map((L, i) => { const r = RES.find((x) => x > 0 && (L.v - 2) / x * 1000 >= 10 && (L.v - 2) / x * 1000 <= 25); return `<b>Circuito ${i + 1}</b> (pila de ${L.v} V): resistencia de <b>${r >= 1000 ? r / 1000 + ' kΩ' : r + ' Ω'}</b> e interruptor cerrado → (${L.v} − 2) ÷ ${r} = <b>${Math.round((L.v - 2) / r * 10000) / 10} mA</b>`; })); }
+      case 'rules': return li(p.levels.map((L) => {
+        const ev = (op, th, a, b, v) => ((op === '<' ? v < th : op === '>' ? v > th : op === '<=' ? v <= th : v >= th) ? a : b);
+        const acts = L.actions; const g = norm(L.goal || ''); const nums = ((L.goal || '').match(/\d+(?:\.\d+)?/g) || []).map(Number);
+        const pref = /mayor o igual|o mas\b/.test(g) ? '>=' : /menor o igual|o menos\b/.test(g) ? '<=' : /mayor|mas de|supera|arriba de/.test(g) ? '>' : '<';
+        const ths = [...nums, ...L.tests.map((t) => t[0])];
+        let sol = null;
+        for (const op of [pref, '<', '>', '<=', '>=']) { for (const th of ths) { for (const a of acts) for (const b of acts) { if (a !== b && L.tests.every((t) => ev(op, th, a, b, t[0]) === t[1])) { sol = { op, th, a, b }; break; } } if (sol) break; } if (sol) break; }
+        if (!sol) return esc(L.goal || '');
+        const sym = { '<': '&lt;', '>': '&gt;', '<=': '≤', '>=': '≥' }[sol.op];
+        return `${L.goal ? `<span class="sol-why">${esc(L.goal)}</span><br>` : ''}si <b>${esc(L.sensor)} ${sym} ${sol.th}</b> → <b>${esc(sol.a)}</b>; si no → <b>${esc(sol.b)}</b>`; }));
+      case 'train': {
+        const n = p.pool.length; const near = (t, use) => { let b = null, bd = Infinity; p.pool.forEach((x, k) => { if (!use[k]) return; const dd = Math.hypot(x.x - t.x, x.y - t.y); if (dd < bd) { bd = dd; b = x; } }); return b && b.label; };
+        let bestSet = null;
+        for (let m = 0; m < (1 << Math.min(n, 16)); m++) { const use = p.pool.map((_, k) => !(m & (1 << k))); const rm = n - use.filter(Boolean).length; if (bestSet && rm >= bestSet.length) continue;
+          if (!p.classes.every((c) => p.pool.filter((x, k) => use[k] && x.label === c).length >= (p.minPer || 2))) continue;
+          if (p.test.every((t) => near(t, use) === t.label)) bestSet = p.pool.map((x, k) => ({ x, k })).filter(({ k }) => !use[k]); }
+        if (!bestSet) return '';
+        return `<p>Había que <b>quitar</b> (desmarcar) estos ejemplos, porque tienen la etiqueta equivocada: están rodeados de puntos del otro color.</p>${li(bestSet.map(({ x, k }) => `Ejemplo <b>${k + 1}</b>: ${esc(x.n)} — decía «${esc(x.label)}», pero es «${esc(p.classes.find((c) => c !== x.label) || '')}»`))}<p class="sol-why">Sin esos ejemplos, el modelo acierta todos los datos de prueba.</p>`;
+      }
+      case 'binary': return li(p.items.map((it) => (it.mode === 'read' ? `${esc(it.q)} → <b>${parseInt(it.bits, 2)}</b>` : `${esc(it.q)} → <code>${(it.target >>> 0).toString(2).padStart(p.bits || 8, '0')}</code>`) + why(it.fb)));
+      case 'html': case 'python': return (s.code ? `<p>Una solución correcta:</p><pre class="code">${esc(s.code)}</pre>` : p.tip && /\n/.test(p.tip) ? `<p>Una solución correcta:</p><pre class="code">${esc(p.tip)}</pre>` : '') + `<p><b>Lo que debía cumplir:</b></p>${li(p.checks.map((c) => esc(c.t)))}`;
+      case 'form': return `<p>Aquí no hay una sola respuesta correcta: cuenta que cada respuesta tenga la extensión mínima${p.fields.some((f) => f.need) ? ' y las palabras que se piden' : ''}.</p>${li(p.fields.map((f) => `${esc(f.label)}: al menos <b>${f.min || 1}</b> caracteres${f.need ? `; debe incluir: <b>${f.need.map(esc).join(', ')}</b>` : ''}`))}`;
+      case 'sheet': return s.sheet ? `<p>Pasos para resolverla:</p>${li(s.sheet)}` : li(p.tasks.map((t) => `${t.text}${t.hint ? `<br>✓ ${esc(t.hint)}` : ''}`));
+      default: return '';
+    }
+  };
   const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
   const app = $('#app');
   function shell() {
@@ -2396,8 +2485,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
     $('#who').addEventListener('input', (e) => { store.name = e.target.value.slice(0, 60); persist(); });
     $('#grp').addEventListener('input', (e) => { store.grupo = normGrupo(e.target.value); persist(); });
-    $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; syncAll(); });
-    $('#who').addEventListener('change', () => syncAll());
+    $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; pullProgress().then(syncAll); });
+    $('#who').addEventListener('change', () => pullProgress().then(syncAll));
   }
   const hiloName = { sistemas: 'Sistemas y redes', datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
@@ -2413,7 +2502,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
     const nextT = temas.find((tm) => !['hecho', 'dominado'].includes(temaStatus(tm)));
     const nextX = nextT ? (nextT.ex.find((x) => !['hecho', 'dominado'].includes(status(x.pid))) || nextT.ex[0]) : null;
     const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}${tm.t.reto ? ' reto' : ''}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
-    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.${REPORT_URL ? ' <b>Antes de empezar escribe arriba tu nombre y apellidos y tu grupo</b>: cada vez que revisas un ejercicio, tu calificación le llega a tu maestra o maestro.' : ''}</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Si los agotas, verás las respuestas correctas para que sepas qué te faltó. En cada reto 🏆 explica con tus palabras cómo lo resolviste. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.${REPORT_URL ? ' <b>Antes de empezar escribe arriba tu nombre y apellidos y tu grupo</b>: cada vez que revisas un ejercicio, tu calificación le llega a tu maestra o maestro.' : ''}</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
       <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
       <p class="legend"><span><i class="dot st-hecho"></i> Ejercicio completado</span><span><i class="dot st-dominado"></i> Ejercicio dominado (100%)</span><span><i class="dot st-intentado"></i> En proceso</span><span><i class="dot st-nuevo"></i> Sin empezar</span></p>`;
     $('#cert').addEventListener('click', cert);
@@ -2441,17 +2530,21 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
       <details class="help" open><summary>¿Cómo se resuelve?</summary><div>${p.help || HELP[p.type] || ''}</div></details>
       ${p.tip ? `<details class="tip"><summary>Ver pista</summary><div>${/\n/.test(p.tip) && !/</.test(p.tip) ? `<pre class="code">${esc(p.tip)}</pre>` : p.tip}</div></details>` : ''}
       <div class="engine"></div>
+      ${tm.t.reto ? `<label class="fld exp-box"><span>✍️ <b>Explica con tus palabras cómo resolviste el reto</b>: qué hiciste primero, qué usaste de los temas y qué se te dificultó (mínimo 60 caracteres). Tu maestra o maestro lo leerá.</span><textarea id="exp" rows="3">${esc(store.exp[pid] || '')}</textarea><span class="muted small exp-n"></span></label>` : ''}
       <div class="result" aria-live="polite"></div>
       <div class="foot"><button type="button" class="btn primary" id="chk">Revisar</button><span class="att" aria-live="polite"></span><button type="button" class="btn ghost" id="rst">Empezar de nuevo</button><span class="grow"></span>${prev ? `<a class="btn ghost" href="#${prev.pid}">← Anterior</a>` : ''}${next ? `<a class="btn" href="#${next.pid}">${nextLabel}</a>` : ''}</div></article>`;
     const api = { pid, load: () => (store.saves[pid] ? JSON.parse(JSON.stringify(store.saves[pid])) : null), save: (s) => { store.saves[pid] = s; persist(); }, autoCheck: () => doCheck(true) };
+    const expN = () => { const n = (store.exp[pid] || '').trim().length; const el = $('.exp-n'); if (el) el.textContent = `${n} caracteres${n < 60 ? ` (faltan ${60 - n})` : ' ✓'}`; };
+    if ($('#exp')) { $('#exp').addEventListener('input', (e) => { store.exp[pid] = e.target.value.slice(0, 1500); persist(); expN(); }); expN(); }
     let eng;
     try { eng = E[p.type]($('.engine'), p, api); } catch (e) { console.error(e); $('.engine').innerHTML = '<p class="xl-flash">Este ejercicio no pudo cargarse. Usa “Empezar de nuevo”.</p>'; }
     /* intentos: cada ejercicio permite MAXT revisiones y se conserva la calificación más alta */
     const used = () => (store.prog[pid] && store.prog[pid].att) || 0;
     const bestPct = () => Math.round(((store.prog[pid] && store.prog[pid].best) || 0) * 100);
+    const showSol = () => { if ($('.sol-box') || bestPct() >= 100) return; let h = ''; try { h = solutionHTML(p); } catch (e) { console.error(e); } if (!h) return; $('.result').insertAdjacentHTML('afterend', `<details class="sol-box" open><summary>✅ Respuestas correctas</summary><p class="sol-note">Ya usaste tus 3 intentos. Compara con tu trabajo para ver qué te faltó; tu calificación se queda en ${bestPct()}%.</p>${h}</details>`); };
     const showAtt = () => {
       const u = used(), left = MAXT - u; const a = $('.att');
-      if (u >= MAXT) { a.innerHTML = `<b>Intentos agotados.</b> Calificación: <b>${bestPct()}%</b>`; $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); }
+      if (u >= MAXT) { a.innerHTML = `<b>Intentos agotados.</b> Calificación: <b>${bestPct()}%</b>`; $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); showSol(); }
       else a.innerHTML = u ? `Te ${left === 1 ? 'queda' : 'quedan'} <b>${left}</b> de ${MAXT} intentos · Calificación más alta: <b>${bestPct()}%</b>` : `Tienes <b>${MAXT} intentos</b> para revisar este ejercicio`;
     };
     const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist();
@@ -2461,6 +2554,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, e) => { if (p.t
     async function doCheck() {
       if (!eng || busy || used() >= MAXT) return;
       if (REPORT_URL && !registered()) { $('.result').innerHTML = '<div class="res res-mid"><span>Antes de revisar, escribe arriba tu <b>nombre y apellidos</b> y tu <b>grupo</b> (por ejemplo 1A). Así tu calificación le llega a tu maestra o maestro. Este intento no se contó.</span></div>'; const f = !store.name.trim() || store.name.trim().length < 3 ? $('#who') : $('#grp'); if (f) { f.classList.add('need'); f.focus(); setTimeout(() => f.classList.remove('need'), 2500); } return; }
+      if (tm.t.reto && (store.exp[pid] || '').trim().length < 60) { $('.result').innerHTML = '<div class="res res-mid"><span>Antes de revisar, escribe en el recuadro <b>✍️ cómo resolviste el reto</b> (mínimo 60 caracteres). Este intento no se contó.</span></div>'; const t = $('#exp'); if (t) { t.classList.add('need'); t.focus(); setTimeout(() => t.classList.remove('need'), 2500); } return; }
       let r = eng.check();
       if (r && typeof r.then === 'function') { busy = true; const btn = $('#chk'); btn.disabled = true; $('.result').innerHTML = '<span class="muted">Revisando…</span>'; try { r = await r; } catch (e) { r = { score: 0, msg: 'No se pudo revisar. Intenta de nuevo.', noCount: true }; } busy = false; btn.disabled = false;
         if (r.noCount) { $('.result').innerHTML = `<div class="res res-bad"><span>${esc(r.msg)} Este intento no se contó.</span></div>`; return; }
