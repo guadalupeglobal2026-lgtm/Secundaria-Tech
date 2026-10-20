@@ -56,6 +56,10 @@ button,input,select,textarea{font:inherit; color:inherit}
 .logo{display:grid; place-items:center; width:46px; height:46px; border-radius:var(--r); background:var(--ink); color:var(--surface); font:800 1.25rem var(--f-head)}
 .brand h1{font-size:1.25rem; font-weight:800}
 .brand p{margin:0; color:var(--muted); font-size:.9rem}
+.tfoot{max-width:1100px; margin:2rem auto 1rem; padding:0 1rem; text-align:right}
+.tfoot #docpanel{text-align:left; margin:.6rem 0 0 auto; max-width:34rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:.8rem 1rem}
+.docopts{border:0; padding:0; margin:.4rem 0} .docopts label{display:block; margin:.25rem 0} .docmsg{color:var(--bad)} .docok{color:var(--ok); font-weight:700}
+@media print{.tfoot{display:none}}
 .top-r{display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
 .who{display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--muted)}
 .exp-box{display:block; margin:1rem 0; max-width:80ch} .exp-box textarea{width:100%} .exp-box textarea.need{outline:3px solid var(--bad)}
@@ -868,7 +872,7 @@ window.GRADE = {
       ] } },
   ] },
   /* ---------------- M5 ---------------- */
-  { name: 'Portafolio web', hilo: 'codigo', temas: [
+  { name: 'Portafolio web y proyectos', hilo: 'codigo', temas: [
     { t: 'Estructura con HTML', p: { type: 'html', starter: HTML_START,
       intro: 'HTML define qué es cada parte de tu página: títulos, párrafos, listas, imágenes y enlaces. Escribe la estructura de tu portafolio y mira la vista previa.',
       tip: '<code>&lt;h1&gt;</code> título principal · <code>&lt;p&gt;</code> párrafo · <code>&lt;ul&gt;&lt;li&gt;</code> lista · <code>&lt;img src="foto.jpg" alt="descripción"&gt;</code> · <code>&lt;a href="…"&gt;</code> enlace.',
@@ -1512,7 +1516,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   let store;
   try { store = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { store = null; }
   if (!store || typeof store !== 'object') store = {};
-  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {};
+  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {}; store.resetsDone = store.resetsDone || [];
   if (!store.dev) store.dev = Math.random().toString(36).slice(2, 8).toUpperCase();
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
@@ -1569,10 +1573,17 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   /* el avance guardado en la hoja de la maestra se combina con el de este navegador:
      así el alumno conserva su avance en otro dispositivo y borrar el navegador no devuelve intentos */
   const byLabel = {}; exs.forEach((x) => { byLabel[`${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`] = x.pid; });
+  /* reinicio hecho por la docente (con contraseña, desde el simulador o desde su hoja) */
+  const applyReset = (id, ej) => { if (!id || store.resetsDone.includes(id)) return false; store.resetsDone.push(id);
+    const pids = !ej || ej === '*' ? exs.map((x) => x.pid) : [byLabel[String(ej).toUpperCase()]].filter(Boolean);
+    pids.forEach((pid) => { delete store.prog[pid]; delete store.saves[pid]; delete store.exp[pid]; });
+    store.outbox = store.outbox.filter((r) => !(ej === '*' || !ej || r.ejercicio === String(ej).toUpperCase()));
+    persist(); return true; };
   let pulling = false;
   const pullProgress = () => { if (!REPORT_URL || !registered() || pulling) return Promise.resolve(false); pulling = true;
     const q = `alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}`;
     return fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => { pulling = false; if (!d || !d.prog) return false; let ch = false;
+      if (Array.isArray(d.resets)) d.resets.forEach((x) => { if (applyReset(x.id, x.ej)) ch = true; });
       Object.entries(d.prog).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const pr = store.prog[pid] || { best: 0, tries: 0 }; const att = Math.min(MAXT, Math.max(pr.att || 0, +v.att || 0)); const best = Math.max(pr.best || 0, (+v.best || 0) / 100);
         if (att !== (pr.att || 0) || best !== pr.best) { pr.att = att; pr.best = best; pr.tries = Math.max(pr.tries || 0, att); store.prog[pid] = pr; ch = true; } });
       store.pulled = store.name.trim() + '|' + store.grupo; persist(); if (ch && typeof route === 'function') route(curHash); return ch; }).catch(() => { pulling = false; return false; }); };
@@ -2482,7 +2493,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   function shell() {
     app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
       <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Nombre y apellidos" autocomplete="name" maxlength="60"></label><label class="who grp"><span>Grupo</span><input type="text" id="grp" value="${esc(store.grupo)}" placeholder="1A" maxlength="8" autocomplete="off"></label><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
-      <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div>`;
+      <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div><footer class="tfoot"><button type="button" class="btn sm ghost" id="docente">🔒 Docente</button><div id="docpanel" hidden></div></footer>`;
+    $('#docente').addEventListener('click', docPanel);
     $('#who').addEventListener('input', (e) => { store.name = e.target.value.slice(0, 60); persist(); });
     $('#grp').addEventListener('input', (e) => { store.grupo = normGrupo(e.target.value); persist(); });
     $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; pullProgress().then(syncAll); });
@@ -2514,6 +2526,32 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     document.body.classList.add('show-cert');
     $('#doprint').addEventListener('click', () => { try { window.print(); } catch (e) { /* bloqueado */ } if (FRAMED) $('#printnote').hidden = false; });
     $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
+  }
+  /* panel docente: reiniciar el simulador de un alumno con la contraseña guardada en la hoja de la maestra */
+  function docPanel() {
+    const pn = $('#docpanel'); if (!pn.hidden) { pn.hidden = true; pn.innerHTML = ''; return; }
+    const curX = byPid[curHash] || (byTid[curHash] && byTid[curHash].ex[0]);
+    const lab = curX ? `${LET[curX.tema.mi]}${curX.tema.ti + 1}.${curX.ei + 1}` : '';
+    pn.hidden = false;
+    if (!REPORT_URL) { pn.innerHTML = '<p>El reinicio docente necesita la conexión con tu hoja de calificaciones.</p>'; return; }
+    if (!registered()) { pn.innerHTML = '<p>Primero el alumno debe escribir arriba su <b>nombre y apellidos</b> y su <b>grupo</b>. Después vuelve a abrir este panel.</p>'; return; }
+    pn.innerHTML = `<h3 class="sub">Reinicio docente</h3><p>Alumno: <b>${esc(store.name.trim())}</b> · Grupo <b>${esc(store.grupo)}</b> · ${esc(G.short)}</p>
+      <fieldset class="docopts"><legend>¿Qué quieres reiniciar?</legend>${lab ? `<label class="chk"><input type="radio" name="docej" value="${lab}" checked> Solo este ejercicio (${lab}): intentos, calificación y trabajo</label>` : ''}<label class="chk"><input type="radio" name="docej" value="*" ${lab ? '' : 'checked'}> Todo el simulador de este alumno</label></fieldset>
+      <label class="fld"><span>Contraseña docente</span><input type="password" id="docclave" autocomplete="off"></label>
+      <div class="row"><button type="button" class="btn primary" id="docgo">Reiniciar</button><button type="button" class="btn ghost" id="doccancel">Cancelar</button></div><p class="docmsg" aria-live="polite"></p>`;
+    $('#doccancel').addEventListener('click', () => { pn.hidden = true; pn.innerHTML = ''; });
+    $('#docgo').addEventListener('click', () => {
+      const clave = $('#docclave').value; const ej = (pn.querySelector('input[name="docej"]:checked') || {}).value || '*'; const msg = $('.docmsg');
+      if (!clave) { msg.textContent = 'Escribe la contraseña.'; return; }
+      $('#docgo').disabled = true; msg.textContent = 'Verificando…';
+      const q = `accion=reiniciar&clave=${encodeURIComponent(clave)}&alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}&ej=${encodeURIComponent(ej)}`;
+      fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => {
+        if (!d || !d.ok) { msg.textContent = (d && d.msg) || 'No se pudo reiniciar.'; $('#docgo').disabled = false; return; }
+        applyReset(d.id, d.ej); pn.hidden = true; pn.innerHTML = ''; route(curHash);
+        const t = document.createElement('p'); t.className = 'docok'; t.textContent = `✓ Reiniciado: ${ej === '*' ? 'todo el simulador' : 'el ejercicio ' + ej} de ${store.name.trim()}.`; $('.tfoot').prepend(t); setTimeout(() => t.remove(), 6000);
+      }).catch(() => { msg.textContent = 'Sin conexión con la hoja. Revisa el internet e intenta de nuevo.'; $('#docgo').disabled = false; });
+    });
+    $('#docclave').focus();
   }
   function practice(pid) {
     const x = byPid[pid]; if (!x) { home(); return; }
