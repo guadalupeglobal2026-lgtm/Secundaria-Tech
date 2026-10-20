@@ -1586,7 +1586,11 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       if (Array.isArray(d.resets)) d.resets.forEach((x) => { if (applyReset(x.id, x.ej)) ch = true; });
       Object.entries(d.prog).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const pr = store.prog[pid] || { best: 0, tries: 0 }; const att = Math.min(MAXT, Math.max(pr.att || 0, +v.att || 0)); const best = Math.max(pr.best || 0, (+v.best || 0) / 100);
         if (att !== (pr.att || 0) || best !== pr.best) { pr.att = att; pr.best = best; pr.tries = Math.max(pr.tries || 0, att); store.prog[pid] = pr; ch = true; } });
-      store.pulled = store.name.trim() + '|' + store.grupo; persist(); if (ch && typeof route === 'function') route(curHash); return ch; }).catch(() => { pulling = false; return false; }); };
+      store.pulled = store.name.trim() + '|' + store.grupo; persist();
+      /* si la hoja no tiene algún ejercicio que este navegador sí tiene (por ejemplo, porque antes no se pudo enviar), se reenvía */
+      const falta = exs.filter((x) => store.prog[x.pid] && store.prog[x.pid].att && !d.prog[`${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`] && !store.outbox.some((r) => r.ejercicio === `${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`));
+      if (falta.length) report(falta.map((x) => rowFor(x, null, 'Avance guardado')));
+      if (ch && typeof route === 'function') route(curHash); return ch; }).catch(() => { pulling = false; return false; }); };
   if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { pullProgress().then(() => { syncAll(); flush(); }); }, 1200); }
 
   /* ---------- gráficas SVG compartidas ---------- */
