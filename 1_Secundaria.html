@@ -58,7 +58,7 @@ button,input,select,textarea{font:inherit; color:inherit}
 .brand p{margin:0; color:var(--muted); font-size:.9rem}
 .tfoot{max-width:1100px; margin:2rem auto 1rem; padding:0 1rem; text-align:right}
 .tfoot #docpanel{text-align:left; margin:.6rem 0 0 auto; max-width:34rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:.8rem 1rem}
-.docopts{border:0; padding:0; margin:.4rem 0} .docopts label{display:block; margin:.25rem 0} .docmsg{color:var(--bad)} .docok{color:var(--ok); font-weight:700}
+.docopts{border:0; padding:0; margin:.4rem 0} .docopts label{display:block; margin:.25rem 0} .docmsg{color:var(--bad)} .docmsg.okm{color:var(--ok); font-weight:700} .docok{color:var(--ok); font-weight:700}
 @media print{.tfoot{display:none}}
 .top-r{display:flex; gap:1rem; align-items:center; flex-wrap:wrap}
 .who{display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--muted)}
@@ -315,6 +315,49 @@ input[type=range]{width:100%; accent-color:var(--hc,var(--ink)); min-height:32px
 .sol-rb{margin:.2rem 0 .5rem; padding-left:1.3rem} .sol-rb li{margin:.15rem 0}
 .sol-sw{display:inline-block; width:1em; height:1em; border:1px solid var(--line); border-radius:3px; vertical-align:-.15em; margin-right:.3rem}
 .sol-box pre.code{white-space:pre-wrap; overflow-x:auto}
+/* ---- logros, arrastrar y soltar, repaso relámpago ---- */
+.xpbtn{display:inline-flex; gap:.3rem; align-items:center; text-decoration:none; color:var(--ink); background:var(--sunk); border:1px solid var(--line); border-radius:999px; padding:.3rem .75rem; font-size:.85rem; white-space:nowrap}
+.xpbtn:hover{border-color:var(--s1)}
+#toasts{position:fixed; right:1rem; bottom:1rem; display:flex; flex-direction:column; gap:.5rem; z-index:60}
+.toast{background:var(--surface); color:var(--ink); border:2px solid var(--s2); border-radius:12px; padding:.65rem 1rem; box-shadow:0 8px 24px rgba(0,0,0,.18); animation:tin .35s ease-out; max-width:22rem}
+.toast.out{opacity:0; transform:translateY(8px); transition:.5s}
+@keyframes tin{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+canvas.confetti{position:fixed; inset:0; pointer-events:none; z-index:70}
+.logros .lvl{display:flex; gap:1rem; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:1rem 1.2rem; margin:1rem 0}
+.lvl-i{font-size:3rem; line-height:1} .lvl-b{flex:1} .lvl-b h2{margin:0 0 .2rem}
+.lvl-bar{height:.7rem; background:var(--sunk); border-radius:999px; overflow:hidden; margin:.5rem 0} .lvl-bar i{display:block; height:100%; background:linear-gradient(90deg,var(--s1),var(--s3))}
+.bdgs{list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(11rem,1fr)); gap:.7rem}
+.bdg{border:1px solid var(--line); border-radius:var(--r); padding:.7rem; background:var(--sunk); display:flex; flex-direction:column; gap:.2rem; opacity:.6}
+.bdg.on{opacity:1; background:var(--surface); border-color:var(--hc, var(--s2)); box-shadow:inset 0 -3px 0 var(--hc, var(--s2))}
+.bdg-i{font-size:1.8rem; line-height:1.1} .bdg-i.letter{display:inline-grid; place-items:center; width:2.2rem; height:2.2rem; border-radius:50%; background:var(--hc, var(--s1)); color:#fff; font-weight:800; font-size:1.2rem}
+.bdg:not(.on) .bdg-i.letter{background:var(--line)} .bdg-d{color:var(--ok)}
+.rapids{list-style:none; padding:0} .rapids li{display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; padding:.45rem 0; border-bottom:1px solid var(--line)}
+.mrapid{display:inline-block; margin-top:.35rem; font-size:.75rem; font-weight:700; color:var(--hc); text-decoration:none}
+.rapid{max-width:46rem} .r-top{display:flex; justify-content:space-between; font-size:1.1rem; margin:.5rem 0}
+.r-bar{height:.6rem; background:var(--sunk); border-radius:999px; overflow:hidden} .r-bar i{display:block; height:100%; width:100%; background:var(--hc); transition:width .2s linear}
+.r-q{font-size:1.25rem; font-weight:700; margin:1.2rem 0 .4rem} .r-q2{font-size:1.1rem; margin:.2rem 0 .6rem}
+.r-opts{display:grid; gap:.5rem} .r-opt{display:flex; gap:.7rem; align-items:center; text-align:left; padding:.75rem 1rem; border:2px solid var(--line); border-radius:var(--r); background:var(--surface); color:var(--ink); font:inherit; cursor:pointer}
+.r-opt:hover{border-color:var(--hc)} .r-opt.ok{border-color:var(--ok); background:color-mix(in srgb,var(--ok) 14%,var(--surface))} .r-opt.bad{border-color:var(--bad); background:color-mix(in srgb,var(--bad) 12%,var(--surface)); animation:shake .3s}
+.r-n{display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:50%; background:var(--sunk); font-weight:700; flex:none}
+.r-fb{min-height:1.5rem; font-weight:600} .r-final{font-size:1.5rem}
+@keyframes shake{25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
+.grip{cursor:grab; color:var(--muted); font-size:1.1rem; padding:0 .45rem 0 0; touch-action:none; user-select:none}
+.ord li{cursor:grab} .ord li.dragging,.cls-item.dragging{opacity:.55; outline:2px dashed var(--s1)}
+.cls-text{cursor:grab; user-select:none}
+.cls-ghost{position:fixed; z-index:80; pointer-events:none; background:var(--surface); border:2px solid var(--s1); border-radius:10px; padding:.4rem .7rem; box-shadow:0 8px 20px rgba(0,0,0,.2); max-width:18rem; font-size:.9rem}
+.cls-drop{position:fixed; left:0; right:0; bottom:0; z-index:75; background:color-mix(in srgb,var(--surface) 94%,transparent); border-top:2px solid var(--s1); padding:.6rem 1rem 1rem; box-shadow:0 -6px 20px rgba(0,0,0,.15)}
+.cls-drop p{margin:0 0 .4rem; font-weight:700; text-align:center} .cls-drop>div{display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap}
+.dz{min-width:8rem; text-align:center; padding:1rem .9rem; border:2px dashed var(--s1); border-radius:12px; font-weight:700; background:var(--sunk)}
+.dz.over{background:var(--s1); color:#fff; border-style:solid}
+.fails{margin:.7rem 0 0; padding:.6rem .9rem; border:1px solid var(--bad); border-left-width:4px; border-radius:var(--r-sm); background:color-mix(in srgb,var(--bad) 6%,var(--surface)); max-width:80ch}
+.fails p{margin:0 0 .3rem} .fails ol{margin:.2rem 0; padding-left:1.4rem} .fails li{margin:.25rem 0}
+.lnk{background:none; border:0; padding:0; font:inherit; color:var(--ink); text-decoration:underline; text-decoration-color:var(--bad); cursor:pointer; text-align:left}
+.ord li.ok{border-color:var(--ok); box-shadow:inset 4px 0 0 var(--ok)} .ord li.bad{border-color:var(--bad); box-shadow:inset 4px 0 0 var(--bad)}
+.flash{animation:flash 1.2s ease-out} @keyframes flash{0%,40%{outline:4px solid var(--s2); outline-offset:3px} 100%{outline:0 solid transparent}}
+.th-goal{stroke:#12804F; stroke-width:4; stroke-dasharray:10 6} .th-goalc{fill:rgba(18,128,79,.15); stroke:#12804F; stroke-width:3; stroke-dasharray:6 4}
+.th-arrow{stroke:#12804F; stroke-width:3; fill:none} .th-lbl{fill:#fff; font:700 18px system-ui,sans-serif; paint-order:stroke; stroke:#12804F; stroke-width:5px}
+.th-res{list-style:none; padding:0; margin:.6rem 0 0} .th-res li{margin:.25rem 0; padding:.35rem .6rem; border-radius:var(--r-sm)} .th-res li.ok{color:var(--ok)} .th-res li.bad{color:var(--bad); background:color-mix(in srgb,var(--bad) 7%,var(--surface))}
+.th-ex{width:100%; max-width:420px; border-radius:var(--r-sm); display:block; margin:.4rem 0}
 .tasks{padding-left:1.4rem}
 .tasks li{margin:.35rem 0; padding:.2rem .4rem}
 .tasks li.ok{color:var(--ok)} .tasks li.ok::marker{content:"✓ "; color:var(--ok)}
@@ -1469,7 +1512,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   let store;
   try { store = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { store = null; }
   if (!store || typeof store !== 'object') store = {};
-  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {}; store.resetsDone = store.resetsDone || [];
+  store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {}; store.resetsDone = store.resetsDone || []; store.lreset = store.lreset || {};
   if (!store.dev) store.dev = Math.random().toString(36).slice(2, 8).toUpperCase();
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
@@ -1532,12 +1575,30 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     pids.forEach((pid) => { delete store.prog[pid]; delete store.saves[pid]; delete store.exp[pid]; });
     store.outbox = store.outbox.filter((r) => !(ej === '*' || !ej || r.ejercicio === String(ej).toUpperCase()));
     persist(); return true; };
+  /* contraseña docente sin internet: se compara su huella SHA-256 (la contraseña no viaja dentro del simulador) */
+  const CLAVE_HASH = ''.length === 64 ? '' : '';
+  const sha256 = (txt) => {
+    const b = new TextEncoder().encode(txt);
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) return crypto.subtle.digest('SHA-256', b).then((h) => [...new Uint8Array(h)].map((x) => x.toString(16).padStart(2, '0')).join(''));
+    const K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+    let H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    const l = b.length; const n = ((l + 9 + 63) >> 6) << 6; const m = new Uint8Array(n); m.set(b); m[l] = 0x80; const dv = new DataView(m.buffer); dv.setUint32(n - 4, l * 8);
+    const r = (x, k) => (x >>> k) | (x << (32 - k)); const w = new Uint32Array(64);
+    for (let o = 0; o < n; o += 64) { for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4); for (let i = 16; i < 64; i++) { const s0 = r(w[i - 15], 7) ^ r(w[i - 15], 18) ^ (w[i - 15] >>> 3); const s1 = r(w[i - 2], 17) ^ r(w[i - 2], 19) ^ (w[i - 2] >>> 10); w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0; }
+      let [a, bb, c, d, e, f, g, h] = H; for (let i = 0; i < 64; i++) { const t1 = (h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0; const t2 = ((r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0; h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0; }
+      H = H.map((v, i) => (v + [a, bb, c, d, e, f, g, h][i]) | 0); }
+    return Promise.resolve(H.map((v) => (v >>> 0).toString(16).padStart(8, '0')).join(''));
+  };
+  const nowStamp = () => { const d = new Date(); const p2 = (x) => String(x).padStart(2, '0'); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`; };
+  /* reinicio hecho sin internet: se aplica aquí y se avisa a la hoja cuando haya conexión */
+  const localReset = (ej) => { const t = nowStamp(); applyReset('L' + Date.now(), ej); store.lreset[ej] = t; persist();
+    report([{ fecha: t, grado: G.short, grupo: store.grupo, alumno: store.name.trim().replace(/\s+/g, ' '), tema: ej === '*' ? '*' : ej.split('.')[0], temaNombre: '', ejercicio: ej, titulo: '', calif: '', intento: '', mejor: '', promTema: '', temasComp: '', totalTemas: temas.length, tipo: 'Reinicio docente (sin conexión)', dev: store.dev, texto: '' }]); };
   let pulling = false;
   const pullProgress = () => { if (!REPORT_URL || !registered() || pulling) return Promise.resolve(false); pulling = true;
     const q = `alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}`;
     return fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => { pulling = false; if (!d || !d.prog) return false; let ch = false;
       if (Array.isArray(d.resets)) d.resets.forEach((x) => { if (applyReset(x.id, x.ej)) ch = true; });
-      Object.entries(d.prog).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const pr = store.prog[pid] || { best: 0, tries: 0 }; const att = Math.min(MAXT, Math.max(pr.att || 0, +v.att || 0)); const best = Math.max(pr.best || 0, (+v.best || 0) / 100);
+      Object.entries(d.prog).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const lr = store.lreset[lab] || store.lreset['*']; if (lr && (!v.f || v.f <= lr)) return; const pr = store.prog[pid] || { best: 0, tries: 0 }; const att = Math.min(MAXT, Math.max(pr.att || 0, +v.att || 0)); const best = Math.max(pr.best || 0, (+v.best || 0) / 100);
         if (att !== (pr.att || 0) || best !== pr.best) { pr.att = att; pr.best = best; pr.tries = Math.max(pr.tries || 0, att); store.prog[pid] = pr; ch = true; } });
       store.pulled = store.name.trim() + '|' + store.grupo; persist();
       /* si la hoja no tiene algún ejercicio que este navegador sí tiene (por ejemplo, porque antes no se pudo enviar), se reenvía */
@@ -1592,7 +1653,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     const draw = () => {
       host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + `<div class="cls">${st.order.map((ix, k) => {
         const it = d.items[ix];
-        return `<div class="cls-item" data-ix="${ix}"><div class="cls-text">${it.html || esc(it.t)}</div><div class="seg" role="group" aria-label="Clasificar">${d.cats.map((c, ci) => `<button type="button" data-k="${k}" data-c="${ci}" aria-pressed="${st.ans[ix] === ci}">${esc(c)}</button>`).join('')}</div><div class="cls-fb" aria-live="polite"></div></div>`;
+        return `<div class="cls-item" data-ix="${ix}"><div class="cls-text"><span class="grip" aria-hidden="true" title="Arrastra a una categoría">⠿</span>${it.html || esc(it.t)}</div><div class="seg" role="group" aria-label="Clasificar">${d.cats.map((c, ci) => `<button type="button" data-k="${k}" data-c="${ci}" aria-pressed="${st.ans[ix] === ci}">${esc(c)}</button>`).join('')}</div><div class="cls-fb" aria-live="polite"></div></div>`;
       }).join('')}</div>` + (d.preview === 'doc' ? `<div class="toc"><strong>Tabla de contenido automática</strong><div class="toc-body"></div></div>` : '');
       if (d.preview === 'doc') drawToc();
     };
@@ -1607,6 +1668,16 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       const item = b.closest('.cls-item'); item.classList.remove('ok', 'bad'); $('.cls-fb', item).textContent = '';
       if (d.preview === 'doc') drawToc();
     });
+    /* arrastrar una tarjeta y soltarla en su categoría (también se puede usar los botones) */
+    let drag = null;
+    const dmove = (e) => { if (!drag) return; drag.ghost.style.left = `${e.clientX + 12}px`; drag.ghost.style.top = `${e.clientY + 12}px`; const z = document.elementFromPoint(e.clientX, e.clientY); $$('.dz', drag.bar).forEach((x) => x.classList.toggle('over', !!z && x.contains(z))); };
+    const dend = (e) => { if (!drag) return; const z = document.elementFromPoint(e.clientX, e.clientY); const zone = z && z.closest && z.closest('.dz'); const { it, ghost, bar } = drag; drag = null; ghost.remove(); bar.remove(); it.classList.remove('dragging'); document.removeEventListener('pointermove', dmove); document.removeEventListener('pointerup', dend); document.removeEventListener('pointercancel', dend);
+      if (zone) { const b = it.querySelector(`button[data-c="${zone.dataset.c}"]`); if (b) b.click(); } };
+    host.addEventListener('pointerdown', (e) => { const it = e.target.closest('.cls-item'); if (!it || !host.contains(it) || e.target.closest('button') || !e.target.closest('.cls-text')) return; if (e.pointerType !== 'mouse' && !e.target.closest('.grip')) return; if (host.closest('.engine.locked')) return; e.preventDefault();
+      const ghost = document.createElement('div'); ghost.className = 'cls-ghost'; ghost.textContent = it.querySelector('.cls-text').textContent.replace('⠿', '').trim().slice(0, 90);
+      const bar = document.createElement('div'); bar.className = 'cls-drop'; bar.innerHTML = `<p>Suelta la tarjeta en su categoría</p><div>${d.cats.map((c, ci) => `<span class="dz" data-c="${ci}">${esc(c)}</span>`).join('')}</div>`;
+      document.body.append(ghost, bar); it.classList.add('dragging'); drag = { it, ghost, bar }; dmove(e);
+      document.addEventListener('pointermove', dmove); document.addEventListener('pointerup', dend); document.addEventListener('pointercancel', dend); });
     draw();
     return {
       check() {
@@ -1678,19 +1749,25 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   /* --- ordenar (con vista previa de capas opcional) --- */
   E.order = (host, d, api) => {
     const sets = d.sets;
-    const st = api.load() || { ord: sets.map((s) => shuffleNot(s.items.length)) };
+    const st0 = api.load(); const st = st0 || { ord: sets.map((s) => shuffleNot(s.items.length)) }; if (!st0) api.save(st);
     const draw = () => {
-      host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + sets.map((s, si) => `<div class="ord-set" data-s="${si}"><p class="ord-prompt">${esc(s.prompt)}</p><div class="ord-wrap ${s.layers ? 'with-prev' : ''}"><ol class="ord">${st.ord[si].map((ix, pos) => `<li><span class="ord-t">${s.html ? s.items[ix] : esc(s.items[ix])}</span><span class="ord-btns"><button type="button" data-s="${si}" data-p="${pos}" data-d="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>↑</button><button type="button" data-s="${si}" data-p="${pos}" data-d="1" aria-label="Bajar" ${pos === s.items.length - 1 ? 'disabled' : ''}>↓</button></span></li>`).join('')}</ol>${s.layers ? `<div class="layer-prev"><svg viewBox="0 0 300 200">${[...st.ord[si]].reverse().map((ix) => s.layers[ix]).join('')}</svg><span class="muted small">Vista del lienzo: la capa de arriba en la lista se dibuja encima.</span></div>` : ''}</div></div>`).join('');
+      host.innerHTML = (d.lead ? `${d.lead ? `<div class="lead-card">${d.lead}</div>` : ""}` : '') + sets.map((s, si) => `<div class="ord-set" data-s="${si}"><p class="ord-prompt">${esc(s.prompt)}</p><div class="ord-wrap ${s.layers ? 'with-prev' : ''}"><ol class="ord">${st.ord[si].map((ix, pos) => `<li data-ix="${ix}"><span class="grip" aria-hidden="true" title="Arrastra para mover">⠿</span><span class="ord-t">${s.html ? s.items[ix] : esc(s.items[ix])}</span><span class="ord-btns"><button type="button" data-s="${si}" data-p="${pos}" data-d="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>↑</button><button type="button" data-s="${si}" data-p="${pos}" data-d="1" aria-label="Bajar" ${pos === s.items.length - 1 ? 'disabled' : ''}>↓</button></span></li>`).join('')}</ol>${s.layers ? `<div class="layer-prev"><svg viewBox="0 0 300 200">${[...st.ord[si]].reverse().map((ix) => s.layers[ix]).join('')}</svg><span class="muted small">Vista del lienzo: la capa de arriba en la lista se dibuja encima.</span></div>` : ''}</div></div>`).join('');
     };
     host.addEventListener('click', (e) => {
       const b = e.target.closest('button[data-d]'); if (!b) return; const si = +b.dataset.s, p = +b.dataset.p, dd = +b.dataset.d; const o = st.ord[si]; const q = p + dd; if (q < 0 || q >= o.length) return;
       [o[p], o[q]] = [o[q], o[p]]; api.save(st); draw(); const nb = $(`button[data-s="${si}"][data-p="${q}"][data-d="${dd}"]`, host) || $(`button[data-s="${si}"][data-p="${q}"]`, host); if (nb && !nb.disabled) nb.focus();
     });
+    /* arrastrar y soltar (mouse en toda la tarjeta; en pantallas táctiles, desde ⠿) */
+    let dragLi = null;
+    host.addEventListener('pointerdown', (e) => { const li = e.target.closest('.ord li'); if (!li || e.target.closest('button')) return; if (e.pointerType !== 'mouse' && !e.target.closest('.grip')) return; dragLi = li; li.classList.add('dragging'); try { li.setPointerCapture(e.pointerId); } catch (er) { /* */ } e.preventDefault(); });
+    host.addEventListener('pointermove', (e) => { if (!dragLi) return; const ol = dragLi.parentNode; const after = [...ol.children].filter((x) => x !== dragLi).find((x) => { const r = x.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; }); if (after) { if (after !== dragLi.nextSibling) ol.insertBefore(dragLi, after); } else if (ol.lastChild !== dragLi) ol.appendChild(dragLi); });
+    const endDrag = () => { if (!dragLi) return; const set = dragLi.closest('.ord-set'); const si = +set.dataset.s; st.ord[si] = [...set.querySelectorAll('.ord li')].map((x) => +x.dataset.ix); dragLi = null; api.save(st); draw(); };
+    host.addEventListener('pointerup', endDrag); host.addEventListener('pointercancel', endDrag);
     draw();
     return {
       check() {
         let tot = 0, allOk = 0;
-        sets.forEach((s, si) => { const o = st.ord[si]; const c = o.filter((ix, pos) => ix === pos).length; tot += c / o.length; const el = $(`.ord-set[data-s="${si}"]`, host); el.classList.remove('ok', 'bad'); el.classList.add(c === o.length ? 'ok' : 'bad'); if (c === o.length) allOk++; });
+        sets.forEach((s, si) => { const o = st.ord[si]; const c = o.filter((ix, pos) => ix === pos).length; $$(`.ord-set[data-s="${si}"] .ord li`, host).forEach((li, pos) => { li.classList.remove('ok', 'bad'); li.classList.add(+li.dataset.ix === pos ? 'ok' : 'bad'); }); tot += c / o.length; const el = $(`.ord-set[data-s="${si}"]`, host); el.classList.remove('ok', 'bad'); el.classList.add(c === o.length ? 'ok' : 'bad'); if (c === o.length) allOk++; });
         return { score: tot / sets.length, msg: allOk === sets.length ? 'El orden es correcto.' : `${allOk} de ${sets.length} secuencia(s) en orden correcto. Los elementos en su lugar suman puntos.` };
       }
     };
@@ -1761,15 +1838,23 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       <div class="th-ctl"><label class="fld"><span>Horizonte (altura)</span><input type="range" min="40" max="360" data-k="hy"></label>
       <label class="fld"><span>Faro: posición horizontal</span><input type="range" min="40" max="560" data-k="sx"></label>
       <label class="fld"><span>Faro: posición vertical</span><input type="range" min="80" max="340" data-k="sy"></label>
-      <label class="chk"><input type="checkbox" data-k="grid"> Mostrar cuadrícula 3×3</label><p class="muted small">También puedes arrastrar el faro y la línea del horizonte con el mouse o el dedo.</p></div></div>`;
+      <label class="chk"><input type="checkbox" data-k="grid"> Mostrar cuadrícula 3×3</label><p class="muted small">También puedes arrastrar el faro y la línea del horizonte con el mouse o el dedo.</p></div></div><ul class="th-res"></ul>`;
     const svg = $('.th-svg', host);
+    const gridAll = () => [200, 400].map((x) => `<line x1="${x}" x2="${x}" y1="0" y2="400" class="th-g"/>`).join('') + [133.3, 266.7].map((y) => `<line y1="${y}" y2="${y}" x1="0" x2="600" class="th-g"/>`).join('') + [200, 400].flatMap((x) => [133.3, 266.7].map((y) => `<circle cx="${x}" cy="${y}" r="5" class="th-dot"/>`)).join('');
+    const target = () => { const ty = Math.abs(st.hy - 133.3) < Math.abs(st.hy - 266.7) ? 133.3 : 266.7; let best = null; [200, 400].forEach((x) => [133.3, 266.7].forEach((y) => { const dd = Math.hypot(st.sx - x, st.sy + 20 - y); if (!best || dd < best.d) best = { x, y, d: dd }; })); return { ty, hOk: Math.abs(st.hy - ty) <= 22, ix: best.x, iy: best.y, sOk: best.d <= 40 }; };
+    /* guía después de revisar: muestra en el dibujo dónde debían ir el horizonte y el faro */
+    const guide = () => { const t = target(); let o = '';
+      if (!t.hOk) o += `<line x1="0" x2="600" y1="${t.ty}" y2="${t.ty}" class="th-goal"/><path d="M40,${st.hy} L40,${t.ty}" class="th-arrow" marker-end="url(#tharr)"/><text x="60" y="${t.ty - 8}" class="th-lbl">El horizonte va aquí</text>`;
+      if (!t.sOk) o += `<g transform="translate(${t.ix},${t.iy - 20})" opacity=".55"><rect x="-14" y="-6" width="28" height="70" fill="#fff" stroke="#12804F" stroke-dasharray="4 3"/><path d="M-12,-22 L0,-40 L12,-22Z" fill="#12804F"/></g><circle cx="${t.ix}" cy="${t.iy}" r="40" class="th-goalc"/><path d="M${st.sx},${st.sy + 20} L${t.ix},${t.iy}" class="th-arrow" marker-end="url(#tharr)"/><text x="${t.ix + 46 > 520 ? t.ix - 150 : t.ix + 46}" y="${t.iy + 5}" class="th-lbl">El faro va aquí</text>`;
+      if (t.hOk && t.sOk) o += `<text x="20" y="30" class="th-lbl">✓ ¡Así está bien!</text>`;
+      return `<defs><marker id="tharr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10z" fill="#12804F"/></marker></defs>${o}`; };
     const draw = () => {
       const g = st.grid ? [200, 400].map((x) => `<line x1="${x}" x2="${x}" y1="0" y2="400" class="th-g"/>`).join('') + [133.3, 266.7].map((y) => `<line y1="${y}" y2="${y}" x1="0" x2="600" class="th-g"/>`).join('') + [200, 400].flatMap((x) => [133.3, 266.7].map((y) => `<circle cx="${x}" cy="${y}" r="5" class="th-dot"/>`)).join('') : '';
       svg.innerHTML = `<defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB3E8"/><stop offset="1" stop-color="#F7C59F"/></linearGradient></defs>
       <rect width="600" height="${st.hy}" fill="url(#sky)"/><circle cx="470" cy="${Math.max(30, st.hy - 40)}" r="26" fill="#FFE08A" opacity=".9"/><rect y="${st.hy}" width="600" height="${400 - st.hy}" fill="#2E6F8E"/>
       <rect y="${st.hy}" width="600" height="6" fill="#ffffff" opacity=".25"/>
       <g class="th-sub" transform="translate(${st.sx},${st.sy})" style="cursor:grab"><rect x="-14" y="-6" width="28" height="70" fill="#F4F4F4" stroke="#33415C"/><rect x="-14" y="10" width="28" height="12" fill="#D64545"/><rect x="-14" y="36" width="28" height="12" fill="#D64545"/><rect x="-18" y="-22" width="36" height="16" fill="#33415C"/><path d="M-12,-22 L0,-40 L12,-22Z" fill="#D64545"/><rect x="-26" y="62" width="52" height="10" fill="#5B4636"/><circle r="5" fill="#FFE08A"/></g>
-      <rect class="th-hz" y="${st.hy - 10}" width="600" height="20" fill="transparent" style="cursor:ns-resize"/>${g}`;
+      <rect class="th-hz" y="${st.hy - 10}" width="600" height="20" fill="transparent" style="cursor:ns-resize"/>${st.guide || st.grid ? g || gridAll() : ''}${st.guide ? guide() : ''}`;
       $$('input[type=range]', host).forEach((r) => { r.value = st[r.dataset.k]; });
       $('input[type=checkbox]', host).checked = st.grid;
     };
@@ -1785,6 +1870,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
         const hOk = Math.min(Math.abs(st.hy - 133.3), Math.abs(st.hy - 266.7)) <= 22;
         const cy = st.sy + 20; const dist = Math.min(...[200, 400].flatMap((x) => [133.3, 266.7].map((y) => Math.hypot(st.sx - x, cy - y))));
         const sOk = dist <= 40;
+        st.guide = !(hOk && sOk); api.save(st); draw();
+        $('.th-res', host).innerHTML = `<li class="${hOk ? 'ok' : 'bad'}">${hOk ? '✓ El horizonte está sobre una línea de los tercios.' : '✗ El horizonte no está sobre una línea de los tercios: debe ir en la línea verde que aparece en el dibujo, no en el centro.'}</li><li class="${sOk ? 'ok' : 'bad'}">${sOk ? '✓ El faro está en una intersección.' : '✗ El faro no está en una intersección: su centro debe quedar dentro del círculo verde, donde se cruzan las líneas.'}</li>`;
         return { score: (hOk ? 0.5 : 0) + (sOk ? 0.5 : 0), msg: `${hOk ? '✓ El horizonte está sobre una línea de los tercios.' : '✗ Mueve el horizonte a una de las líneas horizontales (arriba o abajo), no al centro.'} ${sOk ? '✓ El faro está en una intersección.' : '✗ Lleva el centro del faro a uno de los cuatro puntos de intersección.'}` };
       }
     };
@@ -2400,7 +2487,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       case 'order': return p.sets.map((st) => `<p><b>${esc(st.prompt)}</b></p>${li(st.items.map((x) => (st.html ? x : esc(typeof x === 'string' ? x : x.t || ''))))}`).join('');
       case 'password': return '<p><b>Una contraseña segura</b> cumple los seis criterios, por ejemplo: <code>Rio-Tambor-Nube#48x</code> (frase con mayúsculas, minúsculas, números y símbolo, sin datos personales).</p><p><b>Clasificación de los ejemplos:</b></p>' + li(p.samples.map((x) => `<code>${esc(x.p)}</code> → <b>${esc(p.cats[x.c])}</b>${why(x.why)}`));
       case 'rewrite': return '<p>Hay muchas formas correctas. Un ejemplo de cada mensaje:</p>' + li(p.msgs.map((m, i) => `<span class="sol-why">Original: ${esc(m.orig)}</span><br>✓ ${s.examples && s.examples[i] ? `«${esc(s.examples[i])}»` : `Debe ${esc(m.intent)}, sin mayúsculas sostenidas, sin insultos y con una fórmula amable.`}`));
-      case 'thirds': return li(['<b>Horizonte:</b> sobre una de las dos líneas horizontales de la cuadrícula (a un tercio de arriba o de abajo), nunca en el centro.', '<b>Faro:</b> con su centro en uno de los cuatro puntos donde se cruzan las líneas.', 'Activa «Mostrar cuadrícula 3×3» para verlo.']);
+      case 'thirds': return `<svg viewBox="0 0 600 400" class="th-ex" role="img" aria-label="Ejemplo correcto"><defs><linearGradient id="skyx" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB3E8"/><stop offset="1" stop-color="#F7C59F"/></linearGradient></defs><rect width="600" height="266.7" fill="url(#skyx)"/><rect y="266.7" width="600" height="133.3" fill="#2E6F8E"/><g transform="translate(400,113.3)"><rect x="-14" y="-6" width="28" height="70" fill="#F4F4F4" stroke="#33415C"/><rect x="-14" y="10" width="28" height="12" fill="#D64545"/><rect x="-14" y="36" width="28" height="12" fill="#D64545"/><rect x="-18" y="-22" width="36" height="16" fill="#33415C"/><path d="M-12,-22 L0,-40 L12,-22Z" fill="#D64545"/><rect x="-26" y="62" width="52" height="10" fill="#5B4636"/></g>${[200, 400].map((x) => `<line x1="${x}" x2="${x}" y1="0" y2="400" stroke="#fff" stroke-dasharray="6 5" stroke-width="2"/>`).join('')}${[133.3, 266.7].map((y) => `<line y1="${y}" y2="${y}" x1="0" x2="600" stroke="#fff" stroke-dasharray="6 5" stroke-width="2"/>`).join('')}<circle cx="400" cy="133.3" r="9" fill="none" stroke="#FFE08A" stroke-width="4"/></svg><p class="sol-why">Ejemplo correcto: el horizonte sobre la línea de abajo (el cielo ocupa dos tercios) y el faro en la intersección de arriba a la derecha. También valen las otras líneas e intersecciones.</p>` + li(['<b>Horizonte:</b> sobre una de las dos líneas horizontales de la cuadrícula (a un tercio de arriba o de abajo), nunca en el centro.', '<b>Faro:</b> con su centro en uno de los cuatro puntos donde se cruzan las líneas.', 'Activa «Mostrar cuadrícula 3×3» para verlo.']);
       case 'sliders': return li(p.sliders.map((x) => { const f = x.fmt || ((v) => v); return `<b>${esc(x.label)}</b>: entre <b>${f(x.target[0])}</b> y <b>${f(x.target[1])}</b>`; }));
       case 'robot': {
         const NM = { A: 'Avanzar 1 casilla', I: 'Girar a la izquierda', D: 'Girar a la derecha' };
@@ -2449,7 +2536,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   const app = $('#app');
   function shell() {
     app.innerHTML = `<header class="top"><div class="brand"><span class="logo" aria-hidden="true">${G.short}</span><div><h1>${esc(G.title)}</h1><p>${esc(G.subtitle)}</p></div></div>
-      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Nombre y apellidos" autocomplete="name" maxlength="60"></label><label class="who grp"><span>Grupo</span><input type="text" id="grp" value="${esc(store.grupo)}" placeholder="1A" maxlength="8" autocomplete="off"></label><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
+      <div class="top-r"><label class="who"><span>Nombre</span><input type="text" id="who" value="${esc(store.name)}" placeholder="Nombre y apellidos" autocomplete="name" maxlength="60"></label><label class="who grp"><span>Grupo</span><input type="text" id="grp" value="${esc(store.grupo)}" placeholder="1A" maxlength="8" autocomplete="off"></label><a class="xpbtn" id="xp" href="#logros" title="Mis logros"></a><div class="prog-pill" id="pill"></div>${FRAMED ? `<a class="btn sm" id="newtab" href="${esc(location.href.split('#')[0])}" target="_blank" rel="noopener">Abrir en pestaña nueva ↗</a>` : ''}</div></header>
       <div class="body"><nav class="side" id="side" aria-label="Temas"></nav><main id="main" tabindex="-1"></main></div><div id="print"></div><footer class="tfoot"><button type="button" class="btn sm ghost" id="docente">🔒 Docente</button><div id="docpanel" hidden></div></footer>`;
     $('#docente').addEventListener('click', docPanel);
     $('#who').addEventListener('input', (e) => { store.name = e.target.value.slice(0, 60); persist(); });
@@ -2463,15 +2550,15 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   const dots = (tm) => tm.ex.map((x) => `<i class="dot st-${status(x.pid)}" title="Ejercicio ${x.ei + 1}: ${stText[status(x.pid)]}"></i>`).join('');
   function side(curTid) {
     $('#side').innerHTML = `<a href="#" class="side-home ${!curTid ? 'on' : ''}">Mapa de prácticas</a>` + G.modules.map((m, mi) => `<section class="side-m" style="--hc:var(--${m.hilo})"><h2><span class="mcol">${LET[mi]}</span>${esc(m.name)}</h2><ul>${temas.filter((tm) => tm.mi === mi).map((tm) => { const s = temaStatus(tm); return `<li><a href="#${tm.ex[0].pid}" class="st-${s} ${curTid === tm.tid ? 'on' : ''}" ${curTid === tm.tid ? 'aria-current="page"' : ''}><span class="ic" aria-label="${stText[s]}">${stIcon[s]}</span><span class="sl">${LET[tm.mi]}${tm.ti + 1} · ${esc(tm.t.t)}<span class="dots">${dots(tm)}</span></span></a></li>`; }).join('')}</ul></section>`).join('');
-    const dn = doneCount(); $('#pill').innerHTML = `<span><b>${dn}</b> de ${temas.length} temas</span><span class="pbar"><i style="width:${(dn / temas.length) * 100}%"></i></span>`;
+    renderXP(); const dn = doneCount(); $('#pill').innerHTML = `<span><b>${dn}</b> de ${temas.length} temas</span><span class="pbar"><i style="width:${(dn / temas.length) * 100}%"></i></span>`;
   }
   function home() {
     side(null);
     const maxT = Math.max(...G.modules.map((m) => m.temas.length));
     const nextT = temas.find((tm) => !['hecho', 'dominado'].includes(temaStatus(tm)));
     const nextX = nextT ? (nextT.ex.find((x) => !['hecho', 'dominado'].includes(status(x.pid))) || nextT.ex[0]) : null;
-    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span></div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}${tm.t.reto ? ' reto' : ''}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
-    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Si los agotas, verás las respuestas correctas para que sepas qué te faltó. En cada reto 🏆 explica con tus palabras cómo lo resolviste. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.${REPORT_URL ? ' <b>Antes de empezar escribe arriba tu nombre y apellidos y tu grupo</b>: cada vez que revisas un ejercicio, tu calificación le llega a tu maestra o maestro.' : ''}</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
+    const cells = G.modules.map((m, mi) => `<div class="mcolumn" style="--hc:var(--${m.hilo})"><div class="mhead"><span class="mcol">${LET[mi]}</span><span class="mname">${esc(m.name)}</span><span class="mhilo">${hiloName[m.hilo]}</span>${modDone(mi) && rapidPool(mi).length ? `<a class="mrapid" href="#rapido-${mi + 1}" title="Repaso relámpago del módulo ${LET[mi]}">⚡ Repaso relámpago</a>` : ''}</div>${Array.from({ length: maxT }, (_, ti) => { const tm = byTid[`m${mi + 1}t${ti + 1}`]; if (!tm) return '<div class="pcell empty" aria-hidden="true"></div>'; const s = temaStatus(tm); return `<a class="pcell st-${s}${tm.t.reto ? ' reto' : ''}" href="#${tm.ex[0].pid}"><span class="pref">${LET[mi]}${ti + 1}</span><span class="pname">${esc(tm.t.t)}</span><span class="pst">${exDone(tm)} de ${tm.ex.length} ejercicios <span class="dots">${dots(tm)}</span></span></a>`; }).join('')}</div>`).join('');
+    $('#main').innerHTML = `<section class="hero"><h2>${esc(G.heroTitle)}</h2><p>Cada columna es un módulo y cada celda es un tema de tu cuaderno de trabajo, con la misma clave (A1, B2…). Cada tema tiene ${G.exPerTema || '2 o 3'} ejercicios: una <b>práctica guiada</b>, un ejercicio para <b>aplicar</b> lo aprendido y uno para <b>comprobar</b> lo que sabes. Cada tema empieza con un <b>caso</b> de la vida real y cada módulo termina con un <b>reto</b> 🏆. Tienes <b>3 intentos</b> para revisar cada ejercicio y se guarda tu calificación más alta. Si los agotas, verás las respuestas correctas para que sepas qué te faltó. En cada reto 🏆 explica con tus palabras cómo lo resolviste. Con 80% un ejercicio queda completado; el tema se completa cuando terminas todos sus ejercicios. Tu avance se guarda en este navegador.${REPORT_URL ? ' <b>Antes de empezar escribe arriba tu nombre y apellidos y tu grupo</b>: cada vez que revisas un ejercicio, tu calificación le llega a tu maestra o maestro.' : ''}</p><div class="row">${nextX ? `<a class="btn primary" href="#${nextX.pid}">${doneCount() ? 'Continuar con ' : 'Empezar con '}${LET[nextT.mi]}${nextT.ti + 1} · ${esc(nextT.t.t)}</a>` : ''}<a class="btn" href="#logros">🏅 Mis logros</a><button type="button" class="btn" id="cert">Ver mi constancia de avance</button></div></section>
       <div class="pmap-wrap"><div class="pmap" style="--n:${G.modules.length}">${cells}</div></div>
       <p class="legend"><span><i class="dot st-hecho"></i> Ejercicio completado</span><span><i class="dot st-dominado"></i> Ejercicio dominado (100%)</span><span><i class="dot st-intentado"></i> En proceso</span><span><i class="dot st-nuevo"></i> Sin empezar</span></p>`;
     $('#cert').addEventListener('click', cert);
@@ -2484,31 +2571,158 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     $('#doprint').addEventListener('click', () => { try { window.print(); } catch (e) { /* bloqueado */ } if (FRAMED) $('#printnote').hidden = false; });
     $('#closecert').addEventListener('click', () => { document.body.classList.remove('show-cert'); $('#print').innerHTML = ''; });
   }
+  /* ================= LOGROS: puntos, niveles, insignias y repaso relámpago ================= */
+  store.badges = store.badges || {}; store.days = store.days || []; store.rapid = store.rapid || {};
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const markDay = () => { const t = today(); if (!store.days.includes(t)) { store.days.push(t); store.days = store.days.slice(-60); persist(); } };
+  const exXP = (x) => { const pr = store.prog[x.pid]; if (!pr) return 0; return Math.round((pr.best || 0) * 100) * (x.tema.t.reto ? 2 : 1) + (pr.first === 1 ? 20 : 0); };
+  const maxXP = () => exs.reduce((a, x) => a + 100 * (x.tema.t.reto ? 2 : 1) + 20, 0);
+  const totalXP = () => exs.reduce((a, x) => a + exXP(x), 0);
+  const LEVELS = [['Explorador', 0, '🌱'], ['Aprendiz', 0.08, '🔧'], ['Practicante', 0.2, '⚙️'], ['Hábil', 0.38, '🚀'], ['Avanzado', 0.58, '🏅'], ['Experto', 0.8, '👑']];
+  const levelOf = (xp) => { const mx = maxXP(); let i = 0; LEVELS.forEach((l, k) => { if (xp >= l[1] * mx) i = k; }); const next = LEVELS[i + 1]; return { i, name: LEVELS[i][0], icon: LEVELS[i][2], from: LEVELS[i][1] * mx, to: next ? next[1] * mx : mx, next: next ? next[0] : null }; };
+  const modDone = (mi) => temas.filter((tm) => tm.mi === mi && !tm.t.reto).every((tm) => ['hecho', 'dominado'].includes(temaStatus(tm)));
+  const badgeDefs = () => {
+    const dom = exs.filter((x) => status(x.pid) === 'dominado').length; const done = doneCount();
+    const list = [
+      ['primero', '👣', 'Primer paso', 'Completa tu primer ejercicio.', exs.some((x) => ['hecho', 'dominado'].includes(status(x.pid)))],
+      ['perfecto', '🎯', 'A la primera', 'Saca 100% en el primer intento de un ejercicio.', exs.some((x) => store.prog[x.pid] && store.prog[x.pid].first === 1)],
+      ['diez', '🔟', 'Diez dominados', 'Domina 10 ejercicios (100%).', dom >= 10],
+      ['veinticinco', '💎', 'Veinticinco dominados', 'Domina 25 ejercicios.', dom >= 25],
+      ['racha3', '🔥', 'Constancia', 'Practica en 3 días distintos.', store.days.length >= 3],
+      ['mitad', '🧭', 'Medio camino', `Completa la mitad de los temas (${Math.ceil(temas.length / 2)}).`, done >= Math.ceil(temas.length / 2)],
+      ['relampago', '⚡', 'Rayo veloz', 'Juega un repaso relámpago.', Object.keys(store.rapid).length > 0],
+      ['relampago10', '🧠', 'Mente rápida', 'Logra 10 aciertos en un repaso relámpago.', Object.values(store.rapid).some((v) => v >= 10)],
+    ];
+    G.modules.forEach((m, mi) => {
+      list.push([`mod${LET[mi]}`, LET[mi], `Módulo ${LET[mi]} completo`, `Completa todos los temas de ${m.name}.`, modDone(mi), m.hilo]);
+      const rt = temas.find((tm) => tm.mi === mi && tm.t.reto); if (rt) list.push([`reto${LET[mi]}`, '🏆', `Reto ${LET[mi]} dominado`, `Saca 100% en «${rt.t.t.replace(/^Reto: /, '')}».`, rt.ex.every((x) => status(x.pid) === 'dominado'), m.hilo]);
+    });
+    list.push(['todo', '🎓', 'Graduado', 'Completa todos los temas del simulador.', done === temas.length]);
+    return list;
+  };
+  /* revisa insignias nuevas; muestra aviso y confeti */
+  function checkBadges(quiet) {
+    const nuevas = badgeDefs().filter((b) => b[4] && !store.badges[b[0]]);
+    nuevas.forEach((b) => { store.badges[b[0]] = today(); });
+    if (nuevas.length) { persist(); if (!quiet) { nuevas.slice(0, 3).forEach((b, i) => setTimeout(() => toast(`${b[1].length === 1 ? '🏅' : b[1]} ¡Nueva insignia! <b>${esc(b[2])}</b>`), i * 900)); confetti(); } }
+    renderXP();
+  }
+  function renderXP() {
+    const el = $('#xp'); if (!el) return; const xp = totalXP(); const lv = levelOf(xp);
+    el.innerHTML = `<span aria-hidden="true">${lv.icon}</span> <b>${xp.toLocaleString('es-MX')}</b> XP · ${lv.name}`;
+  }
+  function toast(html) {
+    let box = $('#toasts'); if (!box) { box = document.createElement('div'); box.id = 'toasts'; box.setAttribute('aria-live', 'polite'); document.body.appendChild(box); }
+    const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = html; box.appendChild(t); setTimeout(() => t.classList.add('out'), 3800); setTimeout(() => t.remove(), 4400);
+  }
+  function confetti() {
+    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { /* */ }
+    const c = document.createElement('canvas'); c.className = 'confetti'; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c); const x = c.getContext('2d');
+    const cols = ['#0073C5', '#F69B1F', '#D42F2F', '#2D8034', '#6D2BB7', '#C5357A', '#017B91', '#FFD54A'];
+    const P = Array.from({ length: 140 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * 0.4, vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4, r: 4 + Math.random() * 5, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.3, col: cols[Math.floor(Math.random() * cols.length)] }));
+    let f = 0; const tick = () => { x.clearRect(0, 0, c.width, c.height); P.forEach((p) => { p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.a += p.va; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.col; x.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); x.restore(); }); if (++f < 150) requestAnimationFrame(tick); else c.remove(); };
+    requestAnimationFrame(tick);
+  }
+  /* página «Mis logros» */
+  function logros() {
+    side(null); try { window.scrollTo(0, 0); } catch (e) { /* */ } checkBadges(true);
+    const xp = totalXP(); const lv = levelOf(xp); const pct = lv.next ? Math.round(((xp - lv.from) / Math.max(1, lv.to - lv.from)) * 100) : 100;
+    const defs = badgeDefs(); const got = defs.filter((b) => store.badges[b[0]]).length;
+    const badge = (b) => { const on = !!store.badges[b[0]]; return `<li class="bdg ${on ? 'on' : ''}" ${b[5] ? `style="--hc:var(--${b[5]})"` : ''} title="${esc(b[3])}"><span class="bdg-i ${b[1].length === 1 ? 'letter' : ''}" aria-hidden="true">${on ? b[1] : '🔒'}</span><b>${esc(b[2])}</b><span class="muted small">${esc(b[3])}</span>${on ? `<span class="small bdg-d">Obtenida: ${esc(store.badges[b[0]])}</span>` : ''}</li>`; };
+    const rapidRows = G.modules.map((m, mi) => { const ok = modDone(mi); const n = rapidPool(mi).length; if (!n) return ''; return `<li style="--hc:var(--${m.hilo})"><span class="mcol">${LET[mi]}</span> ${esc(m.name)} ${ok ? `<a class="btn sm primary" href="#rapido-${mi + 1}">⚡ Jugar</a> ${store.rapid[mi] != null ? `<span class="muted small">Récord: ${store.rapid[mi]} aciertos</span>` : ''}` : '<span class="muted small">🔒 Se desbloquea al completar los temas del módulo</span>'}</li>`; }).join('');
+    $('#main').innerHTML = `<article class="logros"><a href="#" class="back">← Mapa de prácticas</a>
+      <section class="lvl"><div class="lvl-i" aria-hidden="true">${lv.icon}</div><div class="lvl-b"><h2>Nivel: ${lv.name}</h2><p><b>${xp.toLocaleString('es-MX')} XP</b>${lv.next ? ` · te faltan <b>${Math.ceil(lv.to - xp).toLocaleString('es-MX')} XP</b> para <b>${lv.next}</b>` : ' · ¡llegaste al nivel más alto!'}</p><div class="lvl-bar"><i style="width:${pct}%"></i></div>
+      <p class="muted small">Ganas XP con tu calificación más alta en cada ejercicio (los retos valen doble) y +20 XP extra si sacas 100% en el primer intento.</p></div></section>
+      <h3 class="sub">Insignias (${got} de ${defs.length})</h3><ul class="bdgs">${defs.map(badge).join('')}</ul>
+      <h3 class="sub">⚡ Repaso relámpago</h3><p class="muted">60 segundos para contestar todas las preguntas que puedas del módulo. Es práctica: no cambia tu calificación ni se envía a tu maestra o maestro.</p><ul class="rapids">${rapidRows}</ul></article>`;
+  }
+  /* repaso relámpago: preguntas de los ejercicios del módulo */
+  function rapidPool(mi) {
+    const out = [];
+    exs.filter((x) => x.tema.mi === mi).forEach((x) => { const p = x.p;
+      if ((p.type === 'quiz' || p.type === 'simulate') && p.qs) p.qs.forEach((q) => { if (q.opts && q.opts.length > 1 && !q.html) out.push({ q: q.q, opts: q.opts, a: q.a, fb: q.fb }); });
+      if (p.type === 'trace') p.items.forEach((it) => { if (it.opts) out.push({ q: `${it.q}\n${it.code}`, opts: it.opts, a: it.a, fb: it.fb, code: true }); });
+      if (p.type === 'classify' && p.cats.length <= 4) p.items.forEach((it) => { if (it.t) out.push({ q: `¿En qué categoría va?\n«${it.t}»`, opts: p.cats, a: it.c, fb: it.why }); });
+    });
+    return out;
+  }
+  function rapid(mi) {
+    side(null); try { window.scrollTo(0, 0); } catch (e) { /* */ } const m = G.modules[mi]; const pool = rapidPool(mi);
+    if (!pool.length || !modDone(mi)) { location.hash = '#logros'; return; }
+    let order = shuffle(pool.length), k = 0, score = 0, tries = 0, t0 = 0, timer = null, busy = false; const DUR = 60;
+    const main = $('#main');
+    const intro = () => { main.innerHTML = `<article class="rapid" style="--hc:var(--${m.hilo})"><a href="#logros" class="back">← Mis logros</a><h2>⚡ Repaso relámpago · Módulo ${LET[mi]}</h2><p>${esc(m.name)}. Tienes <b>${DUR} segundos</b>: contesta todas las preguntas que puedas. Puedes usar las teclas 1, 2, 3 y 4.</p>${store.rapid[mi] != null ? `<p>Tu récord: <b>${store.rapid[mi]}</b> aciertos.</p>` : ''}<button type="button" class="btn primary" id="rgo">¡Empezar!</button></article>`; $('#rgo').addEventListener('click', start); $('#rgo').focus(); };
+    const start = () => { score = 0; tries = 0; k = 0; order = shuffle(pool.length); t0 = Date.now(); main.innerHTML = `<article class="rapid" style="--hc:var(--${m.hilo})"><div class="r-top"><span>⏱ <b id="rt">${DUR}</b> s</span><span>Aciertos: <b id="rs">0</b></span></div><div class="r-bar"><i id="rb"></i></div><div id="rq"></div></article>`; timer = setInterval(tickT, 200); show(); document.addEventListener('keydown', keys); };
+    const tickT = () => { const left = Math.max(0, DUR - (Date.now() - t0) / 1000); const rt = $('#rt'); if (!rt) { stop(); return; } rt.textContent = Math.ceil(left); $('#rb').style.width = `${(left / DUR) * 100}%`; if (left <= 0) end(); };
+    const show = () => { const q = pool[order[k % order.length]]; const oo = shuffle(q.opts.length); const [head, ...rest] = q.q.split('\n');
+      $('#rq').innerHTML = `<p class="r-q">${esc(head)}</p>${rest.length ? (q.code ? `<pre class="code">${esc(rest.join('\n'))}</pre>` : `<p class="r-q2">${esc(rest.join(' '))}</p>`) : ''}<div class="r-opts">${oo.map((oi, n) => `<button type="button" class="r-opt" data-o="${oi}"><span class="r-n">${n + 1}</span>${esc(q.opts[oi])}</button>`).join('')}</div><p class="r-fb" aria-live="polite"></p>`;
+      $$('.r-opt').forEach((b) => b.addEventListener('click', () => answer(+b.dataset.o, b))); busy = false; };
+    const answer = (o, b) => { if (busy) return; busy = true; const q = pool[order[k % order.length]]; tries++; const ok = o === q.a; if (ok) score++; $('#rs').textContent = score;
+      b.classList.add(ok ? 'ok' : 'bad'); if (!ok) { const good = $(`.r-opt[data-o="${q.a}"]`); if (good) good.classList.add('ok'); }
+      $('.r-fb').textContent = ok ? '✓ ¡Bien!' : `✗ ${q.fb || 'Era: ' + q.opts[q.a]}`; k++; if (k % order.length === 0) order = shuffle(pool.length); setTimeout(() => { if ($('#rq')) show(); }, ok ? 450 : 1300); };
+    const keys = (e) => { const n = +e.key; if (n >= 1 && n <= 4) { const b = $$('.r-opt')[n - 1]; if (b) b.click(); } };
+    const stop = () => { clearInterval(timer); document.removeEventListener('keydown', keys); };
+    const end = () => { stop(); const prev = store.rapid[mi]; const rec = prev == null || score > prev; store.rapid[mi] = Math.max(prev || 0, score); persist(); markDay();
+      main.innerHTML = `<article class="rapid" style="--hc:var(--${m.hilo})"><h2>⏱ ¡Tiempo!</h2><p class="r-final"><b>${score}</b> aciertos de ${tries} preguntas</p>${rec && score > 0 ? '<p>🎉 ¡Nuevo récord!</p>' : `<p>Tu récord: <b>${store.rapid[mi]}</b></p>`}<div class="row"><button type="button" class="btn primary" id="rgo">Jugar otra vez</button><a class="btn" href="#logros">Mis logros</a><a class="btn ghost" href="#">Mapa</a></div></article>`;
+      $('#rgo').addEventListener('click', start); if (rec && score > 0) confetti(); checkBadges(); };
+    intro();
+  }
   /* panel docente: reiniciar el simulador de un alumno con la contraseña guardada en la hoja de la maestra */
   function docPanel() {
     const pn = $('#docpanel'); if (!pn.hidden) { pn.hidden = true; pn.innerHTML = ''; return; }
-    const curX = byPid[curHash] || (byTid[curHash] && byTid[curHash].ex[0]);
-    const lab = curX ? `${LET[curX.tema.mi]}${curX.tema.ti + 1}.${curX.ei + 1}` : '';
     pn.hidden = false;
-    if (!REPORT_URL) { pn.innerHTML = '<p>El reinicio docente necesita la conexión con tu hoja de calificaciones.</p>'; return; }
-    if (!registered()) { pn.innerHTML = '<p>Primero el alumno debe escribir arriba su <b>nombre y apellidos</b> y su <b>grupo</b>. Después vuelve a abrir este panel.</p>'; return; }
-    pn.innerHTML = `<h3 class="sub">Reinicio docente</h3><p>Alumno: <b>${esc(store.name.trim())}</b> · Grupo <b>${esc(store.grupo)}</b> · ${esc(G.short)}</p>
-      <fieldset class="docopts"><legend>¿Qué quieres reiniciar?</legend>${lab ? `<label class="chk"><input type="radio" name="docej" value="${lab}" checked> Solo este ejercicio (${lab}): intentos, calificación y trabajo</label>` : ''}<label class="chk"><input type="radio" name="docej" value="*" ${lab ? '' : 'checked'}> Todo el simulador de este alumno</label></fieldset>
-      <label class="fld"><span>Contraseña docente</span><input type="password" id="docclave" autocomplete="off"></label>
-      <div class="row"><button type="button" class="btn primary" id="docgo">Reiniciar</button><button type="button" class="btn ghost" id="doccancel">Cancelar</button></div><p class="docmsg" aria-live="polite"></p>`;
-    $('#doccancel').addEventListener('click', () => { pn.hidden = true; pn.innerHTML = ''; });
-    $('#docgo').addEventListener('click', () => {
-      const clave = $('#docclave').value; const ej = (pn.querySelector('input[name="docej"]:checked') || {}).value || '*'; const msg = $('.docmsg');
-      if (!clave) { msg.textContent = 'Escribe la contraseña.'; return; }
-      $('#docgo').disabled = true; msg.textContent = 'Verificando…';
-      const q = `accion=reiniciar&clave=${encodeURIComponent(clave)}&alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}&ej=${encodeURIComponent(ej)}`;
-      fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => {
-        if (!d || !d.ok) { msg.textContent = (d && d.msg) || 'No se pudo reiniciar.'; $('#docgo').disabled = false; return; }
-        applyReset(d.id, d.ej); pn.hidden = true; pn.innerHTML = ''; route(curHash);
-        const t = document.createElement('p'); t.className = 'docok'; t.textContent = `✓ Reiniciado: ${ej === '*' ? 'todo el simulador' : 'el ejercicio ' + ej} de ${store.name.trim()}.`; $('.tfoot').prepend(t); setTimeout(() => t.remove(), 6000);
-      }).catch(() => { msg.textContent = 'Sin conexión con la hoja. Revisa el internet e intenta de nuevo.'; $('#docgo').disabled = false; });
-    });
-    $('#docclave').focus();
+    const online = () => !!REPORT_URL && !(typeof navigator !== 'undefined' && navigator.onLine === false);
+    const known = () => CLAVE_HASH || store.claveHash || '';
+    const huella = (c) => sha256('TechKids-Sec·' + c);
+    const close = () => { pn.hidden = true; pn.innerHTML = ''; };
+    /* 1. primera vez: crear la contraseña docente */
+    const crear = (nota) => {
+      pn.innerHTML = `<h3 class="sub">Crear contraseña docente</h3><p>${nota}</p>
+        <label class="fld"><span>Nueva contraseña (mínimo 6 caracteres)</span><input type="password" id="dc1" autocomplete="new-password"></label>
+        <label class="fld"><span>Repite la contraseña</span><input type="password" id="dc2" autocomplete="new-password"></label>
+        <div class="row"><button type="button" class="btn primary" id="dcgo">Guardar contraseña</button><button type="button" class="btn ghost" id="dccan">Cancelar</button></div><p class="docmsg" aria-live="polite"></p>`;
+      $('#dccan').addEventListener('click', close); $('#dc1').focus();
+      $('#dcgo').addEventListener('click', () => { const a = $('#dc1').value, b = $('#dc2').value, msg = $('.docmsg');
+        if (a.length < 6) { msg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+        if (a !== b) { msg.textContent = 'Las dos contraseñas no coinciden.'; return; }
+        $('#dcgo').disabled = true; msg.textContent = 'Guardando…';
+        const local = (txt) => huella(a).then((h) => { store.claveHash = h; persist(); msg.className = 'docmsg okm'; msg.textContent = txt; setTimeout(() => { close(); docPanel(); }, 1800); });
+        if (!online()) { local('✓ Contraseña guardada en esta computadora. Úsala para reiniciar aquí, aun sin internet.'); return; }
+        fetch(`${REPORT_URL}?accion=crearclave&clave=${encodeURIComponent(a)}`).then((r) => r.json()).then((d) => {
+          if (d && d.ok) { local('✓ Contraseña guardada. Sirve en todas las computadoras y también sin internet en esta.'); return; }
+          msg.textContent = (d && d.msg) || 'No se pudo guardar.'; $('#dcgo').disabled = false; if (d && d.existe) setTimeout(() => { close(); docPanel(); }, 2200);
+        }).catch(() => local('✓ Sin conexión con la hoja: la contraseña se guardó solo en esta computadora.'));
+      });
+    };
+    /* 2. reiniciar a un alumno */
+    const reiniciar = () => {
+      if (!registered()) { pn.innerHTML = '<p>Para reiniciar, primero el alumno debe escribir arriba su <b>nombre y apellidos</b> y su <b>grupo</b>. Después vuelve a abrir este panel.</p>'; return; }
+      const curX = byPid[curHash] || (byTid[curHash] && byTid[curHash].ex[0]);
+      const lab = curX ? `${LET[curX.tema.mi]}${curX.tema.ti + 1}.${curX.ei + 1}` : '';
+      pn.innerHTML = `<h3 class="sub">Reinicio docente</h3><p>Alumno: <b>${esc(store.name.trim())}</b> · Grupo <b>${esc(store.grupo)}</b> · ${esc(G.short)}</p>
+        <fieldset class="docopts"><legend>¿Qué quieres reiniciar?</legend>${lab ? `<label class="chk"><input type="radio" name="docej" value="${lab}" checked> Solo este ejercicio (${lab}): intentos, calificación y trabajo</label>` : ''}<label class="chk"><input type="radio" name="docej" value="*" ${lab ? '' : 'checked'}> Todo el simulador de este alumno</label></fieldset>
+        <label class="fld"><span>Contraseña docente</span><input type="password" id="docclave" autocomplete="off"></label>
+        <div class="row"><button type="button" class="btn primary" id="docgo">Reiniciar</button><button type="button" class="btn ghost" id="doccancel">Cancelar</button></div><p class="docmsg" aria-live="polite"></p>`;
+      $('#doccancel').addEventListener('click', close); $('#docclave').focus();
+      $('#docgo').addEventListener('click', () => {
+        const clave = $('#docclave').value; const ej = (pn.querySelector('input[name="docej"]:checked') || {}).value || '*'; const msg = $('.docmsg');
+        if (!clave) { msg.textContent = 'Escribe la contraseña.'; return; }
+        $('#docgo').disabled = true; msg.textContent = 'Verificando…';
+        const listo = (sin) => { close(); route(curHash); const t = document.createElement('p'); t.className = 'docok'; t.textContent = `✓ Reiniciado: ${ej === '*' ? 'todo el simulador' : 'el ejercicio ' + ej} de ${store.name.trim()}.${sin ? ' (Sin internet: tu hoja se actualizará cuando haya conexión.)' : ''}`; $('.tfoot').prepend(t); setTimeout(() => t.remove(), 8000); };
+        const offline = () => { if (!known()) { msg.textContent = 'Sin conexión y esta computadora aún no tiene la contraseña docente. Conéctate a internet una vez o crea la contraseña aquí.'; $('#docgo').disabled = false; return; }
+          huella(clave).then((h) => { if (h !== known()) { msg.textContent = 'Contraseña incorrecta.'; $('#docgo').disabled = false; return; } localReset(ej); listo(true); }); };
+        if (!online()) { offline(); return; }
+        const q = `accion=reiniciar&clave=${encodeURIComponent(clave)}&alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}&ej=${encodeURIComponent(ej)}`;
+        fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => {
+          if (!d || !d.ok) { if (d && /Aún no hay contraseña/.test(d.msg || '')) { crear('Todavía no hay una contraseña docente. Créala ahora:'); return; } msg.textContent = (d && d.msg) || 'No se pudo reiniciar.'; $('#docgo').disabled = false; return; }
+          huella(clave).then((h) => { store.claveHash = h; persist(); }); applyReset(d.id, d.ej); listo(false);
+        }).catch(offline);
+      });
+    };
+    if (!online()) { if (known()) reiniciar(); else crear('Esta computadora todavía no tiene contraseña docente. Créala aquí: solo tú la debes conocer. Como no hay internet, se guardará solo en esta computadora.'); return; }
+    pn.innerHTML = '<p class="muted">Revisando…</p>';
+    fetch(`${REPORT_URL}?accion=hayclave`).then((r) => r.json()).then((d) => { if (d && d.ok && !d.existe) crear('Es la primera vez: crea tu contraseña docente. Solo tú la debes conocer; servirá en todas las computadoras.'); else reiniciar(); })
+      .catch(() => { if (known()) reiniciar(); else crear('No hay conexión con tu hoja. Crea una contraseña para esta computadora:'); });
   }
   function practice(pid) {
     const x = byPid[pid]; if (!x) { home(); return; }
@@ -2542,9 +2756,27 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       if (u >= MAXT) { a.innerHTML = `<b>Intentos agotados.</b> Calificación: <b>${bestPct()}%</b>`; $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); showSol(); }
       else a.innerHTML = u ? `Te ${left === 1 ? 'queda' : 'quedan'} <b>${left}</b> de ${MAXT} intentos · Calificación más alta: <b>${bestPct()}%</b>` : `Tienes <b>${MAXT} intentos</b> para revisar este ejercicio`;
     };
-    const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist();
+    const record = (score) => { const pr = store.prog[pid] || { best: 0, tries: 0 }; pr.tries++; pr.att = (pr.att || 0) + 1; if (pr.first == null) pr.first = score; pr.best = Math.max(pr.best, score); store.prog[pid] = pr; persist();
       if (!REPORT_URL) return; syncAll(); const res = $('.result');
       report([rowFor(x, score, 'Revisión')]).then((ok) => { if (!document.body.contains(res) || !res.firstChild) return; const n = document.createElement('p'); n.className = 'sent muted small'; n.textContent = ok ? '✓ Tu calificación se envió a tu maestra o maestro.' : 'Sin conexión: tu calificación se enviará sola cuando vuelvas a tener internet.'; res.appendChild(n); }); };
+    /* lista de lo que el alumno debe corregir (a partir de lo marcado en rojo en el ejercicio) */
+    const failList = () => {
+      const eng0 = $('.engine'); if (!eng0) return '';
+      let els = $$('.bad', eng0).filter((el) => !el.matches('.ord-set') && !(el.parentElement && el.parentElement.closest('.bad:not(.ord-set)')));
+      els = els.concat($$('ul.rules li:not(.on), .ed-rules li:not(.on), .py-rules li:not(.on)', eng0), p.type === 'form' ? $$('.fld[data-i]:not(.ok)', eng0) : []);
+      if (!els.length) return '';
+      const txt = (el, sel) => { const x = sel ? el.querySelector(sel) : el; return x ? x.textContent.replace('⠿', '').replace(/\s+/g, ' ').trim() : ''; };
+      const items = els.slice(0, 10).map((el, i) => {
+        let lab = txt(el, '.cls-text') || txt(el, 'legend') || txt(el, '.tk-t') || txt(el, '.tr-q p') || txt(el, '.bin-q') || txt(el, '.ord-t') || txt(el, '.lv-goal') || txt(el, '.ord-prompt') || (el.matches('.fld') ? txt(el, 'span') : '') || txt(el);
+        if (el.matches('.spot')) lab = `Marcaste «${lab}», pero no es un error`;
+        if (el.matches('.ord li')) lab = `«${lab}» no está en su lugar`;
+        const fb = txt(el, '.cls-fb') || txt(el, '.q-fb') || txt(el, '.tk-h');
+        el.dataset.fail = i;
+        return `<li><button type="button" class="lnk" data-go="${i}">${esc(lab.slice(0, 140))}</button>${fb ? ` <span class="muted">— ${esc(fb.slice(0, 160))}</span>` : ''}</li>`;
+      });
+      return `<div class="fails"><p><b>❌ Lo que debes corregir${els.length > 1 ? ` (${els.length})` : ''}:</b> <span class="muted small">toca cada punto para ir a él.</span></p><ol>${items.join('')}</ol>${els.length > 10 ? `<p class="muted small">…y ${els.length - 10} más, marcados en rojo arriba.</p>` : ''}</div>`;
+    };
+    if (!window.__failNav) window.__failNav = $('#main').addEventListener('click', (e) => { const b = e.target.closest('.fails [data-go]'); if (!b) return; const el = $(`.engine [data-fail="${b.dataset.go}"]`); if (!el) return; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }) || true;
     let busy = false;
     async function doCheck() {
       if (!eng || busy || used() >= MAXT) return;
@@ -2558,13 +2790,18 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       record(r.score);
       const pct = Math.round(r.score * 100); const lvl = r.score >= 1 ? 'ok' : r.score >= 0.8 ? 'mid' : 'bad'; const left = MAXT - used();
       const extra = r.score >= 1 ? '' : left > 0 ? ` Corrige lo marcado en rojo y vuelve a revisar: te ${left === 1 ? 'queda 1 intento' : `quedan ${left} intentos`}.` : ' Ya usaste tus 3 intentos.';
-      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}${extra} Se guarda tu calificación más alta: <span style="font-weight:700">${bestPct()}%</span>.</span></div>${(bestPct() >= 80 || left <= 0) && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
+      $('.result').innerHTML = `<div class="res res-${lvl}"><b>${pct}%</b><span>${r.score >= 1 ? '¡Dominado! ' : r.score >= 0.8 ? 'Completado. ' : ''}${esc(r.msg)}${extra} Se guarda tu calificación más alta: <span style="font-weight:700">${bestPct()}%</span>.</span></div>${r.score < 1 ? failList() : ''}${(bestPct() >= 80 || left <= 0) && next ? `<a class="btn primary" href="#${next.pid}">${nextLabel}</a>` : ''}`;
+      markDay(); if (r.score >= 1) confetti(); checkBadges();
       showAtt();
       side(tm.tid); $$('.extab').forEach((el) => { const e = byPid[el.getAttribute('href').slice(1)]; el.className = 'extab st-' + status(e.pid); el.querySelector('.exl').textContent = e.label + (stIcon[status(e.pid)] ? ' ' + stIcon[status(e.pid)] : ''); });
     }
     $('#chk').addEventListener('click', () => doCheck());
     showAtt();
-    if (best && best.att) $('.result').innerHTML = `<span class="muted">Calificación más alta en este ejercicio: <b>${Math.round(best.best * 100)}%</b> (${best.att} de ${MAXT} intentos usados).</span>`;
+    if (best && best.att) {
+      let fl = '';
+      if (eng && p.type !== 'python' && best.best < 1) { try { const rr = eng.check(); if (rr && typeof rr.then !== 'function' && !rr.incomplete) fl = failList(); } catch (e) { /* */ } }
+      $('.result').innerHTML = `<span class="muted">Calificación más alta en este ejercicio: <b>${Math.round(best.best * 100)}%</b> (${best.att} de ${MAXT} intentos usados).${fl ? ' Así quedó tu última revisión:' : ''}</span>${fl}`;
+    }
     $('#rst').addEventListener('click', (e) => { const b = e.currentTarget; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '¿Seguro? Se borra tu trabajo, no tus intentos'; b.classList.add('warn'); clearTimeout(b._t); b._t = setTimeout(() => { delete b.dataset.sure; b.textContent = 'Empezar de nuevo'; b.classList.remove('warn'); }, 5000); return; } delete store.saves[pid]; persist(); practice(pid); });
     $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
   }
@@ -2573,12 +2810,13 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     let h = typeof force === 'string' ? force : location.hash.slice(1); curHash = h;
     if (byTid[h]) h = byTid[h].ex[0].pid;
     document.body.classList.toggle('in-prac', !!byPid[h]);
+    if (h === 'logros') { logros(); return; } const rmx = h.match(/^rapido-(\d+)$/); if (rmx) { rapid(+rmx[1] - 1); return; }
     if (byPid[h]) practice(h); else home();
   }
   /* navegación interna: funciona aunque la página esté incrustada en Google Sites con restricciones */
   function go(h) { try { if (location.hash.slice(1) !== h) history.pushState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) { /* sin historial: se navega igual */ } route(h); }
   document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#"]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return; e.preventDefault(); go(a.getAttribute('href').slice(1)); });
-  shell(); window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== curHash) route(); }); window.addEventListener('popstate', () => { if (location.hash.slice(1) !== curHash) route(); }); route();
+  shell(); markDay(); checkBadges(true); window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== curHash) route(); }); window.addEventListener('popstate', () => { if (location.hash.slice(1) !== curHash) route(); }); route();
 })();
 
 </script>
