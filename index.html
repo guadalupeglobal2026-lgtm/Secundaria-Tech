@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prácticas de Secundaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3fa;--card:#ffffff;--ink:#14213d;--muted:#5a6478;--g1:#0073C5;--g2:#2D8034;--g3:#6D2BB7;--ring:#14213d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#18223a;--ink:#eef2fb;--muted:#a9b3c9;--ring:#eef2fb}}
+:root[data-theme="dark"]{--bg:#0f1626;--card:#18223a;--ink:#eef2fb;--muted:#a9b3c9;--ring:#eef2fb}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:var(--bg);color:var(--ink);font-family:Montserrat,"Segoe UI",Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px 16px;
+  background-image:radial-gradient(circle at 1px 1px,rgba(120,140,180,.18) 1px,transparent 0);background-size:22px 22px}
+main{width:100%;max-width:880px;text-align:center}
+.tag{display:inline-block;font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1{font-weight:900;font-size:clamp(30px,6vw,54px);letter-spacing:.02em;margin:0 0 8px;line-height:1.1}
+.sub{font-weight:500;font-size:17px;color:var(--muted);margin:0 0 36px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+a.grado{--c:var(--g1);display:flex;flex-direction:column;align-items:center;gap:10px;padding:30px 16px 26px;border-radius:22px;
+  background:var(--card);color:var(--ink);text-decoration:none;border:3px solid var(--c);
+  box-shadow:0 6px 0 var(--c);transition:transform .15s,box-shadow .15s}
+a.grado:hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--c)}
+a.grado:active{transform:translateY(3px);box-shadow:0 2px 0 var(--c)}
+a.grado:focus-visible{outline:3px solid var(--ring);outline-offset:4px}
+a.g2{--c:var(--g2)} a.g3{--c:var(--g3)}
+.num{width:84px;height:84px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:900;font-size:40px}
+.nom{font-weight:900;font-size:26px;letter-spacing:.06em;color:var(--c)}
+.go{font-weight:600;font-size:15px;color:var(--muted)}
+footer{margin-top:34px;font-size:14px;color:var(--muted)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nom{filter:brightness(1.6)}}
+@media (max-width:640px){.grid{grid-template-columns:1fr}a.grado{flex-direction:row;justify-content:flex-start;padding:18px 20px;gap:18px}.num{width:60px;height:60px;font-size:28px}.nom{font-size:22px}.go{margin-left:auto}}
+</style>
+</head>
+<body>
+<main>
+  <p class="tag">Tech Kids · Tecnología</p>
+  <h1>PRÁCTICAS DE SECUNDARIA</h1>
+  <p class="sub">Elige tu grado para entrar a tus prácticas</p>
+  <div class="grid">
+    <a class="grado g1" href="1_Secundaria.html"><span class="num">1°</span><span class="nom">PRIMERO</span><span class="go">Entrar →</span></a>
+    <a class="grado g2" href="2_Secundaria.html"><span class="num">2°</span><span class="nom">SEGUNDO</span><span class="go">Entrar →</span></a>
+    <a class="grado g3" href="3_Secundaria.html"><span class="num">3°</span><span class="nom">TERCERO</span><span class="go">Entrar →</span></a>
+  </div>
+  <footer>Escribe tu nombre completo y tu grupo antes de revisar tus ejercicios.</footer>
+</main>
+</body>
+</html>
