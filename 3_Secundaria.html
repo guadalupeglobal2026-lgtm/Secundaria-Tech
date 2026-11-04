@@ -430,6 +430,11 @@ body.show-cert #print{display:block; position:fixed; inset:0; background:var(--b
 .att{font-size:.9rem; color:var(--muted); align-self:center}
 .att b{color:var(--ink)}
 .engine.locked{pointer-events:none; opacity:.75}
+#viewbar{position:sticky; top:0; z-index:50; display:flex; flex-wrap:wrap; gap:.6rem; justify-content:space-between; align-items:center; background:#14213d; color:#fff; padding:.6rem 1rem; font-size:1rem}
+#viewbar .btn{margin:.1rem 0; background:#fff; color:#14213d; border:1px solid #fff}
+#viewbar .btn.primary{background:#f2c94c; border-color:#f2c94c; color:#14213d}
+body.viewmode .engine.locked{opacity:1}
+.vtrow{margin:.4rem 0}
 .caso{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--hc,var(--ink)); border-radius:var(--r-sm); padding:.7rem 1rem; margin:.6rem 0 .8rem}
 .caso p{margin:.2rem 0} .caso-h{font-size:.95rem; color:var(--hc,var(--ink))} .caso-h b{color:var(--ink)}
 .caso.is-reto{background:var(--sunk)}
@@ -2622,7 +2627,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   if (!store || typeof store !== 'object') store = {};
   store.prog = store.prog || {}; store.saves = store.saves || {}; store.name = store.name || ''; store.grupo = store.grupo || ''; store.outbox = store.outbox || []; store.exp = store.exp || {}; store.resetsDone = store.resetsDone || []; store.lreset = store.lreset || {};
   if (!store.dev) store.dev = Math.random().toString(36).slice(2, 8).toUpperCase();
-  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
+  let VIEW = null; /* vista docente: trabajo de otro alumno, solo lectura */
+  const persist = () => { if (VIEW) return; try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* sin almacenamiento: se trabaja en memoria */ } };
 
   /* migración: avance guardado antes de que hubiera varios ejercicios por tema */
   for (const k of Object.keys(store.prog)) if (/^m\d+t\d+$/.test(k)) { if (!store.prog[k + 'e1']) store.prog[k + 'e1'] = store.prog[k]; delete store.prog[k]; }
@@ -2660,7 +2666,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   const rowFor = (x, calif, tipo) => { const tm = x.tema; const pr = store.prog[x.pid] || {}; const d = new Date(); const pad = (n) => String(n).padStart(2, '0');
     return { fecha: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`, grado: G.short, grupo: store.grupo, alumno: store.name.trim().replace(/\s+/g, ' '),
       tema: `${LET[tm.mi]}${tm.ti + 1}`, temaNombre: tm.t.t, ejercicio: `${LET[tm.mi]}${tm.ti + 1}.${x.ei + 1}`, titulo: x.p.title || x.label, calif: calif == null ? '' : Math.round(calif * 100), intento: pr.att || 0,
-      mejor: Math.round((pr.best || 0) * 100), promTema: temaAvg(tm), temasComp: doneCount(), totalTemas: temas.length, tipo, dev: store.dev, texto: textoFor(x).slice(0, 1500) }; };
+      mejor: Math.round((pr.best || 0) * 100), promTema: temaAvg(tm), temasComp: doneCount(), totalTemas: temas.length, tipo, dev: store.dev, texto: textoFor(x).slice(0, 1500), trabajo: trabajoDe(x.pid) }; };
+  const trabajoDe = (pid) => { const t = JSON.stringify({ s: store.saves[pid] === undefined ? null : store.saves[pid], x: store.exp[pid] || '' }); return t.length < 45000 ? t : ''; };
   let sending = false;
   const flush = () => new Promise((res) => {
     if (!REPORT_URL || sending || !store.outbox.length) { res(!store.outbox.length); return; }
@@ -2670,9 +2677,9 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       .then(() => { store.outbox = store.outbox.slice(batch.length); persist(); sending = false; if (store.outbox.length) flush().then(res); else res(true); })
       .catch(() => { sending = false; res(false); });
   });
-  const report = (rows) => { if (!REPORT_URL || !rows.length) return Promise.resolve(true); store.outbox.push(...rows); if (store.outbox.length > 2000) store.outbox = store.outbox.slice(-2000); persist(); return flush(); };
+  const report = (rows) => { if (VIEW || !REPORT_URL || !rows.length) return Promise.resolve(true); store.outbox.push(...rows); if (store.outbox.length > 2000) store.outbox = store.outbox.slice(-2000); persist(); return flush(); };
   /* al registrarse (o cambiar nombre o grupo) se envía el avance que ya había en este navegador */
-  const syncAll = () => { if (!REPORT_URL || !registered()) return; const who = store.name.trim() + '|' + store.grupo; if (store.synced === who) return;
+  const syncAll = () => { if (VIEW || !REPORT_URL || !registered()) return; const who = store.name.trim() + '|' + store.grupo; if (store.synced === who) return;
     store.synced = who; persist(); report(exs.filter((x) => store.prog[x.pid] && store.prog[x.pid].att).map((x) => rowFor(x, null, 'Avance guardado'))); };
   /* el avance guardado en la hoja de la maestra se combina con el de este navegador:
      así el alumno conserva su avance en otro dispositivo y borrar el navegador no devuelve intentos */
@@ -2702,7 +2709,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   const localReset = (ej) => { const t = nowStamp(); applyReset('L' + Date.now(), ej); store.lreset[ej] = t; persist();
     report([{ fecha: t, grado: G.short, grupo: store.grupo, alumno: store.name.trim().replace(/\s+/g, ' '), tema: ej === '*' ? '*' : ej.split('.')[0], temaNombre: '', ejercicio: ej, titulo: '', calif: '', intento: '', mejor: '', promTema: '', temasComp: '', totalTemas: temas.length, tipo: 'Reinicio docente (sin conexión)', dev: store.dev, texto: '' }]); };
   let pulling = false;
-  const pullProgress = () => { if (!REPORT_URL || !registered() || pulling) return Promise.resolve(false); pulling = true;
+  const pullProgress = () => { if (VIEW || !REPORT_URL || !registered() || pulling) return Promise.resolve(false); pulling = true;
     const q = `alumno=${encodeURIComponent(store.name.trim())}&grupo=${encodeURIComponent(store.grupo)}&grado=${encodeURIComponent(G.short)}`;
     return fetch(`${REPORT_URL}?${q}`).then((r) => r.json()).then((d) => { pulling = false; if (!d || !d.prog) return false; let ch = false;
       if (Array.isArray(d.resets)) d.resets.forEach((x) => { if (applyReset(x.id, x.ej)) ch = true; });
@@ -2713,7 +2720,10 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       const falta = exs.filter((x) => store.prog[x.pid] && store.prog[x.pid].att && !d.prog[`${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`] && !store.outbox.some((r) => r.ejercicio === `${LET[x.tema.mi]}${x.tema.ti + 1}.${x.ei + 1}`));
       if (falta.length) report(falta.map((x) => rowFor(x, null, 'Avance guardado')));
       if (ch && typeof route === 'function') route(curHash); return ch; }).catch(() => { pulling = false; return false; }); };
-  if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { pullProgress().then(() => { syncAll(); flush(); }); }, 1200); }
+  /* el trabajo de cada ejercicio (lo que el alumno contestó) se manda una vez a la hoja para que la docente lo vea desde su computadora */
+  const syncTrabajo = () => { if (VIEW || !REPORT_URL || !registered()) return; const who = store.name.trim() + '|' + store.grupo; if (store.trabSent === who) return; store.trabSent = who; persist();
+    report(exs.filter((x) => store.saves[x.pid] !== undefined || store.exp[x.pid]).map((x) => { const r = rowFor(x, null, 'Trabajo'); return r; }).filter((r) => r.trabajo)); };
+  if (REPORT_URL) { try { window.addEventListener('online', () => flush()); } catch (e) { /* */ } setTimeout(() => { pullProgress().then(() => { syncAll(); syncTrabajo(); flush(); }); }, 1200); }
 
   /* ---------- gráficas SVG compartidas ---------- */
   const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
@@ -3649,8 +3659,8 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     $('#docente').addEventListener('click', docPanel);
     $('#who').addEventListener('input', (e) => { store.name = e.target.value.slice(0, 60); persist(); });
     $('#grp').addEventListener('input', (e) => { store.grupo = normGrupo(e.target.value); persist(); });
-    $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; pullProgress().then(syncAll); });
-    $('#who').addEventListener('change', () => pullProgress().then(syncAll));
+    $('#grp').addEventListener('change', (e) => { e.target.value = store.grupo; pullProgress().then(() => { syncAll(); syncTrabajo(); }); });
+    $('#who').addEventListener('change', () => pullProgress().then(() => { syncAll(); syncTrabajo(); }));
   }
   const hiloName = { sistemas: 'Sistemas y redes', datos: 'Hojas de cálculo', codigo: 'Programación', ciudadania: 'Ciudadanía e IA', creacion: 'Creación', comunicacion: 'Comunicación', integra: 'Integrador' };
   const stIcon = { nuevo: '', intentado: '◐', hecho: '●', dominado: '★' };
@@ -3802,6 +3812,9 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
         }).catch(() => local('✓ Sin conexión con la hoja: la contraseña se guardó solo en esta computadora.'));
       });
     };
+    /* menú docente */
+    const menu = () => { pn.innerHTML = `<h3 class="sub">Panel docente</h3><div class="row"><button type="button" class="btn primary" id="dmver">📋 Ver el trabajo de un alumno</button><button type="button" class="btn ghost" id="dmrei">↺ Reiniciar a este alumno</button></div>`;
+      $('#dmver').addEventListener('click', () => verTrabajo(pn)); $('#dmrei').addEventListener('click', reiniciar); };
     /* 2. reiniciar a un alumno */
     const reiniciar = () => {
       if (!registered()) { pn.innerHTML = '<p>Para reiniciar, primero el alumno debe escribir arriba su <b>nombre y apellidos</b> y su <b>grupo</b>. Después vuelve a abrir este panel.</p>'; return; }
@@ -3829,8 +3842,63 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     };
     if (!online()) { if (known()) reiniciar(); else crear('Esta computadora todavía no tiene contraseña docente. Créala aquí: solo tú la debes conocer. Como no hay internet, se guardará solo en esta computadora.'); return; }
     pn.innerHTML = '<p class="muted">Revisando…</p>';
-    fetch(`${REPORT_URL}?accion=hayclave`).then((r) => r.json()).then((d) => { if (d && d.ok && !d.existe) crear('Es la primera vez: crea tu contraseña docente. Solo tú la debes conocer; servirá en todas las computadoras.'); else reiniciar(); })
+    fetch(`${REPORT_URL}?accion=hayclave`).then((r) => r.json()).then((d) => { if (d && d.ok && !d.existe) crear('Es la primera vez: crea tu contraseña docente. Solo tú la debes conocer; servirá en todas las computadoras.'); else menu(); })
       .catch(() => { if (known()) reiniciar(); else crear('No hay conexión con tu hoja. Crea una contraseña para esta computadora:'); });
+  }
+  /* ---------- vista docente: ver desde cualquier computadora lo que contestó un alumno ---------- */
+  function verTrabajo(pn, prev) {
+    const v = prev || {};
+    pn.innerHTML = `<h3 class="sub">Ver el trabajo de un alumno</h3><p>Busca por su nombre o por parte de él. Verás sus ejercicios tal como los dejó, con lo que tiene bien y mal (solo lectura).</p>
+      <label class="fld"><span>Nombre del alumno (o parte: «López», «Ana»)</span><input type="text" id="vtq" value="${esc(v.q || '')}"></label>
+      <label class="fld"><span>Grupo (opcional)</span><input type="text" id="vtg" maxlength="8" value="${esc(v.g || '')}"></label>
+      <label class="fld"><span>Contraseña docente</span><input type="password" id="vtc" autocomplete="off" value="${esc(VIEW_CLAVE)}"></label>
+      <div class="row"><button type="button" class="btn primary" id="vtgo">Buscar</button><button type="button" class="btn ghost" id="vtno">Cancelar</button></div><p class="docmsg" aria-live="polite"></p><div id="vtres"></div>`;
+    $('#vtno').addEventListener('click', () => { pn.hidden = true; pn.innerHTML = ''; });
+    const msg = () => $('.docmsg', pn);
+    const go = () => {
+      const q = $('#vtq').value.trim(); const g = normGrupo($('#vtg').value); const clave = $('#vtc').value;
+      if (norm(q).length < 2) { msg().textContent = 'Escribe al menos parte del nombre.'; return; }
+      if (!clave) { msg().textContent = 'Escribe la contraseña.'; return; }
+      if (!REPORT_URL || navigator.onLine === false) { msg().textContent = 'Se necesita internet para consultar la hoja.'; return; }
+      $('#vtgo').disabled = true; msg().className = 'docmsg'; msg().textContent = 'Buscando…';
+      fetch(`${REPORT_URL}?accion=alumnos&clave=${encodeURIComponent(clave)}&grado=${encodeURIComponent(G.short)}&q=${encodeURIComponent(q)}&grupo=${encodeURIComponent(g)}`).then((r) => r.json()).then((d) => {
+        $('#vtgo').disabled = false;
+        if (!d || !d.ok) { msg().textContent = (d && d.msg) || 'No se pudo consultar.'; return; }
+        VIEW_CLAVE = clave; const L = d.alumnos || [];
+        msg().className = 'docmsg okm'; msg().textContent = L.length ? `${L.length} alumno${L.length === 1 ? '' : 's'}:` : 'No se encontró ningún alumno con ese nombre en este grado.';
+        $('#vtres').innerHTML = L.map((a, i) => `<p class="vtrow"><button type="button" class="btn sm" data-a="${i}">Ver</button> <b>${esc(a.alumno)}</b> · ${esc(a.grupo)} <span class="muted small">· ${a.comp || 0} temas completados · última actividad ${esc(a.ultima || '')}</span></p>`).join('');
+        $$('#vtres [data-a]').forEach((b) => b.addEventListener('click', () => {
+          const a = L[+b.dataset.a]; b.disabled = true; b.textContent = 'Cargando…';
+          fetch(`${REPORT_URL}?accion=trabajo&clave=${encodeURIComponent(clave)}&grado=${encodeURIComponent(G.short)}&grupo=${encodeURIComponent(a.grupo)}&alumno=${encodeURIComponent(a.alumno)}`).then((r) => r.json()).then((t) => {
+            if (!t || !t.ok) { b.disabled = false; b.textContent = 'Ver'; msg().className = 'docmsg'; msg().textContent = (t && t.msg) || 'No se pudo cargar.'; return; }
+            pn.hidden = true; pn.innerHTML = ''; enterView(a, t, { q, g });
+          }).catch(() => { b.disabled = false; b.textContent = 'Ver'; msg().className = 'docmsg'; msg().textContent = 'Sin conexión con la hoja.'; });
+        }));
+      }).catch(() => { $('#vtgo').disabled = false; msg().textContent = 'Sin conexión con la hoja. Revisa el internet.'; });
+    };
+    $('#vtgo').addEventListener('click', go); $('#vtq').focus();
+    if (v.q && VIEW_CLAVE) go();
+  }
+  let VIEW_CLAVE = '';
+  function enterView(a, d, busq) {
+    if (VIEW) exitView(true);
+    const prog = {}; Object.entries(d.prog || {}).forEach(([lab, v]) => { const pid = byLabel[lab]; if (!pid) return; const att = Math.min(MAXT, +v.att || 0); prog[pid] = { best: (+v.best || 0) / 100, att, tries: att }; });
+    const saves = {}; const exp = {}; Object.entries(d.trabajo || {}).forEach(([lab, t]) => { const pid = byLabel[lab]; if (!pid) return; try { const o = JSON.parse(t); if (o.s !== null && o.s !== undefined) saves[pid] = o.s; if (o.x) exp[pid] = o.x; } catch (e) { /* */ } });
+    VIEW = { saved: store, busq };
+    store = Object.assign(JSON.parse(JSON.stringify(store)), { prog, saves, exp, name: a.alumno, grupo: a.grupo, outbox: [], badges: {} });
+    document.body.classList.add('viewmode');
+    const bar = document.createElement('div'); bar.id = 'viewbar'; bar.innerHTML = `<span>👁️ Vista docente: trabajo de <b>${esc(a.alumno)}</b> · ${esc(a.grupo)} <span class="small">(solo lectura${Object.keys(saves).length ? '' : ' · todavía no hay trabajo guardado en la hoja'})</span></span><span><button type="button" class="btn sm" id="vbback">← Buscar otro alumno</button> <button type="button" class="btn sm primary" id="vbexit">Salir de la vista docente</button></span>`;
+    document.body.prepend(bar);
+    $('#vbexit').addEventListener('click', () => exitView());
+    $('#vbback').addEventListener('click', () => { const b2 = VIEW.busq; exitView(); const pn = $('#docpanel'); pn.hidden = false; verTrabajo(pn, b2); pn.scrollIntoView({ block: 'center' }); });
+    ['#who', '#grp'].forEach((s2) => { const el = $(s2); if (el) { el.value = s2 === '#who' ? a.alumno : a.grupo; el.disabled = true; } });
+    location.hash = ''; route(''); window.scrollTo(0, 0);
+  }
+  function exitView(silent) {
+    if (!VIEW) return; store = VIEW.saved; VIEW = null;
+    document.body.classList.remove('viewmode'); const bar = $('#viewbar'); if (bar) bar.remove();
+    ['#who', '#grp'].forEach((s2) => { const el = $(s2); if (el) { el.value = s2 === '#who' ? store.name : store.grupo; el.disabled = false; } });
+    if (!silent) { route(curHash); window.scrollTo(0, 0); }
   }
   function practice(pid) {
     const x = byPid[pid]; if (!x) { home(); return; }
@@ -3887,7 +3955,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     if (!window.__failNav) window.__failNav = $('#main').addEventListener('click', (e) => { const b = e.target.closest('.fails [data-go]'); if (!b) return; const el = $(`.engine [data-fail="${b.dataset.go}"]`); if (!el) return; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }) || true;
     let busy = false;
     async function doCheck() {
-      if (!eng || busy || used() >= MAXT) return;
+      if (VIEW || !eng || busy || used() >= MAXT) return;
       if (REPORT_URL && !registered()) { $('.result').innerHTML = '<div class="res res-mid"><span>Antes de revisar, escribe arriba tu <b>nombre y apellidos</b> y tu <b>grupo</b> (por ejemplo 1A). Así tu calificación le llega a tu maestra o maestro. Este intento no se contó.</span></div>'; const f = !store.name.trim() || store.name.trim().length < 3 ? $('#who') : $('#grp'); if (f) { f.classList.add('need'); f.focus(); setTimeout(() => f.classList.remove('need'), 2500); } return; }
       if (tm.t.reto && (store.exp[pid] || '').trim().length < 60) { $('.result').innerHTML = '<div class="res res-mid"><span>Antes de revisar, escribe en el recuadro <b>✍️ cómo resolviste el reto</b> (mínimo 60 caracteres). Este intento no se contó.</span></div>'; const t = $('#exp'); if (t) { t.classList.add('need'); t.focus(); setTimeout(() => t.classList.remove('need'), 2500); } return; }
       let r = eng.check();
@@ -3910,6 +3978,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       if (eng && p.type !== 'python' && best.best < 1) { try { const rr = eng.check(); if (rr && typeof rr.then !== 'function' && !rr.incomplete) fl = failList(); } catch (e) { /* */ } }
       $('.result').innerHTML = `<span class="muted">Calificación más alta en este ejercicio: <b>${Math.round(best.best * 100)}%</b> (${best.att} de ${MAXT} intentos usados).${fl ? ' Así quedó tu última revisión:' : ''}</span>${fl}`;
     }
+    if (VIEW) { $('#chk').disabled = true; $('#rst').disabled = true; $('.engine').classList.add('locked'); const att0 = (store.prog[pid] && store.prog[pid].att) || 0; $('.att').innerHTML = att0 ? `Vista docente · ${att0} de ${MAXT} intentos · Calificación más alta: <b>${bestPct()}%</b>` : 'Vista docente · <b>el alumno no ha revisado este ejercicio</b>'; if (!store.saves[pid] && !att0) $('.result').innerHTML = '<span class="muted">No hay trabajo guardado de este ejercicio.</span>'; }
     $('#rst').addEventListener('click', (e) => { const b = e.currentTarget; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '¿Seguro? Se borra tu trabajo, no tus intentos'; b.classList.add('warn'); clearTimeout(b._t); b._t = setTimeout(() => { delete b.dataset.sure; b.textContent = 'Empezar de nuevo'; b.classList.remove('warn'); }, 5000); return; } delete store.saves[pid]; persist(); practice(pid); });
     $('#main').focus({ preventScroll: true }); window.scrollTo(0, 0);
   }

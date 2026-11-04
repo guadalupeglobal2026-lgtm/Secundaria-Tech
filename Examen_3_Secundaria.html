@@ -110,6 +110,15 @@ const flush = () => new Promise((res) => {
 });
 const report = (row) => { if (!REPORT_URL) return Promise.resolve(false); store.outbox.push(row); persist(); return flush(); };
 window.addEventListener('online', () => flush());
+/* exámenes presentados con la versión anterior: sus respuestas se quedaron en esta computadora; se envían a la hoja */
+const recuperar = () => { if (!REPORT_URL) return; let n = 0;
+  Object.values(store.done).forEach((r) => { if (r.rsent || !r.ans || !r.order) return; r.rsent = true; n++;
+    const byId = {}; QS.forEach((q) => { byId[q.id] = q; }); const porMod = {}; r.order.forEach((id) => { const m = byId[id].t[0]; const o = porMod[m] || (porMod[m] = [0, 0]); o[1]++; if (r.ans[id] === 0) o[0]++; });
+    const fallos = r.order.filter((id) => r.ans[id] !== 0).map((id) => byId[id].t).sort();
+    const texto = `Aciertos ${r.ok}/${r.tot} · Calificación ${(r.ok / r.tot * 10).toFixed(1)} · Por módulo: ${Object.keys(porMod).sort().map((m) => `${m} ${porMod[m][0]}/${porMod[m][1]}`).join(', ')}${fallos.length ? ` · Falló en los temas: ${fallos.join(', ')}` : ''}${r.blur ? ` · Salió de la página ${r.blur} ${r.blur === 1 ? 'vez' : 'veces'}` : ''} · Respuestas recuperadas de esta computadora · R:${QS.map((q) => (r.ans[q.id] === undefined ? 'x' : r.ans[q.id])).join('')}`;
+    store.outbox.push({ fecha: r.fecha, grado: G.short, grupo: r.grupo, alumno: r.name, tema: 'EX', temaNombre: 'Examen', ejercicio: 'EXAMEN', titulo: `Examen de ${G.short} (${r.tot} preguntas)`, calif: r.pct, intento: 1, mejor: r.pct, promTema: r.pct, temasComp: '', totalTemas: '', tipo: 'Examen', dev: store.dev, texto }); });
+  if (n) persist(); };
+recuperar();
 setTimeout(flush, 800);
 const pull = (name, grupo) => {
   if (!online()) return Promise.resolve(null);
@@ -203,27 +212,29 @@ function entregar() {
   const fecha = nowStamp();
   store.done[c.key] = { name: c.name, grupo: c.grupo, fecha, ok, tot, pct, order: c.order, perm: c.perm, ans: c.ans, blur: c.blur || 0 };
   delete store.prog[c.key]; cur = null; persist();
-  const texto = `Aciertos ${ok}/${tot} · Calificación ${(ok / tot * 10).toFixed(1)} · Por módulo: ${Object.keys(porMod).sort().map((m) => `${m} ${porMod[m][0]}/${porMod[m][1]}`).join(', ')}${fallos.length ? ` · Falló en los temas: ${fallos.join(', ')}` : ''}${c.blur ? ` · Salió de la página ${c.blur} ${c.blur === 1 ? 'vez' : 'veces'}` : ''} · Inició ${c.start}`;
+  const texto = `Aciertos ${ok}/${tot} · Calificación ${(ok / tot * 10).toFixed(1)} · Por módulo: ${Object.keys(porMod).sort().map((m) => `${m} ${porMod[m][0]}/${porMod[m][1]}`).join(', ')}${fallos.length ? ` · Falló en los temas: ${fallos.join(', ')}` : ''}${c.blur ? ` · Salió de la página ${c.blur} ${c.blur === 1 ? 'vez' : 'veces'}` : ''} · Inició ${c.start} · R:${QS.map((q) => c.ans[q.id]).join('')}`;
   const row = { fecha, grado: G.short, grupo: c.grupo, alumno: c.name, tema: 'EX', temaNombre: 'Examen', ejercicio: 'EXAMEN', titulo: `Examen de ${G.short} (${tot} preguntas)`, calif: pct, intento: 1, mejor: pct, promTema: pct, temasComp: '', totalTemas: '', tipo: 'Examen', dev: store.dev, texto };
-  store.done[c.key].sent = false; persist();
+  store.done[c.key].sent = false; store.done[c.key].rsent = true; persist();
   resultado(c.key, report(row));
 }
 
-function resultado(k, sendP) {
-  const r = store.done[k]; last = { name: r.name, grupo: r.grupo }; const byId = {}; QS.forEach((q) => { byId[q.id] = q; });
+function resultado(k, sendP, rr, docente) {
+  const r = rr || store.done[k]; if (!docente) last = { name: r.name, grupo: r.grupo };
+  const tu_ = docente ? 'Respuesta del alumno' : 'Tu respuesta'; const byId = {}; QS.forEach((q) => { byId[q.id] = q; });
   const cal = (r.ok / r.tot * 10);
   const porMod = {}; r.order.forEach((id) => { const m = byId[id].t[0]; const o = porMod[m] || (porMod[m] = [0, 0]); o[1]++; if (r.ans[id] === 0) o[0]++; });
   const mal = r.order.map((id, i) => [id, i + 1]).filter(([id]) => r.ans[id] !== 0);
   const msg = cal >= 9 ? '¡Excelente trabajo!' : cal >= 8 ? '¡Muy bien!' : cal >= 6 ? 'Aprobaste. Repasa los temas que fallaste.' : 'Repasa los temas que fallaste con tu simulador y tu cuaderno.';
   const card = (id, i, good) => { const q = byId[id]; const tu = r.ans[id]; return `<section class="card rev${good ? ' good' : ''}"><div class="num" style="font-weight:900;color:var(--acc);font-size:15px;text-transform:uppercase">Pregunta ${i} · Tema ${q.t} · ${esc(MODS[q.t[0]] || '')}</div><p style="font-weight:700;margin:6px 0 8px">${esc(q.q)}</p>${q.c ? `<pre class="code">${esc(q.c)}</pre>` : ''}
-    ${good ? `<div class="ans ok">✓ Tu respuesta: ${esc(q.o[0])}</div>` : `<div class="ans bad">✗ Tu respuesta: ${esc(q.o[tu])}</div><div class="ans ok">✓ Correcta: ${esc(q.o[0])}</div>`}
+    ${good ? `<div class="ans ok">✓ ${tu_}: ${esc(q.o[0])}</div>` : `<div class="ans bad">✗ ${tu_}: ${tu === undefined ? '(sin contestar)' : esc(q.o[tu])}</div><div class="ans ok">✓ Correcta: ${esc(q.o[0])}</div>`}
     <p class="exp">${esc(q.e)}${good ? '' : ` <span class="muted">Repasa el tema ${q.t} en tu simulador.</span>`}</p></section>`; };
-  app.innerHTML = `<div class="center">${head()}<span class="tag">Examen · ${G.short} de secundaria</span><h1>Resultado del examen</h1><p><b>${esc(r.name)}</b> · Grupo ${esc(r.grupo)} · ${esc(r.fecha)}</p></div>
+  app.innerHTML = `<div class="center">${head()}<span class="tag">Examen · ${G.short} de secundaria</span><h1>${docente ? 'Respuestas del alumno' : 'Resultado del examen'}</h1>${docente ? '<p class="muted">Vista docente</p>' : ''}<p><b>${esc(r.name)}</b> · Grupo ${esc(r.grupo)} · ${esc(r.fecha)}</p></div>
   <div class="card"><div class="score"><div><div class="big">${cal.toFixed(1)}</div><div class="muted">Calificación</div></div><div><div class="big" style="font-size:44px">${r.ok}/${r.tot}</div><div class="muted">Aciertos</div></div></div>
-  <p class="center" style="font-weight:700;margin-top:14px">${msg}</p><p class="center muted" id="st">${REPORT_URL ? 'Enviando tu calificación…' : ''}</p>
+  ${docente ? (r.extra ? `<p class="center muted">${esc(r.extra)}</p>` : '') : `<p class="center" style="font-weight:700;margin-top:14px">${msg}</p><p class="center muted" id="st">${REPORT_URL ? 'Enviando tu calificación…' : ''}</p>`}
   <h2 style="margin-top:18px">Aciertos por módulo</h2><div class="mods">${Object.keys(porMod).sort().map((m) => `<div class="mod"><b>${m}. ${esc(MODS[m] || '')}</b>${porMod[m][0]} de ${porMod[m][1]}</div>`).join('')}</div></div>
-  ${mal.length ? `<h2>Lo que fallaste (${mal.length})</h2>${mal.map(([id, i]) => card(id, i, false)).join('')}` : '<div class="card center"><b>¡No fallaste ninguna pregunta!</b></div>'}
-  <div class="row noprint" style="justify-content:center;margin-top:16px"><button type="button" class="btn ghost" id="all">Ver todas mis respuestas</button><button type="button" class="btn" id="next">Terminar</button></div><div id="todas"></div>${foot()}`;
+  ${docente ? `<div class="row noprint" style="justify-content:center"><button type="button" class="btn ghost" id="back">← Volver a la búsqueda</button><button type="button" class="btn ghost" id="prn">🖨️ Imprimir</button></div><h2 style="margin-top:20px">Todas sus respuestas (${mal.length} incorrectas)</h2>${r.order.map((id, i) => card(id, i + 1, r.ans[id] === 0)).join('')}<div class="row noprint" style="justify-content:center;margin-top:16px"><button type="button" class="btn" id="fin2">Cerrar vista docente</button></div>` : `${mal.length ? `<h2>Lo que fallaste (${mal.length})</h2>${mal.map(([id, i]) => card(id, i, false)).join('')}` : '<div class="card center"><b>¡No fallaste ninguna pregunta!</b></div>'}
+  <div class="row noprint" style="justify-content:center;margin-top:16px"><button type="button" class="btn ghost" id="all">Ver todas mis respuestas</button><button type="button" class="btn" id="next">Terminar</button></div><div id="todas"></div>${foot()}`}`;
+  if (docente) { $('#back').addEventListener('click', () => docente()); $('#prn').addEventListener('click', () => window.print()); $('#fin2').addEventListener('click', () => inicio()); window.scrollTo(0, 0); return; }
   bindDoc();
   $('#all').addEventListener('click', (e) => { e.currentTarget.remove(); $('#todas').innerHTML = `<h2 style="margin-top:20px">Todas tus respuestas</h2>${r.order.map((id, i) => card(id, i + 1, r.ans[id] === 0)).join('')}`; });
   $('#next').addEventListener('click', () => inicio());
@@ -235,15 +246,65 @@ function resultado(k, sendP) {
 /* ---------- panel docente: permitir que un alumno vuelva a presentar ---------- */
 const sha256 = (txt) => crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt)).then((h) => [...new Uint8Array(h)].map((x) => x.toString(16).padStart(2, '0')).join(''));
 const knownHash = () => { if (CLAVE_HASH) return CLAVE_HASH; if (store.claveHash) return store.claveHash; try { const s = JSON.parse(localStorage.getItem('techkids-sim-sec' + G.n) || '{}'); return (s && s.claveHash) || ''; } catch (e) { return ''; } };
+let docClave = '';
 function docPanel() {
   const pn = $('#doc'); if (!pn.hidden) { pn.hidden = true; pn.innerHTML = ''; return; }
-  pn.hidden = false; const c = cur || {};
+  pn.hidden = false;
+  pn.innerHTML = `<div class="card"><h2>Panel docente</h2><div class="row"><button type="button" class="btn" id="dver">📋 Ver respuestas de un alumno</button><button type="button" class="btn ghost" id="drei">↺ Reiniciar examen</button></div></div>`;
+  $('#dver').addEventListener('click', () => verRespuestas());
+  $('#drei').addEventListener('click', () => reiniciarPanel(pn));
+}
+/* ---------- vista docente: buscar a un alumno por su nombre y ver lo que contestó ---------- */
+const parseR = (texto) => { const m = /R:([0-3x]+)/.exec(String(texto || '')); if (!m || m[1].length !== QS.length) return null; const ans = {}; QS.forEach((q, i) => { const v = m[1][i]; if (v !== 'x' && v !== 'u') ans[q.id] = +v; }); return ans; };
+const matchName = (name, q) => { const w = norm(q).split(' ').filter(Boolean); const nn = norm(name); return w.every((x) => nn.includes(x)); };
+function verRespuestas(prev) {
+  const v = prev || {};
+  app.innerHTML = `<div class="center">${head()}<span class="tag">Vista docente · ${G.short}</span><h1>Respuestas del examen</h1><p class="muted">Busca a un alumno por su nombre o por parte de él.</p></div>
+  <div class="card"><label class="fld"><span>Nombre del alumno (o parte: por ejemplo «López» o «Ana»)</span><input type="text" id="bq" value="${esc(v.q || '')}"></label>
+  <label class="fld"><span>Grupo (opcional)</span><input type="text" id="bg" maxlength="4" value="${esc(v.g || '')}"></label>
+  <label class="fld"><span>Contraseña docente</span><input type="password" id="bc" autocomplete="off" value="${esc(docClave)}"></label>
+  <div class="row"><button type="button" class="btn" id="bgo">Buscar</button><button type="button" class="btn ghost" id="bno">Salir</button></div><p class="msg" id="bm"></p></div><div id="bres"></div>`;
+  $('#bno').addEventListener('click', () => { docClave = ''; inicio(); });
+  $('#bg').addEventListener('input', (e) => { e.target.value = normGrupo(e.target.value); });
+  const go = async () => {
+    const q = $('#bq').value.trim(); const g = normGrupo($('#bg').value); const clave = $('#bc').value; const m = $('#bm');
+    if (norm(q).length < 2) { m.className = 'msg'; m.textContent = 'Escribe al menos parte del nombre.'; return; }
+    if (!clave) { m.className = 'msg'; m.textContent = 'Escribe la contraseña.'; return; }
+    $('#bgo').disabled = true; m.className = 'msg ok'; m.textContent = 'Buscando…';
+    const items = []; let srvOk = false;
+    if (online()) {
+      try {
+        const d = await Promise.race([fetch(`${REPORT_URL}?accion=respuestas&clave=${encodeURIComponent(clave)}&grado=${encodeURIComponent(G.short)}&q=${encodeURIComponent(q)}&grupo=${encodeURIComponent(g)}`).then((r) => r.json()), new Promise((r) => setTimeout(() => r(null), 15000))]);
+        if (d && d.ok === false) { m.className = 'msg'; m.textContent = d.msg || 'No se pudo consultar.'; $('#bgo').disabled = false; return; }
+        if (d && d.ok) { srvOk = true; (d.items || []).forEach((x) => items.push({ name: x.alumno, grupo: x.grupo, fecha: x.fecha, pct: +x.calif || 0, texto: x.texto, ans: parseR(x.texto), src: 'Hoja' })); }
+      } catch (e) { /* sin conexión: se busca en esta computadora */ }
+    }
+    if (!srvOk) { const h = knownHash(); if (!h || await sha256('TechKids-Sec·' + clave) !== h) { m.className = 'msg'; m.textContent = h ? 'Contraseña incorrecta.' : 'Sin conexión con la hoja y esta computadora no tiene guardada la contraseña docente.'; $('#bgo').disabled = false; return; } }
+    docClave = clave;
+    Object.values(store.done).forEach((r) => { if (!matchName(r.name, q) || (g && normGrupo(r.grupo) !== g)) return; if (items.some((x) => keyOf(x.name, x.grupo) === keyOf(r.name, r.grupo) && x.ans)) return; items.push({ name: r.name, grupo: r.grupo, fecha: r.fecha, pct: r.pct, ans: Object.assign({}, r.ans), local: r, src: 'Esta computadora' }); });
+    $('#bgo').disabled = false;
+    m.className = 'msg ok'; m.textContent = items.length ? `${items.length} resultado${items.length === 1 ? '' : 's'}${srvOk ? '' : ' (solo de esta computadora: no hay conexión con la hoja)'}.` : 'No se encontró ningún examen con ese nombre.';
+    if (!items.length) { m.className = 'msg'; $('#bres').innerHTML = ''; return; }
+    items.sort((a, b) => String(a.grupo).localeCompare(String(b.grupo)) || String(a.name).localeCompare(String(b.name)) || String(b.fecha).localeCompare(String(a.fecha)));
+    $('#bres').innerHTML = items.map((x, i) => `<div class="card"><div class="row" style="justify-content:space-between"><div><b>${esc(x.name)}</b> · Grupo ${esc(x.grupo)}<br><span class="muted">${esc(x.fecha)} · Calificación <b>${(Math.round(x.pct) / 10).toFixed(1)}</b> · ${esc(x.src)}</span></div>${x.ans ? `<button type="button" class="btn small" data-v="${i}">Ver respuestas</button>` : '<span class="muted">Presentado con la versión anterior del examen: solo hay resumen.</span>'}</div>${x.ans ? '' : `<p class="muted" style="margin:8px 0 0">${esc(String(x.texto || '').replace(/ · R:.*/, ''))}</p>`}</div>`).join('');
+    $('#bres').querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => {
+      const x = items[+b.dataset.v]; const order = QS.map((q2) => q2.id); const okN = order.filter((id) => x.ans[id] === 0).length;
+      const extra = x.texto ? String(x.texto).split(' · ').filter((t) => /^Salió|^Inició/.test(t)).join(' · ') : (x.local && x.local.blur ? `Salió de la página ${x.local.blur} veces` : '');
+      resultado(null, null, { name: x.name, grupo: x.grupo, fecha: x.fecha, ok: okN, tot: order.length, pct: x.pct, order, ans: x.ans, extra }, () => verRespuestas({ q: $('#bq') ? $('#bq').value : q, g }));
+    }));
+  };
+  $('#bgo').addEventListener('click', go);
+  if (v.q && docClave) go(); else $('#bq').focus();
+}
+function reiniciarPanel(pn) {
+  const c = cur || {};
   pn.innerHTML = `<div class="card"><h2>Reiniciar el examen de un alumno</h2><p class="muted">Úsalo solo si el alumno debe volver a presentarlo. Se usa la misma contraseña docente del simulador.</p>
   <label class="fld"><span>Nombre y apellidos del alumno</span><input type="text" id="dn" value="${esc(c.name || ($('#nom') && $('#nom').value) || last.name)}"></label>
   <label class="fld"><span>Grupo</span><input type="text" id="dg" maxlength="4" value="${esc(c.grupo || ($('#grp') && $('#grp').value) || last.grupo)}"></label>
   <label class="fld"><span>Contraseña docente</span><input type="password" id="dc" autocomplete="off"></label>
   <div class="row"><button type="button" class="btn" id="dgo">Reiniciar examen</button><button type="button" class="btn ghost" id="dno">Cancelar</button></div><p class="msg" id="dm"></p></div>`;
   $('#dno').addEventListener('click', () => { pn.hidden = true; pn.innerHTML = ''; });
+  $('#dn').focus();
   $('#dgo').addEventListener('click', async () => {
     const name = $('#dn').value.trim().replace(/\s+/g, ' '); const grupo = normGrupo($('#dg').value); const clave = $('#dc').value; const m = $('#dm');
     if (name.length < 5 || !grupo) { m.textContent = 'Escribe el nombre completo y el grupo del alumno, como los escribió él.'; return; }
