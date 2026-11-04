@@ -2756,7 +2756,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   function verTrabajo(pn, prev) {
     const v = prev || {};
     pn.innerHTML = `<h3 class="sub">Ver el trabajo de un alumno</h3><p>Busca por su nombre o por parte de él. Verás sus ejercicios tal como los dejó, con lo que tiene bien y mal (solo lectura).</p>
-      <label class="fld"><span>Nombre del alumno (o parte: «López», «Ana»)</span><input type="text" id="vtq" value="${esc(v.q || '')}"></label>
+      <label class="fld"><span>Nombre del alumno (o parte: «López», «Ana»). Déjalo vacío para ver a todos</span><input type="text" id="vtq" value="${esc(v.q || '')}"></label>
       <label class="fld"><span>Grupo (opcional)</span><input type="text" id="vtg" maxlength="8" value="${esc(v.g || '')}"></label>
       <label class="fld"><span>Contraseña docente</span><input type="password" id="vtc" autocomplete="off" value="${esc(VIEW_CLAVE)}"></label>
       <div class="row"><button type="button" class="btn primary" id="vtgo">Buscar</button><button type="button" class="btn ghost" id="vtno">Cancelar</button></div><p class="docmsg" aria-live="polite"></p><div id="vtres"></div>`;
@@ -2764,7 +2764,6 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
     const msg = () => $('.docmsg', pn);
     const go = () => {
       const q = $('#vtq').value.trim(); const g = normGrupo($('#vtg').value); const clave = $('#vtc').value;
-      if (norm(q).length < 2) { msg().textContent = 'Escribe al menos parte del nombre.'; return; }
       if (!clave) { msg().textContent = 'Escribe la contraseña.'; return; }
       if (!REPORT_URL || navigator.onLine === false) { msg().textContent = 'Se necesita internet para consultar la hoja.'; return; }
       $('#vtgo').disabled = true; msg().className = 'docmsg'; msg().textContent = 'Buscando…';
@@ -2773,7 +2772,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
         if (!d || !d.ok) { msg().textContent = (d && d.msg) || 'No se pudo consultar.'; return; }
         VIEW_CLAVE = clave; const L = d.alumnos || [];
         msg().className = 'docmsg okm'; msg().textContent = L.length ? `${L.length} alumno${L.length === 1 ? '' : 's'}:` : 'No se encontró ningún alumno con ese nombre en este grado.';
-        $('#vtres').innerHTML = L.map((a, i) => `<p class="vtrow"><button type="button" class="btn sm" data-a="${i}">Ver</button> <b>${esc(a.alumno)}</b> · ${esc(a.grupo)} <span class="muted small">· ${a.comp || 0} temas completados · última actividad ${esc(a.ultima || '')}</span></p>`).join('');
+        $('#vtres').innerHTML = L.sort((x, y) => String(x.grupo).localeCompare(String(y.grupo)) || String(x.alumno).localeCompare(String(y.alumno), 'es')).map((a, i) => `<p class="vtrow"><button type="button" class="btn sm" data-a="${i}">Ver</button> <b>${esc(a.alumno)}</b> · ${esc(a.grupo)} <span class="muted small">· ${a.comp || 0} temas completados · última actividad ${esc(a.ultima || '')}</span></p>`).join('');
         $$('#vtres [data-a]').forEach((b) => b.addEventListener('click', () => {
           const a = L[+b.dataset.a]; b.disabled = true; b.textContent = 'Cargando…';
           fetch(`${REPORT_URL}?accion=trabajo&clave=${encodeURIComponent(clave)}&grado=${encodeURIComponent(G.short)}&grupo=${encodeURIComponent(a.grupo)}&alumno=${encodeURIComponent(a.alumno)}`).then((r) => r.json()).then((t) => {
@@ -2784,7 +2783,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
       }).catch(() => { $('#vtgo').disabled = false; msg().textContent = 'Sin conexión con la hoja. Revisa el internet.'; });
     };
     $('#vtgo').addEventListener('click', go); $('#vtq').focus();
-    if (v.q && VIEW_CLAVE) go();
+    if (v.q !== undefined && VIEW_CLAVE) go();
   }
   let VIEW_CLAVE = '';
   function enterView(a, d, busq) {

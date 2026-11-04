@@ -259,8 +259,8 @@ const parseR = (texto) => { const m = /R:([0-3x]+)/.exec(String(texto || '')); i
 const matchName = (name, q) => { const w = norm(q).split(' ').filter(Boolean); const nn = norm(name); return w.every((x) => nn.includes(x)); };
 function verRespuestas(prev) {
   const v = prev || {};
-  app.innerHTML = `<div class="center">${head()}<span class="tag">Vista docente · ${G.short}</span><h1>Respuestas del examen</h1><p class="muted">Busca a un alumno por su nombre o por parte de él.</p></div>
-  <div class="card"><label class="fld"><span>Nombre del alumno (o parte: por ejemplo «López» o «Ana»)</span><input type="text" id="bq" value="${esc(v.q || '')}"></label>
+  app.innerHTML = `<div class="center">${head()}<span class="tag">Vista docente · ${G.short}</span><h1>Respuestas del examen</h1><p class="muted">Busca a un alumno por su nombre o por parte de él, o deja el nombre vacío para ver la lista completa.</p></div>
+  <div class="card"><label class="fld"><span>Nombre del alumno (o parte: «López», «Ana»). Déjalo vacío para ver a todos</span><input type="text" id="bq" value="${esc(v.q || '')}"></label>
   <label class="fld"><span>Grupo (opcional)</span><input type="text" id="bg" maxlength="4" value="${esc(v.g || '')}"></label>
   <label class="fld"><span>Contraseña docente</span><input type="password" id="bc" autocomplete="off" value="${esc(docClave)}"></label>
   <div class="row"><button type="button" class="btn" id="bgo">Buscar</button><button type="button" class="btn ghost" id="bno">Salir</button></div><p class="msg" id="bm"></p></div><div id="bres"></div>`;
@@ -268,7 +268,6 @@ function verRespuestas(prev) {
   $('#bg').addEventListener('input', (e) => { e.target.value = normGrupo(e.target.value); });
   const go = async () => {
     const q = $('#bq').value.trim(); const g = normGrupo($('#bg').value); const clave = $('#bc').value; const m = $('#bm');
-    if (norm(q).length < 2) { m.className = 'msg'; m.textContent = 'Escribe al menos parte del nombre.'; return; }
     if (!clave) { m.className = 'msg'; m.textContent = 'Escribe la contraseña.'; return; }
     $('#bgo').disabled = true; m.className = 'msg ok'; m.textContent = 'Buscando…';
     const items = []; let srvOk = false;
@@ -294,7 +293,7 @@ function verRespuestas(prev) {
     }));
   };
   $('#bgo').addEventListener('click', go);
-  if (v.q && docClave) go(); else $('#bq').focus();
+  if (v.q !== undefined && docClave) go(); else $('#bq').focus();
 }
 function reiniciarPanel(pn) {
   const c = cur || {};
