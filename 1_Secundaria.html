@@ -1550,7 +1550,7 @@ M.forEach((m, mi) => m.temas.forEach((t, ti) => t.ps.forEach((p, ei) => { const 
   const doneCount = () => temas.filter((tm) => ['hecho', 'dominado'].includes(temaStatus(tm))).length;
 
   /* ---------- envío de calificaciones a la hoja de la maestra (Google Apps Script) ---------- */
-  const REPORT_URL = 'https://script.google.com/macros/s/AKfycbyKT03IQL3BMPzIwkXtFPYXTPbhbJvrXe0FAujnKgnklZHdki1ScIQf2bEVEigREqlW/exec'.indexOf('http') === 0 ? 'https://script.google.com/macros/s/AKfycbyKT03IQL3BMPzIwkXtFPYXTPbhbJvrXe0FAujnKgnklZHdki1ScIQf2bEVEigREqlW/exec' : '';
+  const REPORT_URL = 'https://script.google.com/macros/s/AKfycbyYAhgO8DKGqTLV_hfJCxZ8RiDGI7hCpT76UwNyEWGqazAU1h3OnFWqB9jKf55i_9Bg/exec'.indexOf('http') === 0 ? 'https://script.google.com/macros/s/AKfycbyYAhgO8DKGqTLV_hfJCxZ8RiDGI7hCpT76UwNyEWGqazAU1h3OnFWqB9jKf55i_9Bg/exec' : '';
   const normGrupo = (v) => String(v || '').toUpperCase().replace(/\s+/g, '').slice(0, 8);
   const registered = () => store.name.trim().length >= 3 && store.grupo.length >= 1;
   const temaAvg = (tm) => { const v = tm.ex.map((x) => (store.prog[x.pid] ? store.prog[x.pid].best : 0)); return Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100); };
